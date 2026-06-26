@@ -344,9 +344,15 @@ export default function MarketsPage() {
 
   if (loading || !user || loadingPage) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
-      </div>
+      <DashboardLayout>
+        <PageBackground variant="trend" />
+        <div className="relative z-10 flex min-h-[60vh] items-center justify-center rounded-3xl border border-slate-800/70 bg-slate-950/60 p-8 backdrop-blur-xl">
+          <div className="flex flex-col items-center gap-4">
+            <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-primary-600"></div>
+            <p className="text-sm text-slate-400">Loading market insights…</p>
+          </div>
+        </div>
+      </DashboardLayout>
     )
   }
 
