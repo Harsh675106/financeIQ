@@ -135,7 +135,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         {renderUserSection()}
       </aside>
 
-      <div className="lg:pl-64">
+      <div className="min-w-0 lg:pl-64">
         <header className="sticky top-0 z-50 border-b border-slate-800/80 bg-slate-950/70 backdrop-blur-2xl lg:static lg:z-auto">
           <div className="container-app flex h-16 items-center justify-between gap-3 px-4 sm:px-6 lg:px-0">
             <div className="flex items-center gap-3">
