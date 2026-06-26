@@ -1,6 +1,6 @@
 'use client'
 
-import { ReactNode, useState } from 'react'
+import { ReactNode, useEffect, useState } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useAuth } from '@/hooks/useAuth'
@@ -28,6 +28,18 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const router = useRouter()
   const pathname = usePathname()
   const [sidebarOpen, setSidebarOpen] = useState(false)
+
+  useEffect(() => {
+    if (sidebarOpen) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = ''
+    }
+
+    return () => {
+      document.body.style.overflow = ''
+    }
+  }, [sidebarOpen])
 
   const handleLogout = () => {
     logout()
@@ -95,7 +107,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   )
 
   return (
-    <div className="min-h-screen bg-transparent text-slate-100 lg:flex lg:h-screen lg:overflow-hidden">
+    <div className="relative min-h-screen bg-transparent text-slate-100 lg:flex lg:h-screen lg:overflow-hidden">
       {sidebarOpen && (
         <>
           <div
@@ -136,7 +148,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       </aside>
 
       <div className="flex-1 min-w-0 overflow-x-hidden lg:overflow-y-auto">
-        <header className="sticky top-0 z-50 border-b border-slate-800/80 bg-slate-950/70 backdrop-blur-2xl lg:static lg:z-auto">
+        <header className="fixed inset-x-0 top-0 z-50 border-b border-slate-800/80 bg-slate-950/70 backdrop-blur-2xl lg:sticky lg:top-0 lg:z-auto">
           <div className="container-app flex h-16 items-center justify-between gap-3 px-4 sm:px-6 lg:px-0">
             <div className="flex items-center gap-3">
               <button
@@ -157,7 +169,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           </div>
         </header>
 
-        <main className="pb-8 pt-4 sm:pt-6 lg:pt-8">
+        <main className="pb-8 pt-16 sm:pt-16 lg:pt-8">
           <div className="container-app">
             {children}
           </div>
