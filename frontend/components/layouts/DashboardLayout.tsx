@@ -117,10 +117,10 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       {sidebarOpen && (
         <>
           <div
-            className="fixed inset-0 z-[60] h-screen w-screen bg-slate-900/45 backdrop-blur-sm lg:hidden"
+            className="fixed inset-0 z-[100] h-screen w-screen bg-slate-900/45 backdrop-blur-sm lg:hidden"
             onClick={() => setSidebarOpen(false)}
           />
-          <aside className="sidebar-ambient fixed inset-y-0 left-0 z-[70] flex h-screen w-64 max-w-[85vw] flex-col border-r border-slate-800/80 bg-slate-950/92 shadow-xl backdrop-blur-2xl lg:hidden">
+          <aside className="sidebar-ambient fixed inset-y-0 left-0 z-[110] flex h-screen w-64 max-w-[85vw] flex-col border-r border-slate-800/80 bg-slate-950/92 shadow-xl backdrop-blur-2xl lg:hidden">
             <div className="flex items-center justify-between border-b border-slate-800/70 px-4 py-4">
               <div className="flex items-center gap-2">
                 <TrendingUp className="h-6 w-6 text-primary-400" />
