@@ -60,7 +60,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
             key={item.href}
             href={item.href}
             onClick={closeOnClick ? () => setSidebarOpen(false) : undefined}
-            className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors ${
+            className={`sidebar-nav-link flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors ${
               isActive
                 ? 'bg-primary-500/15 text-primary-200 ring-1 ring-primary-500/30'
                 : 'text-slate-300 hover:bg-slate-800/60 hover:text-slate-50'
@@ -102,7 +102,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
             className="fixed inset-0 z-30 bg-slate-900/40 backdrop-blur-sm lg:hidden"
             onClick={() => setSidebarOpen(false)}
           />
-          <aside className="fixed inset-y-0 left-0 z-40 flex w-64 flex-col border-r border-slate-800/80 bg-slate-950/92 shadow-xl backdrop-blur-2xl lg:hidden">
+          <aside className="sidebar-ambient fixed inset-y-0 left-0 z-40 flex w-64 flex-col border-r border-slate-800/80 bg-slate-950/92 shadow-xl backdrop-blur-2xl lg:hidden">
             <div className="flex items-center justify-between border-b border-slate-800/70 px-4 py-4">
               <div className="flex items-center gap-2">
                 <TrendingUp className="h-6 w-6 text-primary-400" />
@@ -124,7 +124,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         </>
       )}
 
-      <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 flex-col border-r border-slate-800/80 bg-slate-950/88 shadow-sm backdrop-blur-2xl lg:flex">
+      <aside className="sidebar-ambient fixed inset-y-0 left-0 z-30 hidden w-64 flex-col border-r border-slate-800/80 bg-slate-950/88 shadow-sm backdrop-blur-2xl lg:flex">
         <div className="flex items-center gap-2 border-b border-slate-800/70 px-5 py-5">
           <TrendingUp className="h-7 w-7 text-primary-400" />
           <span className="text-xl font-bold tracking-tight text-slate-50">
