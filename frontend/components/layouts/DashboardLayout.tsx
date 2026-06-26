@@ -154,7 +154,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       </aside>
 
       <div className="relative z-0 flex-1 min-w-0 overflow-x-hidden lg:overflow-y-auto">
-        <header className="fixed inset-x-0 top-0 z-50 border-b border-slate-800/80 bg-slate-950/70 backdrop-blur-2xl lg:sticky lg:top-0 lg:z-auto">
+        <header className="sticky top-0 z-50 border-b border-slate-800/80 bg-slate-950/70 backdrop-blur-2xl lg:sticky lg:top-0 lg:z-auto">
           <div className="container-app flex h-16 items-center justify-between gap-3 px-4 sm:px-6 lg:px-0">
             <div className="flex items-center gap-3">
               <button
@@ -175,7 +175,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           </div>
         </header>
 
-        <main className="pb-8 pt-16 sm:pt-16 lg:pt-8">
+        <main className="pb-8 pt-4 sm:pt-6 lg:pt-8">
           <div className="container-app">
             {children}
           </div>
