@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { api } from '@/lib/api'
-import { DollarSign, TrendingUp, TrendingDown, AlertTriangle } from 'lucide-react'
+import { TrendingUp, TrendingDown, AlertTriangle } from 'lucide-react'
 
 interface FinancialData {
   hasData: boolean
@@ -75,7 +75,7 @@ export default function FinancialOverview() {
     return (
       <div className="space-y-6">
         <div className="card card-pad text-center py-12">
-          <DollarSign className="h-12 w-12 text-slate-600 mx-auto mb-4" />
+          <TrendingUp className="h-12 w-12 text-slate-600 mx-auto mb-4" />
           <h3 className="text-lg font-semibold text-slate-50 mb-2">No Financial Data Yet</h3>
           <p className="text-slate-400 mb-6">
             Start by adding your income, expenses, debts, or savings to see your financial health score and insights.
@@ -133,7 +133,7 @@ export default function FinancialOverview() {
               <TrendingUp className="h-5 w-5 text-success-400" />
             </div>
           </div>
-          <p className="text-3xl font-bold text-slate-50 counter-pulse">
+          <p className="text-3xl font-bold text-success-400 counter-pulse">
             ₹{data?.totalIncome?.toLocaleString('en-IN') || '0'}
           </p>
         </div>
@@ -145,7 +145,7 @@ export default function FinancialOverview() {
               <TrendingDown className="h-5 w-5 text-danger-400" />
             </div>
           </div>
-          <p className="text-3xl font-bold text-slate-50 counter-pulse">
+          <p className="text-3xl font-bold text-danger-400 counter-pulse">
             ₹{data?.totalExpenses?.toLocaleString('en-IN') || '0'}
           </p>
         </div>
@@ -153,11 +153,11 @@ export default function FinancialOverview() {
         <div className="card card-pad card-hover animate-fade-up stagger-4">
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm font-medium text-slate-400">Savings</span>
-            <div className="p-2 bg-primary-500/10 rounded-lg animate-glow-pulse">
-              <DollarSign className="h-5 w-5 text-primary-300" />
-            </div>
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary-500/10 text-lg font-semibold text-primary-300 animate-glow-pulse">
+            ₹
           </div>
-          <p className="text-3xl font-bold text-slate-50 counter-pulse">
+          </div>
+          <p className="text-3xl font-bold text-primary-300 counter-pulse">
             ₹{data?.savings?.toLocaleString('en-IN') || '0'}
           </p>
         </div>
