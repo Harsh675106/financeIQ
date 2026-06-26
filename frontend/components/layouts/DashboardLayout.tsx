@@ -30,14 +30,20 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
   useEffect(() => {
+    const root = document.documentElement
+    const body = document.body
+
     if (sidebarOpen) {
-      document.body.style.overflow = 'hidden'
+      root.style.overflow = 'hidden'
+      body.style.overflow = 'hidden'
     } else {
-      document.body.style.overflow = ''
+      root.style.overflow = ''
+      body.style.overflow = ''
     }
 
     return () => {
-      document.body.style.overflow = ''
+      root.style.overflow = ''
+      body.style.overflow = ''
     }
   }, [sidebarOpen])
 
@@ -107,14 +113,14 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   )
 
   return (
-    <div className="relative min-h-screen bg-transparent text-slate-100 lg:flex lg:h-screen lg:overflow-hidden">
+    <div className="relative min-h-screen overflow-hidden bg-transparent text-slate-100 lg:flex lg:h-screen lg:overflow-hidden">
       {sidebarOpen && (
         <>
           <div
-            className="fixed inset-0 z-30 bg-slate-900/40 backdrop-blur-sm lg:hidden"
+            className="fixed inset-0 z-[60] bg-slate-900/45 backdrop-blur-sm lg:hidden"
             onClick={() => setSidebarOpen(false)}
           />
-          <aside className="sidebar-ambient fixed inset-y-0 left-0 z-40 flex w-64 flex-col border-r border-slate-800/80 bg-slate-950/92 shadow-xl backdrop-blur-2xl lg:hidden">
+          <aside className="sidebar-ambient fixed inset-y-0 left-0 z-[70] flex w-64 flex-col border-r border-slate-800/80 bg-slate-950/92 shadow-xl backdrop-blur-2xl lg:hidden">
             <div className="flex items-center justify-between border-b border-slate-800/70 px-4 py-4">
               <div className="flex items-center gap-2">
                 <TrendingUp className="h-6 w-6 text-primary-400" />
@@ -147,7 +153,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         {renderUserSection()}
       </aside>
 
-      <div className="flex-1 min-w-0 overflow-x-hidden lg:overflow-y-auto">
+      <div className="relative z-0 flex-1 min-w-0 overflow-x-hidden lg:overflow-y-auto">
         <header className="fixed inset-x-0 top-0 z-50 border-b border-slate-800/80 bg-slate-950/70 backdrop-blur-2xl lg:sticky lg:top-0 lg:z-auto">
           <div className="container-app flex h-16 items-center justify-between gap-3 px-4 sm:px-6 lg:px-0">
             <div className="flex items-center gap-3">
