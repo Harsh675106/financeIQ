@@ -113,14 +113,14 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   )
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-transparent text-slate-100 lg:flex lg:h-screen lg:overflow-hidden">
+    <div className="relative min-h-screen overflow-x-hidden bg-transparent text-slate-100 lg:flex lg:h-screen lg:overflow-hidden">
       {sidebarOpen && (
         <>
           <div
-            className="fixed inset-0 z-[60] bg-slate-900/45 backdrop-blur-sm lg:hidden"
+            className="fixed inset-0 z-[60] h-screen w-screen bg-slate-900/45 backdrop-blur-sm lg:hidden"
             onClick={() => setSidebarOpen(false)}
           />
-          <aside className="sidebar-ambient fixed inset-y-0 left-0 z-[70] flex w-64 flex-col border-r border-slate-800/80 bg-slate-950/92 shadow-xl backdrop-blur-2xl lg:hidden">
+          <aside className="sidebar-ambient fixed inset-y-0 left-0 z-[70] flex h-screen w-64 max-w-[85vw] flex-col border-r border-slate-800/80 bg-slate-950/92 shadow-xl backdrop-blur-2xl lg:hidden">
             <div className="flex items-center justify-between border-b border-slate-800/70 px-4 py-4">
               <div className="flex items-center gap-2">
                 <TrendingUp className="h-6 w-6 text-primary-400" />
@@ -175,7 +175,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           </div>
         </header>
 
-        <main className="pb-8 pt-4 sm:pt-6 lg:pt-8">
+        <main className="min-h-[calc(100dvh-4rem)] pb-8 pt-4 sm:pt-6 lg:min-h-0 lg:pt-8">
           <div className="container-app">
             {children}
           </div>

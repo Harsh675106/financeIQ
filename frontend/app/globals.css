@@ -41,8 +41,11 @@ body {
   }
 
   .sidebar-ambient {
-    position: relative;
     overflow: hidden;
+  }
+
+  .sidebar-ambient:not(.fixed):not(.sticky) {
+    position: relative;
   }
 
   .sidebar-ambient::before {
