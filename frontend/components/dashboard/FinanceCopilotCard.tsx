@@ -78,6 +78,8 @@ export default function FinanceCopilotCard({ fullPage = false }: FinanceCopilotC
   const [messages, setMessages] = useState<Message[]>([])
   const [response, setResponse] = useState<CopilotResponse | null>(null)
   const bottomRef = useRef<HTMLDivElement | null>(null)
+  const scrollContainerRef = useRef<HTMLDivElement | null>(null)
+  const shouldAutoScrollRef = useRef(false)
 
   useEffect(() => {
     const loadHistory = async () => {
@@ -96,7 +98,22 @@ export default function FinanceCopilotCard({ fullPage = false }: FinanceCopilotC
   }, [])
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
+    const container = scrollContainerRef.current
+    if (!container || !shouldAutoScrollRef.current) {
+      shouldAutoScrollRef.current = false
+      return
+    }
+
+    const distanceFromBottom = container.scrollHeight - container.scrollTop - container.clientHeight
+    if (distanceFromBottom > 120) {
+      shouldAutoScrollRef.current = false
+      return
+    }
+
+    requestAnimationFrame(() => {
+      container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' })
+    })
+    shouldAutoScrollRef.current = false
   }, [messages, loading])
 
   const askQuestion = async (nextQuestion?: string) => {
@@ -104,6 +121,7 @@ export default function FinanceCopilotCard({ fullPage = false }: FinanceCopilotC
     if (!text) return
 
     const nextMessages: Message[] = [...messages, { role: 'user', content: text }]
+    shouldAutoScrollRef.current = true
     setMessages(nextMessages)
     setLoading(true)
 
@@ -158,7 +176,7 @@ export default function FinanceCopilotCard({ fullPage = false }: FinanceCopilotC
 
   const outerClassName = fullPage
     ? 'relative overflow-hidden rounded-[1.5rem] border border-slate-800/80 bg-slate-950/80 shadow-2xl backdrop-blur-2xl xl:h-full'
-    : 'card card-pad card-hover'
+    : 'card card-pad card-hover h-[36rem] max-h-[75vh] overflow-hidden'
 
   return (
     <div className={outerClassName}>
@@ -186,7 +204,7 @@ export default function FinanceCopilotCard({ fullPage = false }: FinanceCopilotC
         </div>
       ) : null}
 
-      <div className={fullPage ? 'relative flex h-full min-h-0 flex-col' : ''}>
+      <div className={fullPage ? 'relative flex h-full min-h-0 flex-col' : 'relative flex h-full min-h-0 flex-col'}>
         <div className="border-b border-slate-800/70 px-4 py-3">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex min-w-0 items-center gap-3">
@@ -214,8 +232,8 @@ export default function FinanceCopilotCard({ fullPage = false }: FinanceCopilotC
         </div>
 
         <div className="finance-chat-shell flex-1 px-2 pb-2 pt-2 sm:px-3">
-          <div className="finance-chat-panel flex min-h-[82vh] flex-col overflow-hidden rounded-[1.5rem] border border-white/10 bg-slate-950/55 shadow-inner shadow-black/30 xl:h-full xl:min-h-0">
-            <div className="finance-chat-scroll flex-1 overflow-y-auto px-3 py-3 sm:px-5 sm:py-4">
+          <div className="finance-chat-panel flex h-full min-h-0 flex-col overflow-hidden rounded-[1.5rem] border border-white/10 bg-slate-950/55 shadow-inner shadow-black/30 xl:h-full xl:min-h-0">
+            <div ref={scrollContainerRef} className="finance-chat-scroll flex-1 overflow-y-auto overscroll-contain px-3 py-3 sm:px-5 sm:py-4">
               {loadingHistory ? (
                 <div className="space-y-4">
                   <div className="h-20 rounded-[1.6rem] bg-slate-800/70 animate-pulse" />

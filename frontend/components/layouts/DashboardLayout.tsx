@@ -136,12 +136,12 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       </aside>
 
       <div className="lg:pl-64">
-        <header className="sticky top-0 z-20 border-b border-slate-800/80 bg-slate-950/60 backdrop-blur-2xl">
-          <div className="container-app flex h-16 items-center justify-between gap-3">
+        <header className="sticky top-0 z-50 border-b border-slate-800/80 bg-slate-950/70 backdrop-blur-2xl lg:static lg:z-auto">
+          <div className="container-app flex h-16 items-center justify-between gap-3 px-4 sm:px-6 lg:px-0">
             <div className="flex items-center gap-3">
               <button
                 type="button"
-                className="inline-flex items-center justify-center rounded-full p-2 text-slate-200 hover:bg-slate-800/60 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 lg:hidden"
+                className="inline-flex h-10 w-10 items-center justify-center rounded-full p-2 text-slate-200 hover:bg-slate-800/60 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 lg:hidden"
                 onClick={() => setSidebarOpen(true)}
               >
                 <span className="sr-only">Open navigation</span>
