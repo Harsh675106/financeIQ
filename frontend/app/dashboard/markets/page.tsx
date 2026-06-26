@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/hooks/useAuth'
 import DashboardLayout from '@/components/layouts/DashboardLayout'
+import PageBackground from '@/components/layouts/PageBackground'
 import { api } from '@/lib/api'
 import {
   Area,
@@ -375,7 +376,8 @@ export default function MarketsPage() {
 
   return (
     <DashboardLayout>
-      <div className="space-y-6">
+      <PageBackground variant="trend" />
+      <div className="relative z-10 space-y-6">
         <section className="relative overflow-hidden rounded-[2rem] border border-slate-800/80 bg-slate-950/70 p-6 shadow-2xl backdrop-blur-2xl sm:p-8">
           <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(56,189,248,0.18),transparent_28%),radial-gradient(circle_at_bottom_right,rgba(16,185,129,0.16),transparent_30%),linear-gradient(135deg,rgba(15,23,42,0.96),rgba(2,6,23,0.98))]" />
           <div className="pointer-events-none absolute -top-8 right-0 h-36 w-36 rounded-full bg-sky-400/10 blur-3xl animate-float-soft" />

@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/hooks/useAuth'
 import DashboardLayout from '@/components/layouts/DashboardLayout'
+import PageBackground from '@/components/layouts/PageBackground'
 import { Plus, Edit, Trash2, PiggyBank, AlertCircle, TrendingUp, Zap } from 'lucide-react'
 import { api } from '@/lib/api'
 import DebtOptimizerCard from '@/components/wealth/DebtOptimizerCard'
@@ -317,7 +318,8 @@ export default function WealthPage() {
 
   return (
     <DashboardLayout>
-      <div className="space-y-6">
+      <PageBackground variant="flow" />
+      <div className="relative z-10 space-y-6">
         {/* HEADER */}
         <div>
           <h1 className="text-3xl font-bold text-slate-50">Savings & Debts</h1>

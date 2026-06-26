@@ -4,6 +4,7 @@ import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/hooks/useAuth'
 import DashboardLayout from '@/components/layouts/DashboardLayout'
+import PageBackground from '@/components/layouts/PageBackground'
 import { SlidersHorizontal } from 'lucide-react'
 import ProfileForm from '@/components/settings/ProfileForm'
 
@@ -27,7 +28,8 @@ export default function SettingsPage() {
 
   return (
     <DashboardLayout>
-      <div className="space-y-6">
+      <PageBackground variant="orbit" />
+      <div className="relative z-10 space-y-6">
         <div className="flex items-center space-x-2">
           <SlidersHorizontal className="h-7 w-7 text-primary-300" />
           <h1 className="text-3xl font-bold text-slate-50">Settings</h1>

@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/hooks/useAuth'
 import DashboardLayout from '@/components/layouts/DashboardLayout'
+import PageBackground from '@/components/layouts/PageBackground'
 import { Plus, Edit, Trash2, ArrowUpCircle, ArrowDownCircle } from 'lucide-react'
 import { api } from '@/lib/api'
 import SpendingAnalytics from '@/components/transactions/SpendingAnalytics'
@@ -133,7 +134,8 @@ export default function TransactionsPage() {
 
   return (
     <DashboardLayout>
-      <div className="space-y-6">
+      <PageBackground variant="particles" />
+      <div className="relative z-10 space-y-6">
 
         {/* HEADER */}
         <div className="flex justify-between items-center">

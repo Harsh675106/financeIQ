@@ -12,6 +12,7 @@ import InsightsCard from '@/components/dashboard/InsightsCard'
 import NetWorthTrend from '@/components/dashboard/NetWorthTrend'
 import AlertsRecommendations from '@/components/dashboard/AlertsRecommendations'
 import FinanceCopilotCard from '@/components/dashboard/FinanceCopilotCard'
+import PageBackground from '@/components/layouts/PageBackground'
 
 export default function DashboardPage() {
   const { user, loading, initialized } = useAuth()
@@ -37,7 +38,8 @@ export default function DashboardPage() {
 
   return (
     <DashboardLayout>
-      <div className="space-y-6">
+      <PageBackground variant="aurora" />
+      <div className="relative z-10 space-y-6">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold text-slate-50">Dashboard</h1>

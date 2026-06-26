@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/hooks/useAuth'
 import DashboardLayout from '@/components/layouts/DashboardLayout'
+import PageBackground from '@/components/layouts/PageBackground'
 import { Target, Plus, Edit, Trash2, CheckCircle } from 'lucide-react'
 import { api } from '@/lib/api'
 import GoalProjections from '@/components/goals/GoalProjections'
@@ -159,7 +160,8 @@ export default function GoalsPage() {
 
   return (
     <DashboardLayout>
-      <div className="space-y-6">
+      <PageBackground variant="upward" />
+      <div className="relative z-10 space-y-6">
 
         {/* HEADER */}
         <div className="flex justify-between items-center">

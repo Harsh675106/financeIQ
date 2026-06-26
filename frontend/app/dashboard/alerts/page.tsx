@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/hooks/useAuth'
 import DashboardLayout from '@/components/layouts/DashboardLayout'
+import PageBackground from '@/components/layouts/PageBackground'
 import { AlertCircle, CheckCircle, X, AlertTriangle, Info } from 'lucide-react'
 import { api } from '@/lib/api'
 
@@ -141,7 +142,8 @@ export default function AlertsPage() {
 
   return (
     <DashboardLayout>
-      <div className="space-y-6">
+      <PageBackground variant="warning" />
+      <div className="relative z-10 space-y-6">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold text-slate-50">Risk Alerts</h1>

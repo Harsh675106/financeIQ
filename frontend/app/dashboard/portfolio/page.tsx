@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/hooks/useAuth'
 import DashboardLayout from '@/components/layouts/DashboardLayout'
+import PageBackground from '@/components/layouts/PageBackground'
 import PortfolioAllocation from '@/components/dashboard/PortfolioAllocation'
 import PortfolioLiveAnalysis from '@/components/portfolio/PortfolioLiveAnalysis'
 import PortfolioExplainabilityCard from '@/components/portfolio/PortfolioExplainabilityCard'
@@ -118,7 +119,8 @@ export default function PortfolioPage() {
   /* ================= UI ================= */
   return (
     <DashboardLayout>
-      <div className="space-y-6">
+      <PageBackground variant="grid" />
+      <div className="relative z-10 space-y-6">
 
         {/* HEADER */}
         <div>

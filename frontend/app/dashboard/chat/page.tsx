@@ -3,6 +3,7 @@
 import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import DashboardLayout from '@/components/layouts/DashboardLayout'
+import PageBackground from '@/components/layouts/PageBackground'
 import FinanceCopilotCard from '@/components/dashboard/FinanceCopilotCard'
 import { useAuth } from '@/hooks/useAuth'
 
@@ -30,7 +31,8 @@ export default function ChatPage() {
 
   return (
     <DashboardLayout>
-      <div className="chat-page-bleed xl:h-[calc(100dvh-4.75rem)] xl:min-h-0 xl:overflow-hidden">
+      <PageBackground variant="sparkles" />
+      <div className="relative z-10 chat-page-bleed xl:h-[calc(100dvh-4.75rem)] xl:min-h-0 xl:overflow-hidden">
         <FinanceCopilotCard fullPage />
       </div>
     </DashboardLayout>

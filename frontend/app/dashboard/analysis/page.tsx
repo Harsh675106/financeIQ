@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/hooks/useAuth'
 import DashboardLayout from '@/components/layouts/DashboardLayout'
+import PageBackground from '@/components/layouts/PageBackground'
 import { api } from '@/lib/api'
 import {
   LineChart,
@@ -90,7 +91,8 @@ export default function AnalysisPage() {
 
   return (
     <DashboardLayout>
-      <div className="space-y-6">
+      <PageBackground variant="radial" />
+      <div className="relative z-10 space-y-6">
         <div className="card card-pad bg-gradient-to-br from-slate-900 via-slate-950 to-slate-900 border border-slate-800/80">
           <div className="flex items-start gap-4">
             <div className="rounded-2xl bg-primary-500/10 p-3 text-primary-300">
