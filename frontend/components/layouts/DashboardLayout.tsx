@@ -142,7 +142,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         </>
       )}
 
-      <aside className="sidebar-ambient hidden h-screen w-64 shrink-0 flex-col border-r border-slate-800/80 bg-slate-950/88 shadow-sm backdrop-blur-2xl lg:flex lg:sticky lg:top-0 lg:self-start">
+      <aside className="sidebar-ambient relative z-[120] hidden h-screen w-64 shrink-0 flex-col border-r border-slate-800/80 bg-slate-950/88 shadow-sm backdrop-blur-2xl lg:flex lg:sticky lg:top-0 lg:self-start">
         <div className="flex items-center gap-2 border-b border-slate-800/70 px-5 py-5">
           <TrendingUp className="h-7 w-7 text-primary-400" />
           <span className="text-xl font-bold tracking-tight text-slate-50">
