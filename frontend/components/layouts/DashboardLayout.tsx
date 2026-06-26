@@ -95,7 +95,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   )
 
   return (
-    <div className="min-h-screen bg-transparent text-slate-100">
+    <div className="min-h-screen bg-transparent text-slate-100 lg:flex">
       {sidebarOpen && (
         <>
           <div
@@ -124,7 +124,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         </>
       )}
 
-      <aside className="sidebar-ambient fixed inset-y-0 left-0 z-30 hidden w-64 flex-col border-r border-slate-800/80 bg-slate-950/88 shadow-sm backdrop-blur-2xl lg:flex">
+      <aside className="sidebar-ambient hidden h-screen w-64 shrink-0 flex-col border-r border-slate-800/80 bg-slate-950/88 shadow-sm backdrop-blur-2xl lg:flex">
         <div className="flex items-center gap-2 border-b border-slate-800/70 px-5 py-5">
           <TrendingUp className="h-7 w-7 text-primary-400" />
           <span className="text-xl font-bold tracking-tight text-slate-50">
@@ -135,7 +135,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         {renderUserSection()}
       </aside>
 
-      <div className="min-w-0 lg:pl-64">
+      <div className="flex-1 min-w-0">
         <header className="sticky top-0 z-50 border-b border-slate-800/80 bg-slate-950/70 backdrop-blur-2xl lg:static lg:z-auto">
           <div className="container-app flex h-16 items-center justify-between gap-3 px-4 sm:px-6 lg:px-0">
             <div className="flex items-center gap-3">
