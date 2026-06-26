@@ -40,6 +40,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     { href: '/dashboard/goals', icon: Target, label: 'Goals' },
     { href: '/dashboard/wealth', icon: PiggyBank, label: 'Savings & Debts' },
     { href: '/dashboard/portfolio', icon: TrendingUp, label: 'Portfolio' },
+    { href: '/dashboard/analysis', icon: BrainCircuit, label: 'Analysis' },
     { href: '/dashboard/markets', icon: Globe2, label: 'Markets' },
     { href: '/dashboard/chat', icon: BrainCircuit, label: 'AI Chat' },
     { href: '/dashboard/alerts', icon: AlertCircle, label: 'Risk Alerts' },

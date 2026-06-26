@@ -11,6 +11,7 @@ import PortfolioAllocation from '@/components/dashboard/PortfolioAllocation'
 import InsightsCard from '@/components/dashboard/InsightsCard'
 import NetWorthTrend from '@/components/dashboard/NetWorthTrend'
 import AlertsRecommendations from '@/components/dashboard/AlertsRecommendations'
+import FinanceCopilotCard from '@/components/dashboard/FinanceCopilotCard'
 
 export default function DashboardPage() {
   const { user, loading, initialized } = useAuth()
@@ -56,6 +57,10 @@ export default function DashboardPage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <RiskAssessment />
           <QuickActions />
+        </div>
+
+        <div className="grid grid-cols-1 gap-6">
+          <FinanceCopilotCard />
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
