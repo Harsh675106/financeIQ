@@ -207,47 +207,95 @@ export default function GoalsPage() {
               const daysRemaining = getDaysRemaining(
                 goal.target_date
               )
+              const isOverdue = daysRemaining !== null && daysRemaining < 0
+              const isCompleted = progress >= 100
 
               return (
                 <div
                   key={goal.id}
-                  className="card card-pad card-hover"
+                  className={`card card-pad card-hover border-l-4 ${
+                    isCompleted
+                      ? 'border-l-emerald-500'
+                      : isOverdue
+                        ? 'border-l-rose-500'
+                        : 'border-l-primary-500'
+                  }`}
                 >
-                  <h3 className="font-bold text-lg text-slate-50 mb-2">
-                    {goal.name}
-                  </h3>
-
-                  <p className="text-slate-400 text-sm mb-3">
-                    Target: ₹
-                    {goal.target_amount.toLocaleString('en-IN')}
-                  </p>
+                  <div className="flex justify-between items-start mb-3">
+                    <div>
+                      <h3 className="font-bold text-lg text-slate-50">
+                        {goal.name}
+                      </h3>
+                      <p className="text-slate-400 text-xs mt-1">
+                        ₹{goal.current_amount.toLocaleString('en-IN')} / ₹{goal.target_amount.toLocaleString('en-IN')}
+                      </p>
+                    </div>
+                    <div className={`text-xs font-semibold px-2 py-1 rounded ${
+                      isCompleted
+                        ? 'bg-emerald-500/20 text-emerald-300'
+                        : isOverdue
+                          ? 'bg-rose-500/20 text-rose-300'
+                          : 'bg-primary-500/20 text-primary-300'
+                    }`}>
+                      {progress.toFixed(0)}%
+                    </div>
+                  </div>
 
                   {/* PROGRESS */}
                   <div className="mb-4">
-                    <div className="w-full bg-slate-800/70 h-3 rounded-full">
+                    <div className="w-full bg-slate-800/70 h-3 rounded-full overflow-hidden">
                       <div
-                        className="bg-primary-400 h-3 rounded-full"
-                        style={{ width: `${progress}%` }}
+                        className={`h-3 rounded-full transition-all ${
+                          isCompleted
+                            ? 'bg-emerald-400'
+                            : isOverdue
+                              ? 'bg-rose-400'
+                              : 'bg-primary-400'
+                        }`}
+                        style={{ width: `${Math.min(100, progress)}%` }}
                       />
                     </div>
-                    <p className="text-xs text-slate-500 mt-1">
-                      {progress.toFixed(1)}% complete
-                    </p>
                   </div>
 
-                  {daysRemaining !== null && (
-                    <p className="text-sm text-slate-300">
-                      Days Remaining:{' '}
-                      <span className="font-semibold">
-                        {daysRemaining < 0
-                          ? 'Overdue'
-                          : daysRemaining}
-                      </span>
-                    </p>
-                  )}
+                  {/* INFO GRID */}
+                  <div className="grid grid-cols-2 gap-2 mb-4 text-xs">
+                    {goal.monthly_contribution > 0 && (
+                      <div className="bg-slate-900/40 rounded p-2 border border-slate-800/50">
+                        <div className="text-slate-400">Monthly Contribution</div>
+                        <div className="font-semibold text-slate-200 mt-1">
+                          ₹{goal.monthly_contribution.toLocaleString('en-IN')}
+                        </div>
+                      </div>
+                    )}
+
+                    {daysRemaining !== null && (
+                      <div className={`rounded p-2 border ${
+                        isOverdue
+                          ? 'bg-rose-900/30 border-rose-800/50'
+                          : 'bg-slate-900/40 border-slate-800/50'
+                      }`}>
+                        <div className={isOverdue ? 'text-rose-300' : 'text-slate-400'}>
+                          Time Remaining
+                        </div>
+                        <div className={`font-semibold mt-1 ${isOverdue ? 'text-rose-200' : 'text-slate-200'}`}>
+                          {daysRemaining < 0
+                            ? `${Math.abs(daysRemaining)}d Overdue`
+                            : daysRemaining === 0
+                              ? 'Due Today'
+                              : `${daysRemaining}d Left`}
+                        </div>
+                      </div>
+                    )}
+
+                    {!goal.target_date && (
+                      <div className="bg-slate-900/40 rounded p-2 border border-slate-800/50 col-span-2">
+                        <div className="text-slate-400 text-xs">No target date set</div>
+                      </div>
+                    )}
+                  </div>
 
                   {/* ACTIONS */}
-                  <div className="flex gap-4 mt-4 pt-4 border-t border-slate-800/70">
+                  <div className="flex gap-2 mt-4 pt-4 border-t border-slate-800/70">
                     <button
                       onClick={() => openContributeModal(goal)}
                       className="flex items-center gap-1 text-success-300 hover:text-success-200 text-sm"

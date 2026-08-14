@@ -10,11 +10,16 @@ interface FinancialData {
   totalIncome: number
   totalExpenses: number
   savings: number
-  debtRatio: number
+  debtRatio: number | null
+  debt: {
+    total: number
+    recordCount: number
+    dataStatus: 'available' | 'zero' | 'unavailable'
+  }
   healthBreakdown?: {
     savingsScore: number
     emergencyScore: number
-    debtScore: number
+    debtImpact: number | null
     goalScore: number
     diversificationScore: number
   }
@@ -40,6 +45,7 @@ export default function FinancialOverview() {
         totalExpenses: response.data.totals.expenses,
         savings: response.data.totals.savings,
         debtRatio: response.data.metrics.debtRatio,
+        debt: response.data.debt,
         healthBreakdown: response.data.healthBreakdown,
       })
     } catch (error: any) {
@@ -51,7 +57,8 @@ export default function FinancialOverview() {
         totalIncome: 0,
         totalExpenses: 0,
         savings: 0,
-        debtRatio: 0,
+        debtRatio: null,
+        debt: { total: 0, recordCount: 0, dataStatus: 'unavailable' },
       })
     } finally {
       setLoading(false)
@@ -103,6 +110,20 @@ export default function FinancialOverview() {
     if (score >= 60) return 'Good'
     if (score >= 40) return 'Fair'
     return 'Needs Attention'
+  }
+
+  const formatCurrency = (amount: number) => `₹${amount.toLocaleString('en-IN')}`
+  const debtHelp = () => {
+    if (data.debt.dataStatus === 'unavailable') {
+      return 'Debt data unavailable — add a debt record to calculate its impact'
+    }
+    if (data.debt.dataStatus === 'zero') {
+      return 'No debt impact — ₹0 recorded (0% debt ratio)'
+    }
+    if (data.debtRatio === null) {
+      return `${formatCurrency(data.debt.total)} recorded — add income to calculate the debt ratio`
+    }
+    return `${formatCurrency(data.debt.total)} recorded (${data.debtRatio}% debt ratio)`
   }
 
   return (
@@ -168,7 +189,7 @@ export default function FinancialOverview() {
           {[
             { label: 'Savings', value: data.healthBreakdown.savingsScore, help: 'Savings rate contribution' },
             { label: 'Emergency', value: data.healthBreakdown.emergencyScore, help: 'Months of emergency fund' },
-            { label: 'Debt', value: data.healthBreakdown.debtScore, help: 'Debt ratio impact' },
+            { label: 'Debt impact', value: data.healthBreakdown.debtImpact, help: debtHelp() },
             { label: 'Goals', value: data.healthBreakdown.goalScore, help: 'Average goal progress' },
             { label: 'Diversification', value: data.healthBreakdown.diversificationScore, help: 'Portfolio diversification' },
           ].map((item, idx) => (
@@ -181,13 +202,15 @@ export default function FinancialOverview() {
                 <span className="text-xs font-medium text-slate-400">{item.label}</span>
               </div>
               <div className="flex items-baseline space-x-2">
-                <span className="text-2xl font-bold text-slate-50 counter-pulse">{Math.round(item.value)}</span>
-                <span className="text-xs text-slate-500">/100</span>
+                <span className={`text-2xl font-bold counter-pulse ${item.value === null ? 'text-slate-500' : 'text-slate-50'}`}>
+                  {item.value === null ? '—' : Math.round(item.value)}
+                </span>
+                {item.value !== null && <span className="text-xs text-slate-500">/100</span>}
               </div>
               <div className="mt-2 w-full bg-slate-800/70 rounded-full h-2 overflow-hidden">
-                <div 
+                <div
                   className="bg-gradient-to-r from-primary-400 to-primary-600 h-2 rounded-full animate-slide-in-left" 
-                  style={{ width: `${Math.min(100, Math.max(0, item.value))}%` }} 
+                  style={{ width: `${Math.min(100, Math.max(0, item.value ?? 0))}%` }}
                 />
               </div>
               <p className="text-[11px] text-slate-500 mt-2">{item.help}</p>

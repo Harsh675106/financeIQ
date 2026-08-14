@@ -33,6 +33,7 @@ export default function TransactionsPage() {
   const [transactions, setTransactions] = useState<Transaction[]>([])
   const [loadingTransactions, setLoadingTransactions] = useState(true)
   const [analyticsRefreshKey, setAnalyticsRefreshKey] = useState(0)
+  const [budgetRefreshKey, setBudgetRefreshKey] = useState(0)
   const [showModal, setShowModal] = useState(false)
   const [editingTransaction, setEditingTransaction] =
     useState<Transaction | null>(null)
@@ -90,6 +91,7 @@ export default function TransactionsPage() {
 
       await fetchTransactions()
       setAnalyticsRefreshKey(key => key + 1)
+      setBudgetRefreshKey(key => key + 1)
     } catch (error) {
       console.error(error)
       alert('Failed to save transaction')
@@ -101,6 +103,7 @@ export default function TransactionsPage() {
     await api.delete(`/transactions/${id}`)
     await fetchTransactions()
     setAnalyticsRefreshKey(key => key + 1)
+    setBudgetRefreshKey(key => key + 1)
   }
 
   const handleEdit = (transaction: Transaction) => {
@@ -189,7 +192,7 @@ export default function TransactionsPage() {
         <TransactionIntelligencePanel />
         <RecurringBadgeList />
         <BudgetAutopilotCard />
-        <BudgetsPanel />
+        <BudgetsPanel refreshKey={budgetRefreshKey} />
 
         {/* TABLE */}
         <div className="card overflow-hidden">

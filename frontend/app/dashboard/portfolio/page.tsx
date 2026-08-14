@@ -109,10 +109,10 @@ export default function PortfolioPage() {
 
   const chartData = simulationData
     ? [
-        { name: 'Worst Case', value: simulationData.worstCase },
+        { name: '5th Percentile', value: simulationData.percentile5 || simulationData.worstCase },
         { name: 'Median', value: simulationData.median },
         { name: 'Mean', value: simulationData.mean },
-        { name: 'Best Case', value: simulationData.bestCase },
+        { name: '95th Percentile', value: simulationData.percentile95 || simulationData.bestCase },
       ]
     : []
 
@@ -239,22 +239,41 @@ export default function PortfolioPage() {
               Simulation Results
             </h2>
 
-            {/* STATS */}
-            <div className="grid md:grid-cols-4 gap-4 mb-6">
+            {/* STATS GRID */}
+            <div className="grid md:grid-cols-3 gap-4 mb-6">
 
               {[
-                ['Worst Case', simulationData.worstCase, 'bg-slate-900/50', 'text-slate-100'],
-                ['Median', simulationData.median, 'bg-primary-500/10', 'text-primary-200'],
+                ['Minimum Observed', simulationData.minimum || Math.min(simulationData.worstCase, simulationData.percentile5), 'bg-rose-900/30', 'text-rose-200'],
+                ['5th Percentile', simulationData.percentile5 || simulationData.worstCase, 'bg-yellow-900/30', 'text-yellow-200'],
+                ['25th Percentile', simulationData.percentile25, 'bg-slate-900/50', 'text-slate-300'],
+                ['Median (50th)', simulationData.median, 'bg-primary-500/10', 'text-primary-200'],
                 ['Mean', simulationData.mean, 'bg-success-500/10', 'text-success-200'],
-                ['Best Case', simulationData.bestCase, 'bg-purple-500/10', 'text-purple-200'],
+                ['75th Percentile', simulationData.percentile75, 'bg-slate-900/50', 'text-slate-300'],
+                ['95th Percentile', simulationData.percentile95 || simulationData.bestCase, 'bg-purple-900/30', 'text-purple-200'],
+                ['Maximum Observed', simulationData.maximum || Math.max(simulationData.bestCase, simulationData.percentile95), 'bg-emerald-900/30', 'text-emerald-200'],
+                ['Std Deviation', simulationData.stdDev, 'bg-slate-900/50', 'text-slate-300'],
               ].map(([title, value, bg, color]) => (
-                <div key={title as string} className={`${bg} rounded-xl p-4 border border-slate-800/60`}>
-                  <p className="text-sm text-slate-400 mb-1">{title}</p>
-                  <p className={`text-2xl font-bold ${color}`}>
-                    ₹{(value as number)?.toLocaleString('en-IN')}
-                  </p>
-                </div>
+                value !== undefined && (
+                  <div key={title as string} className={`${bg} rounded-xl p-4 border border-slate-800/60`}>
+                    <p className="text-xs text-slate-400 mb-2">{title}</p>
+                    <p className={`text-xl font-bold ${color}`}>
+                      ₹{(value as number)?.toLocaleString('en-IN')}
+                    </p>
+                  </div>
+                )
               ))}
+            </div>
+
+            {/* INFO BOX */}
+            <div className="mb-6 p-4 bg-blue-900/20 border border-blue-800/50 rounded-lg text-xs text-slate-300">
+              <p className="font-semibold text-blue-200 mb-2">📊 Understanding These Results:</p>
+              <ul className="space-y-1 ml-4 list-disc">
+                <li><strong>5th & 95th Percentile:</strong> Range containing 90% of likely outcomes</li>
+                <li><strong>Median:</strong> Middle value - 50% chance to be above/below this</li>
+                <li><strong>Mean:</strong> Average outcome - affected by extreme scenarios</li>
+                <li><strong>Min/Max:</strong> Extreme outcomes from all 10,000 simulations (unlikely)</li>
+                <li><strong>Std Dev:</strong> Measure of uncertainty - higher = more volatile outcomes</li>
+              </ul>
             </div>
 
             {/* CHART */}

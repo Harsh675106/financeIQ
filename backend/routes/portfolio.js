@@ -191,11 +191,24 @@ router.post('/simulation', async (req, res) => {
           userId,
           'monte_carlo',
           initialAmount || 10000,
-          mlResponse.data.worstCase,
-          mlResponse.data.bestCase,
+          mlResponse.data.percentile5,
+          mlResponse.data.percentile95,
           mlResponse.data.median,
           mlResponse.data.mean,
-          JSON.stringify({ monthlyContribution, years, expectedReturn, volatility }),
+          JSON.stringify({
+            monthlyContribution,
+            years,
+            expectedReturn,
+            volatility,
+            // Store all percentiles for historical reference
+            minimum: mlResponse.data.minimum,
+            percentile5: mlResponse.data.percentile5,
+            percentile25: mlResponse.data.percentile25,
+            percentile75: mlResponse.data.percentile75,
+            percentile95: mlResponse.data.percentile95,
+            maximum: mlResponse.data.maximum,
+            stdDev: mlResponse.data.stdDev,
+          }),
         ]
       )
 
@@ -274,35 +287,95 @@ function getRecommendationText(riskLevel) {
 }
 
 function calculateMonteCarloFallback(initialAmount, monthlyContribution, years, expectedReturn, volatility) {
-  // Simple fallback calculation
+  /**
+   * Monte Carlo Simulation using Geometric Brownian Motion (GBM)
+   * This is a fallback when ML service is unavailable
+   * 
+   * Formula: S(t) = S(0) * exp((μ - σ²/2)*t + σ*√t*Z)
+   * Where:
+   * - μ (drift) = expected return adjusted for volatility
+   * - σ (volatility) = standard deviation of returns
+   * - Z = standard normal random variable
+   */
+
   const months = years * 12
-  const monthlyReturn = expectedReturn / 12
+  
+  // Convert annual rates to monthly using geometric compounding
+  // This is mathematically correct for compound returns
+  // Annual: 1 + r_annual = (1 + r_monthly)^12
+  // Therefore: r_monthly = (1 + r_annual)^(1/12) - 1
+  const monthlyReturn = Math.pow(1 + expectedReturn, 1 / 12) - 1
+  
+  // Convert annual volatility to monthly
+  // σ_monthly = σ_annual / √12
   const monthlyVolatility = volatility / Math.sqrt(12)
 
-  let amount = initialAmount
+  // Drift term for GBM (accounts for volatility drag)
+  // drift = (μ - σ²/2) where μ is the log-return
+  const drift = Math.log(1 + monthlyReturn) - 0.5 * Math.pow(monthlyVolatility, 2)
+
   const scenarios = []
 
   for (let i = 0; i < 1000; i++) {
     let scenarioAmount = initialAmount
+
     for (let month = 0; month < months; month++) {
-      const randomReturn = monthlyReturn + (Math.random() - 0.5) * monthlyVolatility * 2
-      scenarioAmount = scenarioAmount * (1 + randomReturn) + monthlyContribution
+      // Generate standard normal random variable using Box-Muller transform
+      // This ensures truly normal distribution, not uniform
+      const u1 = Math.random()
+      const u2 = Math.random()
+      const randomNormal = Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2)
+
+      // Calculate log return using GBM
+      const logReturn = drift + monthlyVolatility * randomNormal
+      
+      // Convert log return to actual return
+      const monthlyMultiplier = Math.exp(logReturn)
+
+      // Apply return first, then add contribution at end of period
+      scenarioAmount = scenarioAmount * monthlyMultiplier + monthlyContribution
     }
+
     scenarios.push(scenarioAmount)
   }
 
   scenarios.sort((a, b) => a - b)
 
+  // Calculate percentiles
+  // 5th percentile = index 50 (out of 1000)
+  // 25th percentile = index 250
+  // 50th percentile (median) = index 500
+  // 75th percentile = index 750
+  // 95th percentile = index 950
+  const p5 = scenarios[50]
+  const p25 = scenarios[250]
+  const median = scenarios[500]
+  const p75 = scenarios[750]
+  const p95 = scenarios[950]
+  const minimum = scenarios[0]
+  const maximum = scenarios[999]
+  const mean = scenarios.reduce((a, b) => a + b, 0) / scenarios.length
+  const stdDev = calculateStdDev(scenarios)
+
   return {
-    initialAmount,
-    monthlyContribution,
+    initialAmount: Math.round(initialAmount * 100) / 100,
+    monthlyContribution: Math.round(monthlyContribution * 100) / 100,
     years,
     simulations: 1000,
-    worstCase: Math.round(scenarios[50]),
-    bestCase: Math.round(scenarios[950]),
-    median: Math.round(scenarios[500]),
-    mean: Math.round(scenarios.reduce((a, b) => a + b, 0) / scenarios.length),
-    stdDev: Math.round(calculateStdDev(scenarios)),
+    minimum: Math.round(minimum * 100) / 100,
+    percentile5: Math.round(p5 * 100) / 100,
+    percentile25: Math.round(p25 * 100) / 100,
+    median: Math.round(median * 100) / 100,
+    percentile75: Math.round(p75 * 100) / 100,
+    percentile95: Math.round(p95 * 100) / 100,
+    maximum: Math.round(maximum * 100) / 100,
+    mean: Math.round(mean * 100) / 100,
+    stdDev: Math.round(stdDev * 100) / 100,
+    expectedAnnualReturn: Math.round(expectedReturn * 10000) / 100,
+    volatility: Math.round(volatility * 10000) / 100,
+    // Include for backwards compatibility
+    worstCase: Math.round(p5 * 100) / 100,
+    bestCase: Math.round(p95 * 100) / 100,
   }
 }
 

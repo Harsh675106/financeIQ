@@ -44,10 +44,21 @@ async function getEmergencyFundMonths(userId) {
 
 async function getDebtAssets(userId) {
   const debtsRes = await pool.query(
-    'SELECT COALESCE(SUM(amount),0) AS total FROM debts WHERE user_id=$1',
+    `SELECT COUNT(*)::int AS record_count, COALESCE(SUM(amount), 0) AS total
+     FROM debts
+     WHERE user_id=$1`,
     [userId]
   )
   const totalDebt = parseFloat(debtsRes.rows[0].total) || 0
+  const debtRecordCount = parseInt(debtsRes.rows[0].record_count, 10) || 0
+  // An empty debts table does not prove that the user is debt-free. Keep it
+  // separate from an explicit ₹0 debt record so the dashboard can avoid
+  // turning missing data into a perfect debt score.
+  const debtDataStatus = debtRecordCount === 0
+    ? 'unavailable'
+    : totalDebt === 0
+      ? 'zero'
+      : 'available'
 
   // Assets proxy: savings only for now
   const savingsRes = await pool.query(
@@ -55,7 +66,7 @@ async function getDebtAssets(userId) {
     [userId]
   )
   const totalAssets = parseFloat(savingsRes.rows[0].total) || 0
-  return { totalDebt, totalAssets }
+  return { totalDebt, totalAssets, debtRecordCount, debtDataStatus }
 }
 
 async function getGoalProgress(userId) {
@@ -95,28 +106,46 @@ async function getDiversificationScore(userId) {
   return { score: normalized }
 }
 
-function computeHealthScore({ savingsRate, emergencyMonths, debtRatio, goalProgress, diversificationScore }) {
+function calculateDebtImpact(debtRatio, debtDataStatus) {
+  if (debtDataStatus === 'unavailable') return null
+
+  // A 0% debt-to-income ratio has no negative debt impact. At 40% or more,
+  // debt has the maximum impact, matching the existing debt-risk threshold.
+  return clamp01(debtRatio / 0.4)
+}
+
+function computeHealthScore({ savingsRate, emergencyMonths, debtImpact, goalProgress, diversificationScore }) {
   // Map raw metrics to 0..1 subscores
   const savingsScore = clamp01(savingsRate) // assume rate already fraction
   const emergencyScore = clamp01(emergencyMonths / 6) // 6+ months ideal
-  const debtScore = clamp01(1 / (1 + debtRatio)) // normalized: 0 = high debt, 1 = low debt (better curve)
   const goalScore = clamp01(goalProgress)
   const divScore = clamp01(diversificationScore)
 
-  const healthScore = (
-    savingsScore * 0.25 +
-    emergencyScore * 0.20 +
-    debtScore * 0.20 +
-    goalScore * 0.15 +
-    divScore * 0.20
-  ) * 100
+  const components = [
+    { value: savingsScore, weight: 0.25 },
+    { value: emergencyScore, weight: 0.20 },
+    { value: goalScore, weight: 0.15 },
+    { value: divScore, weight: 0.20 },
+  ]
+
+  // Debt impact is a penalty, not a score. When it is unavailable, exclude
+  // the debt dimension and reweight the known dimensions instead of assuming
+  // the user deserves 100/100 for debt.
+  if (debtImpact !== null) {
+    components.push({ value: 1 - debtImpact, weight: 0.20 })
+  }
+
+  const totalWeight = components.reduce((sum, component) => sum + component.weight, 0)
+  const healthScore = totalWeight > 0
+    ? (components.reduce((sum, component) => sum + component.value * component.weight, 0) / totalWeight) * 100
+    : 0
 
   return {
     value: Math.round(healthScore),
     breakdown: {
       savingsScore: round2(savingsScore*100),
       emergencyScore: round2(emergencyScore*100),
-      debtScore: round2(debtScore*100),
+      debtImpact: debtImpact === null ? null : round2(debtImpact * 100),
       goalScore: round2(goalScore*100),
       diversificationScore: round2(divScore*100)
     }
@@ -234,17 +263,27 @@ async function getDashboardAnalytics(userId) {
   const savingsRate = income > 0 ? savings / income : 0
 
   const { months: emergencyMonths } = await getEmergencyFundMonths(userId)
-  const { totalDebt, totalAssets } = await getDebtAssets(userId)
+  const { totalDebt, totalAssets, debtRecordCount, debtDataStatus } = await getDebtAssets(userId)
   
   // Check if user has any data
-  const hasData = income > 0 || expenses > 0 || totalDebt > 0 || totalAssets > 0
+  const hasData = income > 0 || expenses > 0 || debtRecordCount > 0 || totalAssets > 0
   
-  // Better debt ratio: 0 = high debt, 1 = low/no debt (using debt-to-income ratio concept)
-  const rawDebtRatio = income > 0 ? totalDebt / income : totalDebt > 0 ? 1 : 0
+  // A ratio cannot be calculated without income. Keep that distinct from a
+  // confirmed ₹0 balance, whose impact is correctly zero even without income.
+  const rawDebtRatio = debtDataStatus === 'unavailable'
+    ? null
+    : totalDebt === 0
+      ? 0
+      : income > 0
+        ? totalDebt / income
+        : null
+  const debtImpact = rawDebtRatio === null
+    ? null
+    : calculateDebtImpact(rawDebtRatio, debtDataStatus)
   const { avgProgress: goalProgress } = await getGoalProgress(userId)
   const { score: diversificationScore } = await getDiversificationScore(userId)
 
-  const health = computeHealthScore({ savingsRate, emergencyMonths, debtRatio: rawDebtRatio, goalProgress, diversificationScore })
+  const health = computeHealthScore({ savingsRate, emergencyMonths, debtImpact, goalProgress, diversificationScore })
 
   // Insights
   const insights = []
@@ -267,13 +306,19 @@ async function getDashboardAnalytics(userId) {
       savingsRate: round2(savingsRate*100),
       expenseRatio: round2((income>0? (expenses/income):1)*100),
       emergencyMonths: round2(emergencyMonths),
-      debtRatio: round2(rawDebtRatio*100),
+      debtRatio: rawDebtRatio === null ? null : round2(rawDebtRatio * 100),
+      debtImpact: debtImpact === null ? null : round2(debtImpact * 100),
       goalProgress: round2(goalProgress*100),
       diversification: round2(diversificationScore*100)
+    },
+    debt: {
+      total: round2(totalDebt),
+      recordCount: debtRecordCount,
+      dataStatus: debtDataStatus,
     },
     insights,
     netWorth,
   }
 }
 
-module.exports = { getDashboardAnalytics }
+module.exports = { getDashboardAnalytics, calculateDebtImpact, computeHealthScore }

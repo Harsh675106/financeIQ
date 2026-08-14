@@ -176,20 +176,58 @@ router.get('/:id(\\d+)/progress', async (req, res) => {
     }
 
     const goal = result.rows[0]
-    const progress = (goal.current_amount / goal.target_amount) * 100
-    const remaining = goal.target_amount - goal.current_amount
-    const monthsRemaining = goal.target_date 
-      ? Math.ceil((new Date(goal.target_date) - new Date()) / (1000 * 60 * 60 * 24 * 30))
-      : null
-    const requiredMonthly = monthsRemaining && monthsRemaining > 0
-      ? remaining / monthsRemaining
-      : null
+    const today = new Date()
+    const currentAmount = parseFloat(goal.current_amount) || 0
+    const targetAmount = parseFloat(goal.target_amount) || 0
+
+    // Calculate completion percentage (0-100)
+    const completionPercentage = targetAmount > 0
+      ? Math.min(100, Math.round((currentAmount / targetAmount) * 100 * 100) / 100)
+      : 0
+
+    // Calculate remaining amount
+    const remaining = Math.max(0, targetAmount - currentAmount)
+
+    // Calculate days remaining to target date
+    let daysRemaining = null
+    if (goal.target_date) {
+      const targetDate = new Date(goal.target_date)
+      targetDate.setHours(0, 0, 0, 0)
+      today.setHours(0, 0, 0, 0)
+      const diffTime = targetDate.getTime() - today.getTime()
+      daysRemaining = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+    }
+
+    // Calculate months remaining to target date
+    let monthsRemaining = null
+    if (goal.target_date) {
+      const targetDate = new Date(goal.target_date)
+      monthsRemaining =
+        (targetDate.getFullYear() - today.getFullYear()) * 12 +
+        (targetDate.getMonth() - today.getMonth())
+
+      // Adjust if we haven't reached the same day yet in the target month
+      if (targetDate.getDate() < today.getDate()) {
+        monthsRemaining -= 1
+      }
+    }
+
+    // Calculate required monthly contribution
+    const monthlyContribution = parseFloat(goal.monthly_contribution) || 0
+    let requiredMonthly = null
+    if (monthsRemaining !== null && monthsRemaining > 0) {
+      requiredMonthly = remaining / monthsRemaining
+    }
 
     res.json({
-      progress: Math.min(100, Math.max(0, progress)),
-      remaining,
+      completionPercentage,
+      daysRemaining,
       monthsRemaining,
-      requiredMonthly,
+      currentAmount,
+      targetAmount,
+      remaining,
+      monthlyContribution,
+      requiredMonthly: requiredMonthly ? Math.round(requiredMonthly * 100) / 100 : null,
       goal,
     })
   } catch (error) {

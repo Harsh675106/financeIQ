@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { api } from '@/lib/api'
 
-export default function BudgetsPanel() {
+export default function BudgetsPanel({ refreshKey = 0 }: { refreshKey?: number }) {
   const [budgets, setBudgets] = useState<any[]>([])
   const [period, setPeriod] = useState<{start:string, end:string} | null>(null)
   const [form, setForm] = useState({ category: '', amountMonthly: '' })
@@ -22,7 +22,7 @@ export default function BudgetsPanel() {
     }
   }
 
-  useEffect(() => { load() }, [])
+  useEffect(() => { load() }, [refreshKey])
 
   const save = async (e: any) => {
     e.preventDefault()

@@ -236,14 +236,33 @@ def predict_stress_probability(debt_to_income, savings_rate, emi_burden, expense
     return prob * 100
 
 def run_monte_carlo(initial_amount, monthly_contribution, years, expected_return, volatility):
-    """Run Monte Carlo simulation using Geometric Brownian Motion"""
+    """
+    Run Monte Carlo simulation using Geometric Brownian Motion (GBM)
+    
+    Mathematical Model:
+    dS = μ*S*dt + σ*S*dW
+    
+    Where:
+    - S = portfolio value
+    - μ = drift (expected return)
+    - σ = volatility (std dev of returns)
+    - dW = Wiener process (random shock from N(0,1))
+    
+    For discrete time steps (monthly):
+    r_monthly = exp((μ - σ²/2)/12 + (σ/√12)*Z)
+    S(t+1) = S(t) * r_monthly + contribution
+    
+    Where Z ~ N(0,1) is standard normal random variable
+    """
     np.random.seed(42)
     n_simulations = 10000
     n_months = years * 12
     
     # Properly convert annual to monthly rates using continuous compounding
     # This accounts for the fact that returns compound geometrically, not linearly
-    monthly_drift = (expected_return - 0.5 * volatility**2) / 12
+    # drift = ln(1 + r_annual) - σ²/2, then divide by 12 for monthly
+    # This is correct for Geometric Brownian Motion
+    monthly_drift = (np.log(1 + expected_return) - 0.5 * volatility**2) / 12
     monthly_vol = volatility / np.sqrt(12)
     
     final_amounts = []
@@ -252,25 +271,29 @@ def run_monte_carlo(initial_amount, monthly_contribution, years, expected_return
         amount = initial_amount
         
         for month in range(n_months):
-            # Generate random shock from standard normal distribution
+            # Generate random shock from standard normal distribution N(0,1)
             random_shock = np.random.normal(0, 1)
             
             # Calculate monthly return using log-normal distribution (GBM)
-            # This ensures returns follow a more realistic distribution
+            # This ensures returns follow a realistic log-normal distribution
             log_return = monthly_drift + monthly_vol * random_shock
             monthly_multiplier = np.exp(log_return)
             
-            # Apply return and add monthly contribution
+            # Apply return to current amount, then add contribution at end of period
             amount = amount * monthly_multiplier + monthly_contribution
         
         final_amounts.append(amount)
     
     final_amounts = np.array(final_amounts)
     
-    # Calculate statistics
-    worst_case = np.percentile(final_amounts, 5)
-    best_case = np.percentile(final_amounts, 95)
+    # Calculate comprehensive statistics
+    minimum = np.min(final_amounts)
+    p5 = np.percentile(final_amounts, 5)
+    p25 = np.percentile(final_amounts, 25)
     median = np.median(final_amounts)
+    p75 = np.percentile(final_amounts, 75)
+    p95 = np.percentile(final_amounts, 95)
+    maximum = np.max(final_amounts)
     mean = np.mean(final_amounts)
     std_dev = np.std(final_amounts)
     
@@ -279,13 +302,20 @@ def run_monte_carlo(initial_amount, monthly_contribution, years, expected_return
         "monthlyContribution": round(monthly_contribution, 2),
         "years": years,
         "simulations": n_simulations,
-        "worstCase": round(worst_case, 2),
-        "bestCase": round(best_case, 2),
+        "minimum": round(minimum, 2),
+        "percentile5": round(p5, 2),
+        "percentile25": round(p25, 2),
         "median": round(median, 2),
+        "percentile75": round(p75, 2),
+        "percentile95": round(p95, 2),
+        "maximum": round(maximum, 2),
         "mean": round(mean, 2),
         "stdDev": round(std_dev, 2),
         "expectedAnnualReturn": round(expected_return * 100, 2),
-        "volatility": round(volatility * 100, 2)
+        "volatility": round(volatility * 100, 2),
+        # Included for backwards compatibility with frontend
+        "worstCase": round(p5, 2),
+        "bestCase": round(p95, 2),
     }
 
 if __name__ == "__main__":
