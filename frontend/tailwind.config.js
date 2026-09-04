@@ -118,6 +118,18 @@ module.exports = {
           '0%, 100%': { transform: 'scale(1)' },
           '50%': { transform: 'scale(1.05)' },
         },
+        'border-beam': {
+          '100%': { 'offset-distance': '100%' },
+        },
+        'radar-ping': {
+          '0%': { transform: 'scale(0.8)', opacity: '0.8' },
+          '70%, 100%': { transform: 'scale(2.2)', opacity: '0' },
+        },
+        'pop-in': {
+          '0%': { opacity: '0', transform: 'scale(0.85) translateY(6px)' },
+          '70%': { transform: 'scale(1.02) translateY(0)' },
+          '100%': { opacity: '1', transform: 'scale(1) translateY(0)' },
+        },
       },
       animation: {
         'float-soft': 'float-soft 14s ease-in-out infinite',
@@ -135,6 +147,8 @@ module.exports = {
         'pulse-ring': 'pulse-ring 2s infinite',
         'flip': 'flip 3s ease-in-out infinite',
         'breathe': 'breathe 3s ease-in-out infinite',
+        'radar-ping': 'radar-ping 2s cubic-bezier(0, 0, 0.2, 1) infinite',
+        'pop-in': 'pop-in 350ms cubic-bezier(0.16, 1, 0.3, 1) both',
       },
     },
   },

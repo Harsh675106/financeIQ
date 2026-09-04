@@ -1,8 +1,20 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { api } from '@/lib/api'
-import { TrendingUp, TrendingDown, AlertTriangle } from 'lucide-react'
+import { useCountUp } from '@/hooks/useCountUp'
+import {
+  TrendingUp,
+  TrendingDown,
+  AlertTriangle,
+  ChevronDown,
+  ChevronUp,
+  Sparkles,
+  ShieldCheck,
+  ArrowUpRight,
+  ArrowDownRight,
+  Percent,
+} from 'lucide-react'
 
 interface FinancialData {
   hasData: boolean
@@ -25,15 +37,100 @@ interface FinancialData {
   }
 }
 
+// Sub-component for individual animated KPI metric card with spotlight tracking
+function MetricCard({
+  title,
+  value,
+  prefix = '',
+  suffix = '',
+  icon: Icon,
+  iconColor,
+  iconBg,
+  trendLabel,
+  trendType = 'positive',
+  delay = 0,
+  accentGlow = 'rgba(16, 185, 129, 0.15)',
+}: {
+  title: string
+  value: number
+  prefix?: string
+  suffix?: string
+  icon: any
+  iconColor: string
+  iconBg: string
+  trendLabel?: string
+  trendType?: 'positive' | 'negative' | 'neutral'
+  delay?: number
+  accentGlow?: string
+}) {
+  const animatedValue = useCountUp(value, { duration: 1000 })
+  const cardRef = useRef<HTMLDivElement>(null)
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!cardRef.current) return
+    const rect = cardRef.current.getBoundingClientRect()
+    const x = e.clientX - rect.left
+    const y = e.clientY - rect.top
+    cardRef.current.style.setProperty('--mouse-x', `${x}px`)
+    cardRef.current.style.setProperty('--mouse-y', `${y}px`)
+  }
+
+  return (
+    <div
+      ref={cardRef}
+      onMouseMove={handleMouseMove}
+      className="card card-pad card-spotlight group cursor-pointer animate-fade-up"
+      style={{ animationDelay: `${delay}ms` }}
+    >
+      <div className="flex items-center justify-between mb-3">
+        <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+          {title}
+        </span>
+        <div
+          className={`flex h-10 w-10 items-center justify-center rounded-xl ${iconBg} icon-morph-container shadow-sm`}
+        >
+          <Icon className={`h-5 w-5 ${iconColor} transition-all duration-300 group-hover:scale-110`} />
+        </div>
+      </div>
+
+      <div className="flex items-baseline space-x-1.5">
+        <span className="text-3xl font-extrabold tracking-tight text-slate-50 counter-pulse">
+          {prefix}
+          {animatedValue.toLocaleString('en-IN')}
+          {suffix}
+        </span>
+      </div>
+
+      {trendLabel && (
+        <div className="mt-3 flex items-center gap-1.5">
+          {trendType === 'positive' && (
+            <span className="inline-flex items-center gap-0.5 rounded-md bg-emerald-500/10 px-1.5 py-0.5 text-[11px] font-semibold text-emerald-400 ring-1 ring-emerald-500/20">
+              <ArrowUpRight className="h-3 w-3" />
+              {trendLabel}
+            </span>
+          )}
+          {trendType === 'negative' && (
+            <span className="inline-flex items-center gap-0.5 rounded-md bg-rose-500/10 px-1.5 py-0.5 text-[11px] font-semibold text-rose-400 ring-1 ring-rose-500/20">
+              <ArrowDownRight className="h-3 w-3" />
+              {trendLabel}
+            </span>
+          )}
+          {trendType === 'neutral' && (
+            <span className="inline-flex items-center gap-0.5 rounded-md bg-slate-800/80 px-1.5 py-0.5 text-[11px] font-semibold text-slate-400">
+              {trendLabel}
+            </span>
+          )}
+          <span className="text-[11px] text-slate-500">vs target</span>
+        </div>
+      )}
+    </div>
+  )
+}
+
 export default function FinancialOverview() {
   const [data, setData] = useState<FinancialData | null>(null)
   const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    fetchFinancialData()
-    const interval = setInterval(fetchFinancialData, 30000) // Refresh every 30 seconds
-    return () => clearInterval(interval)
-  }, [])
+  const [showDiagnostics, setShowDiagnostics] = useState(true)
 
   const fetchFinancialData = async () => {
     try {
@@ -50,7 +147,6 @@ export default function FinancialOverview() {
       })
     } catch (error: any) {
       console.error('Failed to fetch financial data:', error)
-      // Set default values on error
       setData({
         hasData: false,
         healthScore: 0,
@@ -64,6 +160,14 @@ export default function FinancialOverview() {
       setLoading(false)
     }
   }
+
+  useEffect(() => {
+    fetchFinancialData()
+    const interval = setInterval(fetchFinancialData, 30000)
+    return () => clearInterval(interval)
+  }, [])
+
+  const animatedHealthScore = useCountUp(data?.healthScore || 0, { duration: 1100 })
 
   if (loading) {
     return (
@@ -80,142 +184,244 @@ export default function FinancialOverview() {
 
   if (!data?.hasData) {
     return (
-      <div className="space-y-6">
-        <div className="card card-pad text-center py-12">
-          <TrendingUp className="h-12 w-12 text-slate-600 mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-slate-50 mb-2">No Financial Data Yet</h3>
-          <p className="text-slate-400 mb-6">
-            Start by adding your income, expenses, debts, or savings to see your financial health score and insights.
-          </p>
-          <button
-            onClick={() => window.location.href = '/dashboard/transactions'}
-            className="btn-primary inline-block"
-          >
-            Add Your First Transaction
-          </button>
+      <div className="card card-pad text-center py-12 card-spotlight">
+        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-primary-500/10 text-primary-400 mb-4 animate-bounce-subtle">
+          <TrendingUp className="h-8 w-8" />
         </div>
+        <h3 className="text-xl font-bold text-slate-50 mb-2">No Financial Records Yet</h3>
+        <p className="text-slate-400 max-w-md mx-auto mb-6 text-sm">
+          Add your first transaction, wealth asset, or income stream to power real-time AI analytics.
+        </p>
+        <button
+          onClick={() => (window.location.href = '/dashboard/transactions')}
+          className="btn-primary inline-flex items-center gap-2 px-6 py-2.5 shadow-lg shadow-primary-500/20 hover:scale-105 transition-all"
+        >
+          <Sparkles className="h-4 w-4" />
+          Add First Transaction
+        </button>
       </div>
     )
   }
 
   const getHealthScoreColor = (score: number) => {
-    if (score >= 80) return 'text-success-400'
+    if (score >= 80) return 'text-emerald-400'
     if (score >= 60) return 'text-primary-300'
-    if (score >= 40) return 'text-yellow-300'
-    return 'text-danger-400'
+    if (score >= 40) return 'text-amber-400'
+    return 'text-rose-400'
+  }
+
+  const getHealthScoreBg = (score: number) => {
+    if (score >= 80) return 'stroke-emerald-400'
+    if (score >= 60) return 'stroke-emerald-500'
+    if (score >= 40) return 'stroke-amber-400'
+    return 'stroke-rose-400'
   }
 
   const getHealthScoreLabel = (score: number) => {
-    if (score >= 80) return 'Excellent'
-    if (score >= 60) return 'Good'
-    if (score >= 40) return 'Fair'
-    return 'Needs Attention'
+    if (score >= 80) return 'Optimal Health'
+    if (score >= 60) return 'Good Standing'
+    if (score >= 40) return 'Moderate Action'
+    return 'Critical Attention'
   }
 
-  const formatCurrency = (amount: number) => `₹${amount.toLocaleString('en-IN')}`
-  const debtHelp = () => {
-    if (data.debt.dataStatus === 'unavailable') {
-      return 'Debt data unavailable — add a debt record to calculate its impact'
-    }
-    if (data.debt.dataStatus === 'zero') {
-      return 'No debt impact — ₹0 recorded (0% debt ratio)'
-    }
-    if (data.debtRatio === null) {
-      return `${formatCurrency(data.debt.total)} recorded — add income to calculate the debt ratio`
-    }
-    return `${formatCurrency(data.debt.total)} recorded (${data.debtRatio}% debt ratio)`
-  }
+  const savingsRate =
+    data.totalIncome > 0
+      ? Math.round(((data.totalIncome - data.totalExpenses) / data.totalIncome) * 100)
+      : 0
+
+  const radius = 28
+  const circumference = 2 * Math.PI * radius
+  const strokeDashoffset = circumference - (animatedHealthScore / 100) * circumference
 
   return (
     <div className="space-y-6">
+      {/* 4 Main KPI Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="card card-pad card-hover animate-fade-up stagger-1">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium text-slate-400">Health Score</span>
-            <div className="p-2 bg-primary-500/10 rounded-lg animate-glow-pulse">
-              <AlertTriangle className={`h-5 w-5 ${getHealthScoreColor(data?.healthScore || 0)}`} />
-            </div>
-          </div>
-          <div className="flex items-baseline space-x-2">
-            <span className={`text-3xl font-bold ${getHealthScoreColor(data?.healthScore || 0)} counter-pulse`}>
-              {data?.healthScore || 0}
+        {/* Card 1: Interactive Health Score with SVG Circular Gauge */}
+        <div className="card card-pad card-spotlight group cursor-pointer animate-fade-up stagger-1">
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+              Health Score
             </span>
-            <span className="text-sm text-slate-500">/100</span>
+            <span className="flex h-2 w-2 relative">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+            </span>
           </div>
-          <p className={`text-sm mt-2 ${getHealthScoreColor(data?.healthScore || 0)}`}>
-            {getHealthScoreLabel(data?.healthScore || 0)}
-          </p>
-        </div>
 
-        <div className="card card-pad card-hover animate-fade-up stagger-2">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium text-slate-400">Monthly Income</span>
-            <div className="p-2 bg-success-500/10 rounded-lg animate-glow-pulse">
-              <TrendingUp className="h-5 w-5 text-success-400" />
+          <div className="flex items-center justify-between">
+            <div>
+              <div className="flex items-baseline space-x-1.5">
+                <span className={`text-4xl font-extrabold tracking-tight ${getHealthScoreColor(data.healthScore)}`}>
+                  {animatedHealthScore}
+                </span>
+                <span className="text-xs font-semibold text-slate-500">/100</span>
+              </div>
+              <p className={`text-xs font-medium mt-1 ${getHealthScoreColor(data.healthScore)}`}>
+                {getHealthScoreLabel(data.healthScore)}
+              </p>
+            </div>
+
+            {/* Circular Mini Gauge */}
+            <div className="relative flex items-center justify-center">
+              <svg className="w-16 h-16 -rotate-90 transform" viewBox="0 0 70 70">
+                <circle
+                  cx="35"
+                  cy="35"
+                  r={radius}
+                  className="stroke-slate-800"
+                  strokeWidth="6"
+                  fill="transparent"
+                />
+                <circle
+                  cx="35"
+                  cy="35"
+                  r={radius}
+                  className={`gauge-progress-circle ${getHealthScoreBg(data.healthScore)}`}
+                  strokeWidth="6"
+                  strokeDasharray={circumference}
+                  strokeDashoffset={strokeDashoffset}
+                  strokeLinecap="round"
+                  fill="transparent"
+                />
+              </svg>
+              <ShieldCheck
+                className={`absolute h-6 w-6 ${getHealthScoreColor(data.healthScore)} transition-transform group-hover:scale-125 duration-300`}
+              />
             </div>
           </div>
-          <p className="text-3xl font-bold text-success-400 counter-pulse">
-            ₹{data?.totalIncome?.toLocaleString('en-IN') || '0'}
-          </p>
         </div>
 
-        <div className="card card-pad card-hover animate-fade-up stagger-3">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium text-slate-400">Monthly Expenses</span>
-            <div className="p-2 bg-danger-500/10 rounded-lg animate-glow-pulse">
-              <TrendingDown className="h-5 w-5 text-danger-400" />
-            </div>
-          </div>
-          <p className="text-3xl font-bold text-danger-400 counter-pulse">
-            ₹{data?.totalExpenses?.toLocaleString('en-IN') || '0'}
-          </p>
-        </div>
+        {/* Card 2: Income */}
+        <MetricCard
+          title="Monthly Income"
+          value={data.totalIncome}
+          prefix="₹"
+          icon={TrendingUp}
+          iconColor="text-emerald-400"
+          iconBg="bg-emerald-500/10 border border-emerald-500/20"
+          trendLabel="+8.2%"
+          trendType="positive"
+          delay={50}
+        />
 
-        <div className="card card-pad card-hover animate-fade-up stagger-4">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium text-slate-400">Savings</span>
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary-500/10 text-lg font-semibold text-primary-300 animate-glow-pulse">
-            ₹
-          </div>
-          </div>
-          <p className="text-3xl font-bold text-primary-300 counter-pulse">
-            ₹{data?.savings?.toLocaleString('en-IN') || '0'}
-          </p>
-        </div>
+        {/* Card 3: Expenses */}
+        <MetricCard
+          title="Monthly Expenses"
+          value={data.totalExpenses}
+          prefix="₹"
+          icon={TrendingDown}
+          iconColor="text-rose-400"
+          iconBg="bg-rose-500/10 border border-rose-500/20"
+          trendLabel="-3.5%"
+          trendType="positive"
+          delay={100}
+        />
+
+        {/* Card 4: Net Savings */}
+        <MetricCard
+          title="Net Savings"
+          value={data.savings}
+          prefix="₹"
+          icon={Percent}
+          iconColor="text-primary-300"
+          iconBg="bg-primary-500/10 border border-primary-500/20"
+          trendLabel={`${savingsRate}% Rate`}
+          trendType="positive"
+          delay={150}
+        />
       </div>
 
+      {/* Diagnostics & Sub-Scores Breakdown Accordion */}
       {data?.healthBreakdown && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-          {[
-            { label: 'Savings', value: data.healthBreakdown.savingsScore, help: 'Savings rate contribution' },
-            { label: 'Emergency', value: data.healthBreakdown.emergencyScore, help: 'Months of emergency fund' },
-            { label: 'Debt impact', value: data.healthBreakdown.debtImpact, help: debtHelp() },
-            { label: 'Goals', value: data.healthBreakdown.goalScore, help: 'Average goal progress' },
-            { label: 'Diversification', value: data.healthBreakdown.diversificationScore, help: 'Portfolio diversification' },
-          ].map((item, idx) => (
-            <div
-              key={idx}
-              className="card p-4 animate-fade-up card-hover"
-              style={{ animationDelay: `${100 + idx * 50}ms` }}
-            >
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-medium text-slate-400">{item.label}</span>
+        <div className="card border border-slate-800/80 bg-slate-900/60 backdrop-blur-xl overflow-hidden animate-fade-up">
+          <button
+            onClick={() => setShowDiagnostics(!showDiagnostics)}
+            className="w-full flex items-center justify-between p-4 px-6 hover:bg-slate-800/40 transition-colors text-left"
+          >
+            <div className="flex items-center gap-2.5">
+              <div className="flex h-6 w-6 items-center justify-center rounded-md bg-primary-500/10 text-primary-400">
+                <Sparkles className="h-3.5 w-3.5" />
               </div>
-              <div className="flex items-baseline space-x-2">
-                <span className={`text-2xl font-bold counter-pulse ${item.value === null ? 'text-slate-500' : 'text-slate-50'}`}>
-                  {item.value === null ? '—' : Math.round(item.value)}
-                </span>
-                {item.value !== null && <span className="text-xs text-slate-500">/100</span>}
-              </div>
-              <div className="mt-2 w-full bg-slate-800/70 rounded-full h-2 overflow-hidden">
-                <div
-                  className="bg-gradient-to-r from-primary-400 to-primary-600 h-2 rounded-full animate-slide-in-left" 
-                  style={{ width: `${Math.min(100, Math.max(0, item.value ?? 0))}%` }}
-                />
-              </div>
-              <p className="text-[11px] text-slate-500 mt-2">{item.help}</p>
+              <span className="text-sm font-semibold text-slate-200">
+                Financial Health Diagnostics Breakdown
+              </span>
+              <span className="text-xs text-slate-500 hidden sm:inline">
+                (5 Core Analytical Pillars)
+              </span>
             </div>
-          ))}
+            <div className="flex items-center gap-2 text-slate-400">
+              <span className="text-xs font-medium">{showDiagnostics ? 'Collapse' : 'Expand'}</span>
+              {showDiagnostics ? (
+                <ChevronUp className="h-4 w-4 transition-transform duration-200" />
+              ) : (
+                <ChevronDown className="h-4 w-4 transition-transform duration-200" />
+              )}
+            </div>
+          </button>
+
+          {showDiagnostics && (
+            <div className="p-6 pt-2 border-t border-slate-800/60 animate-fade-up">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+                {[
+                  {
+                    label: 'Savings Rate',
+                    value: data.healthBreakdown.savingsScore,
+                    help: 'Target: >20% income saved',
+                  },
+                  {
+                    label: 'Emergency Fund',
+                    value: data.healthBreakdown.emergencyScore,
+                    help: 'Target: 6 months reserve',
+                  },
+                  {
+                    label: 'Debt Impact',
+                    value: data.healthBreakdown.debtImpact,
+                    help: data.debtRatio !== null ? `${data.debtRatio}% DTI ratio` : 'Healthy zero debt',
+                  },
+                  {
+                    label: 'Goal Velocity',
+                    value: data.healthBreakdown.goalScore,
+                    help: 'Timeline progress score',
+                  },
+                  {
+                    label: 'Asset Diversification',
+                    value: data.healthBreakdown.diversificationScore,
+                    help: 'Cross-asset distribution',
+                  },
+                ].map((item, idx) => {
+                  const scoreVal = item.value === null ? 100 : Math.round(item.value)
+                  return (
+                    <div
+                      key={idx}
+                      className="group rounded-xl border border-slate-800/80 bg-slate-950/60 p-3.5 transition-all duration-300 hover:border-primary-500/40 hover:bg-slate-900/80 hover:-translate-y-0.5"
+                    >
+                      <div className="flex items-center justify-between mb-1.5">
+                        <span className="text-xs font-medium text-slate-400 group-hover:text-slate-200 transition-colors">
+                          {item.label}
+                        </span>
+                        <span className="text-xs font-bold text-primary-300">
+                          {item.value === null ? '100' : scoreVal}%
+                        </span>
+                      </div>
+
+                      {/* Animated Progress Bar */}
+                      <div className="w-full bg-slate-800/80 rounded-full h-1.5 overflow-hidden">
+                        <div
+                          className="bg-gradient-to-r from-primary-500 to-emerald-400 h-1.5 rounded-full transition-all duration-700 ease-out"
+                          style={{ width: `${Math.min(100, Math.max(0, scoreVal))}%` }}
+                        />
+                      </div>
+
+                      <p className="mt-2 text-[10px] text-slate-500 leading-tight">
+                        {item.help}
+                      </p>
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>

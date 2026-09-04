@@ -904,3 +904,118 @@ input[type="date"]::-webkit-datetime-edit-year-field {
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(100, 116, 139, 0.8);
 }
+
+/* ==========================================================================
+   ADVANCED DASHBOARD UI ENHANCEMENTS: ANIMATIONS & MICRO-INTERACTIONS
+   ========================================================================== */
+
+/* Dynamic Spotlight & 3D Tilt Card */
+.card-spotlight {
+  position: relative;
+  overflow: hidden;
+  transition: transform 350ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 350ms ease, border-color 300ms ease;
+  will-change: transform, box-shadow;
+}
+
+.card-spotlight:hover {
+  transform: translateY(-4px) scale(1.008);
+  box-shadow: 0 16px 36px -12px rgba(2, 6, 23, 0.7), 0 0 24px -4px rgba(16, 185, 129, 0.18);
+  border-color: rgba(52, 211, 153, 0.35);
+}
+
+.card-spotlight::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(52, 211, 153, 0.12), transparent 40%);
+  opacity: 0;
+  transition: opacity 300ms ease;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.card-spotlight:hover::before {
+  opacity: 1;
+}
+
+/* Morphing Icon Action Container */
+.icon-morph-container {
+  transition: transform 300ms cubic-bezier(0.34, 1.56, 0.64, 1), background-color 300ms ease, box-shadow 300ms ease;
+}
+
+.icon-morph-container:hover {
+  transform: scale(1.15) rotate(6deg);
+  box-shadow: 0 0 20px rgba(16, 185, 129, 0.4);
+}
+
+.icon-morph-pulse {
+  animation: pulse-ring 2.5s infinite;
+}
+
+/* Metric Counter Shimmer */
+.metric-counter-glow {
+  text-shadow: 0 0 18px rgba(52, 211, 153, 0.4);
+  transition: all 300ms ease;
+}
+
+/* SVG Circular Gauge Animation */
+.gauge-progress-circle {
+  transition: stroke-dashoffset 1.2s cubic-bezier(0.16, 1, 0.3, 1), stroke 500ms ease;
+}
+
+/* Live sync indicator */
+.live-beacon {
+  position: relative;
+  display: inline-flex;
+}
+
+.live-beacon::before {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  border-radius: 9999px;
+  background-color: rgb(34 197 94);
+  opacity: 0.75;
+  animation: radar-ping 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+/* Quick Action Card Advanced Hover */
+.quick-action-card {
+  position: relative;
+  transition: transform 260ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 260ms ease;
+  will-change: transform;
+}
+
+.quick-action-card:hover {
+  transform: translateY(-5px) scale(1.02);
+}
+
+.quick-action-card .action-arrow {
+  opacity: 0;
+  transform: translateX(-8px);
+  transition: all 250ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.quick-action-card:hover .action-arrow {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.quick-action-card .action-icon {
+  transition: transform 350ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.quick-action-card:hover .action-icon {
+  transform: scale(1.22) rotate(-6deg);
+}
+
+/* Filter Tab Smooth Slider Pill */
+.tab-pill-btn {
+  position: relative;
+  transition: all 200ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.tab-pill-btn:hover {
+  color: #f8fafc;
+}
+
