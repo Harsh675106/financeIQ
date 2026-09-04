@@ -367,30 +367,53 @@ export default function FinancialOverview() {
                   {
                     label: 'Savings Rate',
                     value: data.healthBreakdown.savingsScore,
+                    unit: '%',
                     help: 'Target: >20% income saved',
+                    color: 'from-primary-500 to-emerald-400',
                   },
                   {
                     label: 'Emergency Fund',
                     value: data.healthBreakdown.emergencyScore,
+                    unit: '%',
                     help: 'Target: 6 months reserve',
+                    color: 'from-primary-500 to-emerald-400',
                   },
                   {
-                    label: 'Debt Impact',
+                    label: 'Debt Burden',
                     value: data.healthBreakdown.debtImpact,
-                    help: data.debtRatio !== null ? `${data.debtRatio}% DTI ratio` : 'Healthy zero debt',
+                    unit: '%',
+                    help:
+                      data.debt.dataStatus === 'unavailable'
+                        ? 'No debt records added'
+                        : data.debt.total === 0 || data.healthBreakdown.debtImpact === 0
+                        ? 'Healthy — 0% debt burden'
+                        : data.debtRatio !== null
+                        ? `${data.debtRatio}% DTI ratio`
+                        : `₹${data.debt.total.toLocaleString('en-IN')} total debt`,
+                    color:
+                      (data.healthBreakdown.debtImpact || 0) > 40
+                        ? 'from-rose-500 to-red-500'
+                        : 'from-emerald-500 to-teal-400',
+                    isDebt: true,
                   },
                   {
                     label: 'Goal Velocity',
                     value: data.healthBreakdown.goalScore,
+                    unit: '%',
                     help: 'Timeline progress score',
+                    color: 'from-primary-500 to-emerald-400',
                   },
                   {
                     label: 'Asset Diversification',
                     value: data.healthBreakdown.diversificationScore,
+                    unit: '%',
                     help: 'Cross-asset distribution',
+                    color: 'from-primary-500 to-emerald-400',
                   },
                 ].map((item, idx) => {
-                  const scoreVal = item.value === null ? 100 : Math.round(item.value)
+                  const hasValue = item.value !== null && item.value !== undefined
+                  const scoreVal = hasValue ? Math.round(item.value as number) : null
+
                   return (
                     <div
                       key={idx}
@@ -400,16 +423,28 @@ export default function FinancialOverview() {
                         <span className="text-xs font-medium text-slate-400 group-hover:text-slate-200 transition-colors">
                           {item.label}
                         </span>
-                        <span className="text-xs font-bold text-primary-300">
-                          {item.value === null ? '100' : scoreVal}%
+                        <span
+                          className={`text-xs font-bold ${
+                            scoreVal === null
+                              ? 'text-slate-500'
+                              : item.isDebt && scoreVal === 0
+                              ? 'text-emerald-400'
+                              : 'text-primary-300'
+                          }`}
+                        >
+                          {scoreVal === null ? '—' : `${scoreVal}%`}
                         </span>
                       </div>
 
                       {/* Animated Progress Bar */}
                       <div className="w-full bg-slate-800/80 rounded-full h-1.5 overflow-hidden">
                         <div
-                          className="bg-gradient-to-r from-primary-500 to-emerald-400 h-1.5 rounded-full transition-all duration-700 ease-out"
-                          style={{ width: `${Math.min(100, Math.max(0, scoreVal))}%` }}
+                          className={`bg-gradient-to-r ${item.color} h-1.5 rounded-full transition-all duration-700 ease-out`}
+                          style={{
+                            width: `${
+                              scoreVal === null ? 0 : Math.min(100, Math.max(0, scoreVal))
+                            }%`,
+                          }}
                         />
                       </div>
 
