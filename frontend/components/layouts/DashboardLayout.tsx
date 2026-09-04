@@ -307,13 +307,6 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                   <span className="sr-only">Open navigation</span>
                   <Menu className="h-5 w-5" />
                 </button>
-
-                <div className="flex items-center gap-2 pl-12 lg:pl-0">
-                  <div className="hidden sm:flex items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-3 py-1 text-xs text-emerald-300">
-                    <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-                    <span className="font-semibold tracking-wide uppercase text-[10px]">Real-time Engine</span>
-                  </div>
-                </div>
               </div>
 
               {/* Right Side Header Controls */}
