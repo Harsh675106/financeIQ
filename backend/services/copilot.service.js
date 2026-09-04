@@ -46,7 +46,179 @@ function createCitation(id, type, label, detail, extras = {}) {
   };
 }
 
-async function getRecentTransactions(userId, limit = 8) {
+async function getUserProfileDetails(userId) {
+  try {
+    const [userRes, profileRes] = await Promise.all([
+      pool.query(`SELECT id, name, email, age FROM users WHERE id = $1`, [userId]).catch(() => ({ rows: [] })),
+      pool.query(`SELECT age, retirement_age, dependents, income_stability, risk_quiz_score, target_allocation FROM profiles WHERE user_id = $1`, [userId]).catch(() => ({ rows: [] })),
+    ]);
+    const user = userRes.rows[0] || {};
+    const profile = profileRes.rows[0] || {};
+    return {
+      name: user.name || "User",
+      email: user.email || null,
+      age: user.age || profile.age || null,
+      retirementAge: profile.retirement_age || 60,
+      dependents: profile.dependents || 0,
+      incomeStability: profile.income_stability || "Stable",
+      riskQuizScore: profile.risk_quiz_score || null,
+      targetAllocation: profile.target_allocation || null,
+    };
+  } catch {
+    return { name: "User", age: null, retirementAge: 60, dependents: 0, incomeStability: "Stable" };
+  }
+}
+
+async function getBudgetVarianceRows(userId) {
+  try {
+    const [budgetsRes, spendRes] = await Promise.all([
+      pool.query(
+        `SELECT category, amount_monthly
+         FROM budgets
+         WHERE user_id = $1
+         ORDER BY amount_monthly DESC, category ASC`,
+        [userId],
+      ).catch(() => ({ rows: [] })),
+      pool.query(
+        `SELECT category, SUM(amount) as spent
+         FROM transactions
+         WHERE user_id = $1
+           AND type = 'expense'
+           AND date >= DATE_TRUNC('month', CURRENT_DATE)
+         GROUP BY category`,
+        [userId],
+      ).catch(() => ({ rows: [] })),
+    ]);
+
+    const spendMap = {};
+    for (const row of spendRes.rows) {
+      spendMap[row.category] = parseFloat(row.spent) || 0;
+    }
+
+    return budgetsRes.rows.map((b) => {
+      const monthlyLimit = parseFloat(b.amount_monthly) || 0;
+      const currentMonthSpent = round2(spendMap[b.category] || 0);
+      const remaining = round2(monthlyLimit - currentMonthSpent);
+      const percentUsed = monthlyLimit > 0 ? round2((currentMonthSpent / monthlyLimit) * 100) : 0;
+      return {
+        category: b.category,
+        monthlyLimit,
+        currentMonthSpent,
+        remaining,
+        percentUsed,
+        status: percentUsed > 100 ? `Over Budget by ₹${currency(currentMonthSpent - monthlyLimit)} (${percentUsed}%)` : `${percentUsed}% used (₹${currency(remaining)} remaining)`,
+      };
+    });
+  } catch {
+    return [];
+  }
+}
+
+async function getComprehensiveDebtsAndLiabilities(userId) {
+  try {
+    const [debtsRes, liabRes] = await Promise.all([
+      pool.query(
+        `SELECT id, amount, interest_rate, debt_type, description
+         FROM debts
+         WHERE user_id = $1
+         ORDER BY interest_rate DESC NULLS LAST, amount DESC`,
+        [userId],
+      ).catch(() => ({ rows: [] })),
+      pool.query(
+        `SELECT id, amount, rate, type, due_date
+         FROM liabilities
+         WHERE user_id = $1
+         ORDER BY amount DESC`,
+        [userId],
+      ).catch(() => ({ rows: [] })),
+    ]);
+
+    const list = [];
+    for (const d of debtsRes.rows) {
+      const balance = parseFloat(d.amount) || 0;
+      const rate = parseFloat(d.interest_rate) || 0;
+      list.push({
+        id: `debt-${d.id}`,
+        source: "debt",
+        type: d.debt_type || "Debt",
+        description: d.description || d.debt_type || "Loan",
+        balance,
+        annualInterestRate: rate,
+        estimatedMinimumPayment: round2(Math.max(500, balance * 0.03)),
+      });
+    }
+    for (const l of liabRes.rows) {
+      list.push({
+        id: `liability-${l.id}`,
+        source: "liability",
+        type: l.type || "Liability",
+        description: l.type || "Liability",
+        balance: parseFloat(l.amount) || 0,
+        annualInterestRate: parseFloat(l.rate) || 0,
+        dueDate: l.due_date || null,
+      });
+    }
+    return list;
+  } catch {
+    return [];
+  }
+}
+
+async function getComprehensiveGoals(userId) {
+  try {
+    const result = await pool.query(
+      `SELECT id, name, target_amount, current_amount, target_date, monthly_contribution, status
+       FROM goals
+       WHERE user_id = $1
+       ORDER BY target_date ASC NULLS LAST, id ASC`,
+      [userId],
+    ).catch(() => ({ rows: [] }));
+
+    return result.rows.map((g) => {
+      const target = parseFloat(g.target_amount) || 0;
+      const current = parseFloat(g.current_amount) || 0;
+      const gap = round2(Math.max(0, target - current));
+      const progressPercent = target > 0 ? round2((current / target) * 100) : 0;
+      return {
+        id: g.id,
+        name: g.name,
+        targetAmount: target,
+        currentAmount: current,
+        gap,
+        progressPercent,
+        targetDate: g.target_date,
+        monthlyContribution: parseFloat(g.monthly_contribution) || 0,
+        status: g.status || "active",
+      };
+    });
+  } catch {
+    return [];
+  }
+}
+
+async function getTopExpenseCategories(userId) {
+  try {
+    const result = await pool.query(
+      `SELECT category, SUM(amount) as total_amount, COUNT(*) as count
+       FROM transactions
+       WHERE user_id = $1 AND type = 'expense'
+       GROUP BY category
+       ORDER BY total_amount DESC
+       LIMIT 6`,
+      [userId],
+    ).catch(() => ({ rows: [] }));
+
+    return result.rows.map((r) => ({
+      category: r.category || "Other",
+      totalAmount: round2(parseFloat(r.total_amount) || 0),
+      transactionCount: parseInt(r.count, 10) || 0,
+    }));
+  } catch {
+    return [];
+  }
+}
+
+async function getRecentTransactions(userId, limit = 15) {
   const result = await pool.query(
     `SELECT id, date, type, amount, category, description
      FROM transactions
@@ -562,7 +734,8 @@ function applyScenarioToAffordability(affordability, scenarioResult) {
   };
 }
 
-function buildContextSnapshot(
+function buildContextSnapshot({
+  userProfile,
   dashboard,
   forecast,
   briefing,
@@ -571,37 +744,107 @@ function buildContextSnapshot(
   citationCatalog,
   affordability,
   budgets,
+  budgetVariances,
+  topExpenseCategories,
+  comprehensiveDebts,
+  comprehensiveGoals,
   transactions,
   savings,
   portfolio,
   riskProfile,
   liveMarketContext,
-) {
+}) {
+  const totalMonthlyIncome = round2(dashboard.totals?.income || forecast.baseline?.monthlyIncome || 0);
+  const totalMonthlyExpenses = round2(dashboard.totals?.expenses || forecast.baseline?.monthlyExpense || 0);
+  const netMonthlySurplus = round2(totalMonthlyIncome - totalMonthlyExpenses);
+  const savingsRate = totalMonthlyIncome > 0 ? round2((netMonthlySurplus / totalMonthlyIncome) * 100) : 0;
+  const totalSavings = round2(
+    savings.reduce((sum, item) => sum + (item.amount || 0), 0) || dashboard.totals?.savings || 0,
+  );
+  const emergencyReserveMonths = totalMonthlyExpenses > 0 ? round2(totalSavings / totalMonthlyExpenses) : 0;
+  const totalDebt = round2(
+    comprehensiveDebts.reduce((sum, d) => sum + (d.balance || 0), 0) ||
+    debtPlan.debts?.reduce((sum, d) => sum + (d.balance || 0), 0) ||
+    dashboard.debt?.total || 0,
+  );
+  const totalInvestments = round2(portfolio.totalValue || 0);
+  const estimatedNetWorth = round2(totalSavings + totalInvestments - totalDebt);
+
   return {
-    dashboard: {
-      healthScore: dashboard.healthScore,
-      totals: dashboard.totals,
-      metrics: dashboard.metrics,
-      insights: dashboard.insights,
-      netWorth: dashboard.netWorth,
+    userProfile: {
+      name: userProfile?.name || "User",
+      age: userProfile?.age || null,
+      retirementAge: userProfile?.retirementAge || 60,
+      dependents: userProfile?.dependents || 0,
+      incomeStability: userProfile?.incomeStability || "Stable",
+      currency: "INR (₹)",
     },
-    forecast,
+    balanceSheet: {
+      totalLiquidSavings: totalSavings,
+      totalInvestments,
+      totalDebt,
+      estimatedNetWorth,
+      emergencyReserveMonths,
+      healthScore: dashboard.healthScore,
+      riskLevel: riskProfile.portfolioRiskLevel,
+      riskScore: riskProfile.portfolioRiskScore,
+      stressProbabilityPercent: riskProfile.stressProbability ?? 8.5,
+    },
+    cashflowSummary: {
+      monthlyIncome: totalMonthlyIncome,
+      monthlyExpenses: totalMonthlyExpenses,
+      netMonthlySurplus,
+      savingsRatePercent: savingsRate,
+      baselineForecast: forecast.baseline,
+      sixMonthTrend: forecast.forecast,
+    },
+    budgetPerformance: budgetVariances.length > 0 ? budgetVariances : budgets,
+    topSpendingCategories: topExpenseCategories,
+    recentTransactions: transactions.slice(0, 15),
+    recurringSubscriptionsAndBills: briefing.recurringSubscriptions,
+    debtsAndLiabilities: comprehensiveDebts.length > 0 ? comprehensiveDebts : (debtPlan.debts || []),
+    debtOptimizationPlan: {
+      hasDebts: debtPlan.hasDebts,
+      monthlyPaymentBudget: debtPlan.monthlyPaymentBudget,
+      recommendedStrategy: debtPlan.recommendedStrategy,
+      strategies: debtPlan.strategies,
+    },
+    goals: comprehensiveGoals.length > 0 ? comprehensiveGoals : goalProjections.map((g) => ({
+      name: g.goal.name,
+      targetAmount: g.goal.target_amount,
+      currentAmount: g.goal.current_amount,
+      targetDate: g.goal.target_date,
+      successProbability: g.projection.successProbability,
+      projectedShortfall: g.projection.projectedShortfall,
+      recommendation: g.projection.recommendation,
+    })),
+    goalProjections: goalProjections.map((g) => ({
+      name: g.goal.name,
+      targetAmount: g.goal.target_amount,
+      currentAmount: g.goal.current_amount,
+      targetDate: g.goal.target_date,
+      successProbability: g.projection.successProbability,
+      projectedShortfall: g.projection.projectedShortfall,
+      recommendation: g.projection.recommendation,
+    })),
+    portfolio: {
+      hasPortfolio: portfolio.hasPortfolio,
+      totalValue: portfolio.totalValue,
+      currentAllocation: portfolio.currentAllocation,
+      targetAllocation: portfolio.targetAllocation,
+      riskScore: portfolio.risk?.score,
+      riskLevel: portfolio.risk?.level,
+      annualVolatilityPercent: portfolio.risk?.annualVolatility,
+      holdings: portfolio.holdings,
+    },
+    affordabilitySnapshot: affordability,
     briefing: {
       summary: briefing.summary,
       priorities: briefing.priorities,
       opportunities: briefing.opportunities,
-      recurringSubscriptions: briefing.recurringSubscriptions,
     },
-    savings,
-    budgets,
-    recentTransactions: transactions,
-    debtPlan,
-    goalProjections,
-    portfolio,
-    riskProfile,
-    liveMarketContext,
+    liveMarketQuote: liveMarketContext?.result || null,
     citationCatalog,
-    affordability,
   };
 }
 
@@ -1057,6 +1300,27 @@ async function answerPortfolioQuestion(portfolio, riskProfile, citationMap, live
   };
 }
 
+async function answerInvestingQuestion(dashboard, forecast, briefing) {
+  const monthlyIncome = round2(forecast.baseline?.monthlyIncome || 0);
+  const monthlyExpense = round2(forecast.baseline?.monthlyExpense || 0);
+  const monthlySurplus = round2(monthlyIncome - monthlyExpense);
+  const priority = briefing.priorities?.[0];
+
+  return {
+    answer: `To build wealth through investing, prioritize systematic compounding: invest consistently in diversified index funds or blue-chip assets, reinvest dividends/gains, and avoid excessive speculative trading. Based on your FinanceIQ data, your monthly surplus is approximately ${currency(monthlySurplus)}. First maintain a 3-6 month emergency cash buffer, then route a disciplined portion of your surplus into automated SIPs. ${priority ? `Also consider addressing "${priority.title}" to protect your downside.` : ""}`.trim(),
+    citations: [],
+    followUps: [
+      "How much of my monthly surplus can I invest safely?",
+      "Should I prioritize debt payoff or investing first?",
+      "How do I balance my portfolio between equity and debt?",
+    ],
+    assistantMeta: buildAssistantMeta({
+      usedFinanceData: true,
+      usedGeneralKnowledge: true,
+    }),
+  };
+}
+
 async function answerRiskQuestion(dashboard, riskProfile, portfolio, citationMap) {
   return {
     answer: `Your money risk picture is mixed across two layers: cashflow risk is ${riskProfile.cashflowRisk.toLowerCase()} and portfolio risk is ${riskProfile.portfolioRiskLevel.toLowerCase()}. Emergency runway is ${riskProfile.emergencyMonths} month(s), debt ratio is ${riskProfile.debtRatio}%, and your overall health score is ${dashboard.healthScore}/100. ${riskProfile.cashflowRisk === "High" ? "I would fix liquidity and debt pressure before taking more investment risk." : "That gives you a more stable base for goal funding and investing decisions."}`,
@@ -1230,30 +1494,23 @@ async function answerAffordabilityQuestion(
   };
 }
 
-function extractResponseText(response) {
-  if (typeof response?.output_text === "string" && response.output_text.length > 0) {
-    return response.output_text;
-  }
-
-  const parts = [];
-  for (const item of response?.output || []) {
-    for (const content of item?.content || []) {
-      if (content?.type === "output_text" && content?.text) {
-        parts.push(content.text);
-      }
-      if (content?.type === "text" && content?.text) {
-        parts.push(content.text);
-      }
-    }
-  }
-  return parts.join("\n").trim();
-}
-
 function getLlmClientConfig() {
+  const primaryModel = process.env.GROQ_MODEL || "openai/gpt-oss-120b";
+  const candidateModels = Array.from(
+    new Set([
+      primaryModel,
+      "openai/gpt-oss-120b",
+      "openai/gpt-oss-20b",
+      "qwen/qwen3.8-27b",
+      "groq/compound",
+      "groq/compound-mini",
+    ])
+  );
+
   return {
     apiKey: process.env.GROQ_API_KEY,
     baseUrl: process.env.GROQ_BASE_URL || "https://api.groq.com/openai/v1",
-    model: process.env.GROQ_MODEL || "llama-3.3-70b-versatile",
+    models: candidateModels,
   };
 }
 
@@ -1262,18 +1519,52 @@ function extractJsonObject(rawText) {
     throw new Error("LLM response was not text");
   }
 
-  const trimmed = rawText.trim();
-  if (trimmed.startsWith("{") && trimmed.endsWith("}")) {
-    return JSON.parse(trimmed);
+  let cleaned = rawText.trim();
+  // Strip markdown code fences if present
+  if (cleaned.startsWith("```json")) {
+    cleaned = cleaned.slice(7);
+  } else if (cleaned.startsWith("```")) {
+    cleaned = cleaned.slice(3);
+  }
+  if (cleaned.endsWith("```")) {
+    cleaned = cleaned.slice(0, -3);
+  }
+  cleaned = cleaned.trim();
+
+  if (cleaned.startsWith("{") && cleaned.endsWith("}")) {
+    try {
+      return JSON.parse(cleaned);
+    } catch (e) {}
   }
 
-  const firstBrace = trimmed.indexOf("{");
-  const lastBrace = trimmed.lastIndexOf("}");
+  const firstBrace = cleaned.indexOf("{");
+  const lastBrace = cleaned.lastIndexOf("}");
   if (firstBrace >= 0 && lastBrace > firstBrace) {
-    return JSON.parse(trimmed.slice(firstBrace, lastBrace + 1));
+    try {
+      return JSON.parse(cleaned.slice(firstBrace, lastBrace + 1));
+    } catch (e) {}
   }
 
-  throw new Error("LLM response did not contain JSON");
+  // If LLM returned raw text answer without JSON wrapper
+  if (cleaned.length > 20) {
+    return {
+      answer: cleaned,
+      citations: [],
+      followUps: [
+        "How can I optimize this further?",
+        "What is the impact on my monthly cashflow?",
+        "Show me a step-by-step roadmap.",
+      ],
+      assistantMeta: {
+        style: "executive",
+        usedFinanceData: true,
+        usedGeneralKnowledge: true,
+        needsMoreData: false,
+      },
+    };
+  }
+
+  throw new Error("LLM response did not contain valid JSON or answer");
 }
 
 function normalizeLlmPayload(payload) {
@@ -1288,10 +1579,14 @@ function normalizeLlmPayload(payload) {
       : [],
     followUps: Array.isArray(payload.followUps)
       ? payload.followUps.filter((item) => typeof item === "string")
-      : [],
+      : [
+          "How can I optimize this further?",
+          "What is the impact on my monthly cashflow?",
+          "Show me a step-by-step roadmap.",
+        ],
     assistantMeta: payload.assistantMeta && typeof payload.assistantMeta === "object"
       ? buildAssistantMeta({
-          style: typeof payload.assistantMeta.style === "string" ? payload.assistantMeta.style : "interactive",
+          style: typeof payload.assistantMeta.style === "string" ? payload.assistantMeta.style : "executive",
           usedFinanceData: Boolean(payload.assistantMeta.usedFinanceData),
           usedGeneralKnowledge: Boolean(payload.assistantMeta.usedGeneralKnowledge),
           needsMoreData: Boolean(payload.assistantMeta.needsMoreData),
@@ -1323,60 +1618,114 @@ function extractChatCompletionText(response) {
 }
 
 async function getGroqAssistantResponse(question, history, contextSnapshot) {
-  const { apiKey, baseUrl, model } = getLlmClientConfig();
+  const { apiKey, baseUrl, models } = getLlmClientConfig();
   if (!apiKey) {
     return null;
   }
 
-  const apiResponse = await axios.post(
-    `${baseUrl.replace(/\/+$/, "")}/chat/completions`,
-    {
-      model,
-      temperature: 0.3,
-      messages: [
-        {
-          role: "system",
-          content:
-            "You are FinanceIQ Assistant, a professional personal finance copilot. You may answer only finance and money topics. Cover the user's complete finance picture when relevant: cashflow, savings, budgets, debts, goals, transactions, net worth, portfolio allocation, investing, and risk. Use the provided personal finance context as first source of truth. You may also use broader finance knowledge and live market context when the question is still about finance. Never invent personal facts not present in context. If liveMarketContext is present, you may answer current price/rate questions from it and connect the answer back to the user's finances when possible. If the user asks something non-finance, politely refuse and steer back to finance topics. If the user asks something personal and data is missing, say exactly what is missing. Keep answers concise, practical, conversational, and professional. Reply with valid JSON only using keys answer, citations, followUps, assistantMeta. The citations field must contain citation ids copied exactly from citationCatalog only, and should be an empty array when no citation from the provided context directly supports the answer. assistantMeta must be an object with keys style, usedFinanceData, usedGeneralKnowledge, needsMoreData, missingData.",
-        },
-        {
-          role: "system",
-          content: `Financial context:\n${JSON.stringify(contextSnapshot)}`,
-        },
-        ...history.map((item) => ({
-          role: item.role === "assistant" ? "assistant" : "user",
-          content: item.content,
-        })),
-        {
-          role: "user",
-          content: question,
-        },
-      ],
-      response_format: {
-        type: "json_object",
-      },
-    },
-    {
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
-      },
-      timeout: 30000,
-    },
-  );
+  const systemPrompt = `You are AURA 2.0, the world-class Chief Financial Officer, Quantitative Financial Architect, and Elite AI Co-Pilot of FinanceIQ.
+Your purpose is to provide deeply intelligent, highly accurate, mathematically sound, and actionable personal finance intelligence grounded entirely in the user's real financial telemetry.
 
-  const rawText = extractChatCompletionText(apiResponse.data);
-  return normalizeLlmPayload(extractJsonObject(rawText));
+CORE DIRECTIVES:
+1. DEEPLY ANALYZE AND USE THE USER'S ACTUAL DATA:
+   - Always reference their real numbers from balanceSheet, cashflowSummary, debtsAndLiabilities, budgetPerformance, and goals.
+   - For affordability queries ("Can I afford X?"): Calculate exact down payments, loan interest, monthly EMI, impact on emergency reserves, and post-purchase cash headroom.
+   - For investment queries: Evaluate emergency runway first, calculate investable monthly surplus, and provide exact allocation breakdown (Equity/Debt/Gold/Cash).
+   - For debt queries: Detail exact Avalanche (highest APR first) vs Snowball (smallest balance first) payoff schedules with timeline in months and interest savings in ₹.
+   - For goal queries: Calculate the exact monthly SIP/contribution required to achieve 100% success probability by target date.
+   - For budget/spending queries: Pinpoint specific category overages and subscription leakages from their actual transactions.
+   - For general/tax/market queries: Provide clear, expert financial explanations illustrated with examples relevant to their income and portfolio.
+
+2. ADAPTIVE PERSONA:
+   - If question contains [Focus: Capital Preservation & Risk Mitigation], emphasize downside protection, liquidity buffers, and debt elimination.
+   - If question contains [Focus: High Growth & Alpha Velocity], emphasize systematic compounding, high-return SIPs, and surplus expansion.
+   - Otherwise, maintain an executive, balanced, empowering wealth architecture tone.
+
+3. STRUCTURE & FORMATTING:
+   - Format answers using clean GitHub markdown with bold headers, bullet lists, and rupee amounts (₹).
+   - Maintain a crisp structure:
+     • **Executive Verdict / Direct Answer**
+     • **Data & Math Breakdown** (specific numbers, balances, EMIs, margins)
+     • **Step-by-Step Strategic Roadmap**
+   - Provide 3 highly relevant, contextual follow-up questions in "followUps".
+
+4. OUTPUT FORMAT:
+   - Respond ONLY with a valid JSON object:
+   {
+     "answer": "Your comprehensive markdown answer...",
+     "citations": ["citation-id-1", ...],
+     "followUps": ["Follow up 1?", "Follow up 2?", "Follow up 3?"],
+     "assistantMeta": {
+       "style": "executive",
+       "usedFinanceData": true,
+       "usedGeneralKnowledge": true,
+       "needsMoreData": false,
+       "missingData": []
+     }
+   }`;
+
+  const conversationHistory = history.slice(-8).map((item) => ({
+    role: item.role === "assistant" ? "assistant" : "user",
+    content: item.content,
+  }));
+
+  // Multi-model fallback cascade
+  let lastError = null;
+  for (const model of models) {
+    try {
+      const apiResponse = await axios.post(
+        `${baseUrl.replace(/\/+$/, "")}/chat/completions`,
+        {
+          model,
+          temperature: 0.3,
+          messages: [
+            {
+              role: "system",
+              content: systemPrompt,
+            },
+            {
+              role: "system",
+              content: `LIVE USER COMPLETE FINANCIAL TELEMETRY:\n${JSON.stringify(contextSnapshot, null, 2)}`,
+            },
+            ...conversationHistory,
+            {
+              role: "user",
+              content: question,
+            },
+          ],
+          response_format: {
+            type: "json_object",
+          },
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${apiKey}`,
+            "Content-Type": "application/json",
+          },
+          timeout: 25000,
+        },
+      );
+
+      const rawText = extractChatCompletionText(apiResponse.data);
+      if (rawText) {
+        return normalizeLlmPayload(extractJsonObject(rawText));
+      }
+    } catch (error) {
+      lastError = error;
+      console.warn(`Groq model ${model} failed:`, error.response?.data?.error?.message || error.message);
+      // Continue to next candidate model
+    }
+  }
+
+  if (lastError) {
+    throw lastError;
+  }
+  return null;
 }
 
 async function answerInvestingQuestion(dashboard, forecast, briefing) {
-  const monthlyIncome = round2(forecast.baseline.monthlyIncome || 0);
-  const monthlyExpense = round2(forecast.baseline.monthlyExpense || 0);
-  const monthlySurplus = round2(monthlyIncome - monthlyExpense);
-  const priority = briefing.priorities[0];
-
   return {
-    answer: `To increase income from the share market, focus on process instead of chasing fast returns: invest regularly in diversified index funds or high-quality businesses, add capital consistently, reinvest gains, and avoid oversized bets or frequent trading. In your FinanceIQ data, monthly surplus is about ${currency(monthlySurplus)}, so the first step is to route a fixed part of that into investing only after keeping a cash buffer. ${priority ? `Before taking more market risk, handle "${priority.title}" as well.` : ""}`.trim(),
+    answer: "I can provide insights on your investment strategy, including asset allocation, SIP planning, and risk management based on your financial goals.",
     citations: [],
     followUps: [
       "How much of my monthly surplus can I invest safely?",
@@ -1392,12 +1741,12 @@ async function answerInvestingQuestion(dashboard, forecast, briefing) {
 
 function buildOutOfScopeResponse() {
   return {
-    answer: "I can help only with finance and money topics, such as savings, debt, goals, transactions, budgets, portfolio risk, investing, and market prices that relate to your finances.",
+    answer: "I can help with all areas of your money: savings, emergency fund runway, debt payoff plans, goal tracking, category budgets, transaction audits, portfolio risk, and live market quotes.",
     citations: [],
     followUps: [
-      "Review my savings plan.",
-      "How risky is my portfolio?",
-      "What is the price of gold today and how does it affect me?",
+      "Review my complete financial health.",
+      "How do I optimize my monthly savings?",
+      "Stress test my portfolio.",
     ],
     assistantMeta: buildAssistantMeta({
       usedFinanceData: false,
@@ -1485,12 +1834,12 @@ async function getRuleBasedResponse(
 
   if (containsAny(normalized, ["hello", "hi", "hey"])) {
     return {
-      answer: "Hello. I can help with your full money picture: savings, budgets, cashflow, debts, goals, transactions, portfolio allocation, risk, and finance-market questions that matter to your finances.",
+      answer: "Hello. I am your FinanceIQ AI Co-Pilot. I have access to your full financial data: income, expenses, liquid savings, debts, goals, portfolio allocation, and budgets. Ask me anything about optimizing your wealth!",
       citations: citationsById(citationMap, ["metric.health-score"]),
       followUps: [
         "Review my full financial situation.",
-        "What should I fix first?",
-        "What is the price of gold today and does it matter for me?",
+        "What is my monthly savings surplus?",
+        "How can I become debt-free faster?",
       ],
       assistantMeta: buildAssistantMeta({
         usedFinanceData: true,
@@ -1501,8 +1850,8 @@ async function getRuleBasedResponse(
 
   return {
     answer: `${briefing.summary} Top recommendation: ${
-      briefing.priorities[0]?.title || "keep building your financial data"
-    }. I can also help with savings, debt payoff, goals, risk, portfolio allocation, transactions, and live finance-market questions like gold price when they matter to your money.`,
+      briefing.priorities[0]?.title || "keep building your financial telemetry"
+    }. I can also help with savings, debt payoff, goals, risk, portfolio allocation, transactions, and live finance-market trends.`,
     citations: citationsById(citationMap, ["briefing.top-priority", "metric.health-score", "forecast.lowest-month", "risk.profile"]),
     followUps: [
       "Give me a full finance review.",
@@ -1518,18 +1867,40 @@ async function getRuleBasedResponse(
 
 async function getCopilotResponse(userId, question, history = []) {
   const liveMarketSymbol = extractMarketQuery(question);
-  const [dashboard, forecast, briefing, debtPlan, goalProjections, budgets, transactions, savings, portfolio, liveMarketContext] = await Promise.all([
+  const [
+    userProfile,
+    dashboard,
+    forecast,
+    briefing,
+    debtPlan,
+    goalProjections,
+    budgets,
+    budgetVariances,
+    topExpenseCategories,
+    comprehensiveDebts,
+    comprehensiveGoals,
+    transactions,
+    savings,
+    portfolio,
+    liveMarketContext,
+  ] = await Promise.all([
+    getUserProfileDetails(userId),
     getDashboardAnalytics(userId),
     forecastNext6Months(userId),
     getFinancialBriefing(userId),
     getDebtOptimization(userId),
     getUserGoalProjections(userId),
     getBudgetRows(userId),
-    getRecentTransactions(userId),
+    getBudgetVarianceRows(userId),
+    getTopExpenseCategories(userId),
+    getComprehensiveDebtsAndLiabilities(userId),
+    getComprehensiveGoals(userId),
+    getRecentTransactions(userId, 15),
     getSavingsRows(userId),
     getPortfolioSnapshot(userId),
     liveMarketSymbol ? searchMarketAsset(liveMarketSymbol) : Promise.resolve(null),
   ]);
+
   const riskProfile = await getRiskProfile(userId, dashboard, portfolio);
 
   const { catalog, map: citationMap } = buildCitationCatalog(
@@ -1544,6 +1915,7 @@ async function getCopilotResponse(userId, question, history = []) {
     portfolio,
     riskProfile,
   );
+
   const affordability = buildAffordabilitySnapshot(
     dashboard,
     forecast,
@@ -1551,21 +1923,26 @@ async function getCopilotResponse(userId, question, history = []) {
     goalProjections,
   );
 
-  const contextSnapshot = buildContextSnapshot(
+  const contextSnapshot = buildContextSnapshot({
+    userProfile,
     dashboard,
     forecast,
     briefing,
     debtPlan,
     goalProjections,
-    catalog,
+    citationCatalog: catalog,
     affordability,
     budgets,
+    budgetVariances,
+    topExpenseCategories,
+    comprehensiveDebts,
+    comprehensiveGoals,
     transactions,
     savings,
     portfolio,
     riskProfile,
     liveMarketContext,
-  );
+  });
 
   try {
     const groqResponse = await getGroqAssistantResponse(question, history, contextSnapshot);

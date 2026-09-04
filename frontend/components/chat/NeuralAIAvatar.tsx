@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React from 'react'
 import {
   Sparkles,
   Zap,
@@ -20,6 +20,8 @@ interface NeuralAIAvatarProps {
   persona: PersonaMode
   onPersonaChange: (persona: PersonaMode) => void
   confidenceScore?: number
+  audioEnabled?: boolean
+  onToggleAudio?: () => void
 }
 
 export default function NeuralAIAvatar({
@@ -27,9 +29,9 @@ export default function NeuralAIAvatar({
   persona,
   onPersonaChange,
   confidenceScore = 99.4,
+  audioEnabled = true,
+  onToggleAudio,
 }: NeuralAIAvatarProps) {
-  const [audioEnabled, setAudioEnabled] = useState(true)
-
   const personaConfig = {
     wealth: {
       name: 'AURA 2.0 • Wealth Strategist',
@@ -71,7 +73,11 @@ export default function NeuralAIAvatar({
             {/* Outer Orbit Ring 1 */}
             <div
               className={`absolute inset-0 rounded-full border border-emerald-400/40 ${
-                status === 'thinking' ? 'animate-spin [animation-duration:3s]' : 'neural-avatar-orbit-1'
+                status === 'thinking'
+                  ? 'animate-spin [animation-duration:2.5s]'
+                  : status === 'speaking'
+                  ? 'animate-spin [animation-duration:5s]'
+                  : 'neural-avatar-orbit-1'
               }`}
               style={{ boxShadow: `0 0 20px ${currentPersona.glow}` }}
             >
@@ -81,7 +87,11 @@ export default function NeuralAIAvatar({
             {/* Inner Orbit Ring 2 */}
             <div
               className={`absolute inset-2 rounded-full border border-cyan-400/40 ${
-                status === 'thinking' ? 'animate-spin [animation-duration:2s] [animation-direction:reverse]' : 'neural-avatar-orbit-2'
+                status === 'thinking'
+                  ? 'animate-spin [animation-duration:1.8s] [animation-direction:reverse]'
+                  : status === 'speaking'
+                  ? 'animate-spin [animation-duration:4s] [animation-direction:reverse]'
+                  : 'neural-avatar-orbit-2'
               }`}
             >
               <div className="absolute bottom-0 right-1/2 translate-x-1/2 h-1.5 w-1.5 rounded-full bg-cyan-400 shadow-[0_0_8px_#22d3ee]" />
@@ -99,7 +109,7 @@ export default function NeuralAIAvatar({
                   status === 'thinking'
                     ? 'text-cyan-300 animate-pulse'
                     : status === 'speaking'
-                    ? 'text-emerald-300 scale-110'
+                    ? 'text-emerald-300 scale-110 animate-bounce-subtle'
                     : 'text-primary-300'
                 } transition-all duration-300`}
               />
@@ -117,7 +127,11 @@ export default function NeuralAIAvatar({
             <div className="flex items-center gap-2">
               <span className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-bold ${currentPersona.badgeBg}`}>
                 <Radio className="h-3 w-3 animate-pulse" />
-                {status === 'thinking' ? 'NEURAL COMPUTE ACTIVE' : status === 'speaking' ? 'TRANSMITTING STREAM' : 'NEURAL CORE SYNCHRONIZED'}
+                {status === 'thinking'
+                  ? 'NEURAL COMPUTE ACTIVE'
+                  : status === 'speaking'
+                  ? 'VOICE SPEECH STREAMING'
+                  : 'NEURAL CORE SYNCHRONIZED'}
               </span>
               <span className="hidden sm:inline-flex items-center gap-1 rounded-md bg-slate-900/90 px-2 py-0.5 text-[11px] font-mono text-slate-400 border border-slate-800">
                 <Cpu className="h-3 w-3 text-emerald-400" />
@@ -136,28 +150,36 @@ export default function NeuralAIAvatar({
 
         {/* Right: Audio Waveform Equalizer & Interactive Persona Switcher */}
         <div className="flex flex-wrap items-center gap-3">
-          {/* Futuristic Audio Equalizer Waveform */}
-          <div className="flex items-center gap-1.5 rounded-2xl border border-slate-800/90 bg-slate-950/80 px-3.5 py-2">
+          {/* Futuristic Audio Equalizer Waveform & Master Speech Toggle */}
+          <div className="flex items-center gap-2 rounded-2xl border border-slate-800/90 bg-slate-950/80 px-3.5 py-2 shadow-inner">
             <button
-              onClick={() => setAudioEnabled(!audioEnabled)}
-              className="text-slate-400 hover:text-slate-100 transition-colors mr-1"
-              title={audioEnabled ? 'Mute AI Audio Voice' : 'Enable AI Audio Voice'}
+              onClick={onToggleAudio}
+              className="flex items-center gap-1.5 text-slate-300 hover:text-slate-50 transition-colors"
+              title={audioEnabled ? 'Mute AI Auto Voice Response' : 'Enable AI Voice Response'}
             >
               {audioEnabled ? (
-                <Volume2 className="h-4 w-4 text-emerald-400 animate-pulse" />
+                <>
+                  <Volume2 className="h-4 w-4 text-emerald-400 animate-pulse" />
+                  <span className="text-[11px] font-semibold text-emerald-300 hidden sm:inline">Voice ON</span>
+                </>
               ) : (
-                <VolumeX className="h-4 w-4 text-slate-500" />
+                <>
+                  <VolumeX className="h-4 w-4 text-slate-500" />
+                  <span className="text-[11px] font-semibold text-slate-500 hidden sm:inline">Voice Muted</span>
+                </>
               )}
             </button>
 
-            <div className="flex items-end gap-1 h-6">
+            <div className="flex items-end gap-1 h-6 pl-1 border-l border-slate-800">
               {[...Array(8)].map((_, i) => (
                 <div
                   key={i}
-                  className={`w-1 rounded-full bg-gradient-to-t from-emerald-500 to-cyan-400 ${
-                    status === 'speaking' || (status === 'thinking' && audioEnabled)
+                  className={`w-1 rounded-full bg-gradient-to-t from-emerald-500 to-cyan-400 transition-all ${
+                    status === 'speaking'
                       ? 'cyber-eq-bar'
-                      : 'h-1 opacity-40'
+                      : status === 'thinking' && audioEnabled
+                      ? 'h-3 opacity-60 animate-pulse'
+                      : 'h-1.5 opacity-30'
                   }`}
                   style={{
                     height: status === 'speaking' ? undefined : `${4 + (i % 3) * 3}px`,

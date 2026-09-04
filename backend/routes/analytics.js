@@ -98,8 +98,8 @@ router.post(
   '/copilot',
   copilotRateLimiter,
   [
-    body('question').isString().trim().isLength({ min: 2, max: 500 }),
-    body('history').optional().isArray({ max: 12 }),
+    body('question').isString().trim().isLength({ min: 1, max: 2000 }),
+    body('history').optional().isArray({ max: 20 }),
   ],
   async (req, res) => {
     try {
