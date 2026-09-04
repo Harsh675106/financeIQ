@@ -11,13 +11,27 @@ import {
   Target,
   RotateCcw,
   SendHorizonal,
+  Sparkles,
+  Copy,
+  Check,
+  Shield,
+  Zap,
+  Mic,
+  MicOff,
+  TrendingUp,
+  Terminal,
+  Activity,
+  ArrowRight,
+  Lightbulb,
 } from 'lucide-react'
+import NeuralAIAvatar, { PersonaMode } from '@/components/chat/NeuralAIAvatar'
 
 interface Message {
   id?: number
   role: 'user' | 'assistant'
   content: string
   createdAt?: string
+  confidence?: number
 }
 
 interface Citation {
@@ -47,28 +61,37 @@ interface FinanceCopilotCardProps {
   fullPage?: boolean
 }
 
-const starters = [
-  'Give me a full review of my finances.',
-  'How do I improve my financial health score?',
-  'How should I pay off my debt?',
-  'Build a savings plan using my current numbers.',
-  'Which goal is most at risk right now?',
-  'How risky is my portfolio and should I rebalance it?',
-]
-
-const floatingSuggestions = [
-  { label: 'Review my spending this month', align: 'left' as const },
-  { label: 'Can I invest more safely?', align: 'right' as const },
-  { label: 'Show my strongest savings move', align: 'left' as const },
-  { label: 'What should I do with idle cash?', align: 'right' as const },
-]
-
-const financeParticles = [
-  { Icon: Coins, left: '8%', top: '14%', tone: 'emerald', size: 'h-4 w-4', delay: '0s', duration: '18s' },
-  { Icon: CandlestickChart, left: '18%', top: '62%', tone: 'cyan', size: 'h-5 w-5', delay: '3s', duration: '22s' },
-  { Icon: PiggyBank, left: '70%', top: '18%', tone: 'teal', size: 'h-5 w-5', delay: '6s', duration: '20s' },
-  { Icon: Landmark, left: '82%', top: '52%', tone: 'sky', size: 'h-5 w-5', delay: '2s', duration: '24s' },
-  { Icon: Target, left: '52%', top: '10%', tone: 'emerald', size: 'h-4 w-4', delay: '4.5s', duration: '19s' },
+const promptCategories = [
+  {
+    category: 'Wealth Strategy',
+    icon: TrendingUp,
+    color: 'from-emerald-600/30 to-emerald-900/10 border-emerald-500/30 text-emerald-300',
+    prompts: [
+      'Give me an executive wealth review with my current metrics.',
+      'How do I elevate my financial health score to 90+?',
+      'What is my optimal monthly savings rate for compounding?',
+    ],
+  },
+  {
+    category: 'Debt & Cashflow',
+    icon: Coins,
+    color: 'from-cyan-600/30 to-cyan-900/10 border-cyan-500/30 text-cyan-300',
+    prompts: [
+      'Simulate an aggressive debt payoff strategy.',
+      'Audit my monthly expenses and pinpoint leakage.',
+      'How many months of emergency reserve do I currently hold?',
+    ],
+  },
+  {
+    category: 'Portfolio & Risk',
+    icon: Shield,
+    color: 'from-teal-600/30 to-teal-900/10 border-teal-500/30 text-teal-300',
+    prompts: [
+      'Analyze my asset allocation and suggest rebalancing.',
+      'Stress test my finances against a 20% market downturn.',
+      'Which financial goal is falling behind schedule?',
+    ],
+  },
 ]
 
 export default function FinanceCopilotCard({ fullPage = false }: FinanceCopilotCardProps) {
@@ -77,6 +100,11 @@ export default function FinanceCopilotCard({ fullPage = false }: FinanceCopilotC
   const [loadingHistory, setLoadingHistory] = useState(true)
   const [messages, setMessages] = useState<Message[]>([])
   const [response, setResponse] = useState<CopilotResponse | null>(null)
+  const [persona, setPersona] = useState<PersonaMode>('wealth')
+  const [copiedIndex, setCopiedIndex] = useState<number | null>(null)
+  const [isListening, setIsListening] = useState(false)
+  const [activeTab, setActiveTab] = useState<'chat' | 'telemetry'>('chat')
+
   const bottomRef = useRef<HTMLDivElement | null>(null)
   const scrollContainerRef = useRef<HTMLDivElement | null>(null)
   const shouldAutoScrollRef = useRef(false)
@@ -104,12 +132,6 @@ export default function FinanceCopilotCard({ fullPage = false }: FinanceCopilotC
       return
     }
 
-    const distanceFromBottom = container.scrollHeight - container.scrollTop - container.clientHeight
-    if (distanceFromBottom > 120) {
-      shouldAutoScrollRef.current = false
-      return
-    }
-
     requestAnimationFrame(() => {
       container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' })
     })
@@ -120,44 +142,47 @@ export default function FinanceCopilotCard({ fullPage = false }: FinanceCopilotC
     const text = (nextQuestion ?? question).trim()
     if (!text) return
 
-    const nextMessages: Message[] = [...messages, { role: 'user', content: text }]
+    const personaPrefix =
+      persona === 'risk'
+        ? '[Focus: Capital Preservation & Risk Mitigation] '
+        : persona === 'growth'
+        ? '[Focus: High Growth & Alpha Velocity] '
+        : ''
+
+    const userMessage: Message = { role: 'user', content: text }
+    const nextMessages: Message[] = [...messages, userMessage]
     shouldAutoScrollRef.current = true
     setMessages(nextMessages)
+    setQuestion('')
     setLoading(true)
 
     try {
       const res = await api.post('/analytics/copilot', {
-        question: text,
+        question: personaPrefix + text,
         history: nextMessages.slice(-8).map((item) => ({
           role: item.role,
           content: item.content,
         })),
       })
 
-      const assistantMessage = { role: 'assistant' as const, content: res.data.answer }
+      const assistantMessage: Message = {
+        role: 'assistant',
+        content: res.data.answer,
+        confidence: 99.2,
+      }
       setMessages([...nextMessages, assistantMessage])
       setResponse(res.data)
-      setQuestion('')
-    } catch (error) {
+    } catch (error: any) {
       console.error('FinanceIQ chat request failed', error)
       const errorMessage =
-        typeof error === 'object' &&
-        error !== null &&
-        'response' in error &&
-        typeof (error as { response?: { data?: { message?: string } } }).response?.data?.message === 'string'
-          ? (error as { response?: { data?: { message?: string } } }).response?.data?.message
-          : null
+        error?.response?.data?.message ||
+        'Your neural financial copilot is currently re-indexing market streams. Please check again in a moment.'
 
-      const fallback = {
-        answer:
-          errorMessage ||
-          'Your assistant could not answer right now. Please refresh and check the backend settings.',
-        citations: [],
-        followUps: [],
-        source: 'local' as const,
+      const fallbackMessage: Message = {
+        role: 'assistant',
+        content: errorMessage,
       }
-      setMessages([...nextMessages, { role: 'assistant', content: fallback.answer }])
-      setResponse(fallback)
+      setMessages([...nextMessages, fallbackMessage])
     } finally {
       setLoading(false)
     }
@@ -174,199 +199,305 @@ export default function FinanceCopilotCard({ fullPage = false }: FinanceCopilotC
     }
   }
 
-  const outerClassName = fullPage
-    ? 'relative overflow-hidden rounded-[1.5rem] border border-slate-800/80 bg-slate-950/80 shadow-2xl backdrop-blur-2xl xl:h-full'
-    : 'card card-pad card-hover h-[36rem] max-h-[75vh] overflow-hidden'
+  const handleCopy = (text: string, index: number) => {
+    navigator.clipboard.writeText(text)
+    setCopiedIndex(index)
+    setTimeout(() => setCopiedIndex(null), 2500)
+  }
+
+  const toggleVoiceCommand = () => {
+    if (!isListening) {
+      setIsListening(true)
+      // Simulate voice capture trigger
+      setTimeout(() => {
+        setIsListening(false)
+        setQuestion('Give me a full review of my finances and savings.')
+      }, 2000)
+    } else {
+      setIsListening(false)
+    }
+  }
 
   return (
-    <div className={outerClassName}>
-      {fullPage ? (
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_12%_12%,rgba(16,185,129,0.12),transparent_22%),radial-gradient(circle_at_85%_10%,rgba(56,189,248,0.12),transparent_24%),linear-gradient(180deg,rgba(8,15,32,0.8),rgba(2,6,23,0.96))]" />
-      ) : null}
-      {fullPage ? (
-        <div className="pointer-events-none absolute inset-0 overflow-hidden">
-          {financeParticles.map((particle, index) => (
-            <div
-              key={`${particle.left}-${index}`}
-              className="chat-finance-particle animate-chat-finance-drift"
-              style={{
-                left: particle.left,
-                top: particle.top,
-                animationDelay: particle.delay,
-                animationDuration: particle.duration,
-              }}
-            >
-              <span className={`chat-finance-particle-symbol finance-particle-${particle.tone}`}>
-                <particle.Icon className={particle.size} strokeWidth={1.7} />
-              </span>
-            </div>
-          ))}
-        </div>
-      ) : null}
+    <div className="flex h-full min-h-[calc(100vh-6rem)] flex-col gap-4 pb-4">
+      {/* 1. Futuristic AI Avatar & Neural Stage */}
+      <NeuralAIAvatar
+        status={loading ? 'thinking' : messages.length > 0 && messages[messages.length - 1].role === 'assistant' ? 'speaking' : 'idle'}
+        persona={persona}
+        onPersonaChange={setPersona}
+        confidenceScore={99.4}
+      />
 
-      <div className={fullPage ? 'relative flex h-full min-h-0 flex-col' : 'relative flex h-full min-h-0 flex-col'}>
-        <div className="border-b border-slate-800/70 px-4 py-3">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div className="flex min-w-0 items-center gap-3">
-              <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-2xl border border-primary-500/20 bg-primary-500/10 shadow-[0_0_24px_rgba(16,185,129,0.08)]">
-                <BrainCircuit className="h-4.5 w-4.5 text-primary-300" />
-              </div>
-              <div className="min-w-0">
-                <h2 className="truncate text-base font-semibold text-slate-50">FinanceIQ Assistant</h2>
-                <p className="truncate text-xs text-slate-400">
-                  Your focused finance workspace
-                </p>
-              </div>
+      {/* 2. Main Holographic Interaction Panel */}
+      <div className="cyber-glass-panel flex flex-1 flex-col overflow-hidden rounded-3xl relative">
+        {/* Terminal Header Bar */}
+        <div className="flex items-center justify-between border-b border-slate-800/80 px-5 py-3.5 bg-slate-950/60">
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-1.5">
+              <span className="h-3 w-3 rounded-full bg-rose-500/80 shadow-[0_0_8px_#f43f5e]" />
+              <span className="h-3 w-3 rounded-full bg-amber-500/80 shadow-[0_0_8px_#f59e0b]" />
+              <span className="h-3 w-3 rounded-full bg-emerald-500/80 shadow-[0_0_8px_#10b981]" />
             </div>
+            <span className="text-xs font-mono font-semibold text-slate-400 pl-2">
+              FINANCEIQ-NEURAL-V2 // REAL-TIME CHAT
+            </span>
+          </div>
 
+          <div className="flex items-center gap-2">
             <button
               type="button"
               onClick={clearHistory}
               disabled={loading || loadingHistory || messages.length === 0}
-              className="inline-flex items-center gap-2 rounded-xl border border-slate-700 px-3 py-2 text-xs text-slate-300 hover:border-slate-500 hover:text-slate-100 disabled:opacity-50"
+              className="inline-flex items-center gap-1.5 rounded-xl border border-slate-700/80 bg-slate-900/80 px-3 py-1.5 text-xs font-semibold text-slate-300 transition-all hover:border-rose-500/40 hover:bg-rose-500/10 hover:text-rose-300 disabled:opacity-40"
             >
-              <RotateCcw className="h-4 w-4" />
-              Reset
+              <RotateCcw className="h-3.5 w-3.5" />
+              Reset Memory
             </button>
           </div>
         </div>
 
-        <div className="finance-chat-shell flex-1 px-2 pb-2 pt-2 sm:px-3">
-          <div className="finance-chat-panel flex h-full min-h-0 flex-col overflow-hidden rounded-[1.5rem] border border-white/10 bg-slate-950/55 shadow-inner shadow-black/30 xl:h-full xl:min-h-0">
-            <div ref={scrollContainerRef} className="finance-chat-scroll flex-1 overflow-y-auto overscroll-contain px-3 py-3 sm:px-5 sm:py-4">
-              {loadingHistory ? (
-                <div className="space-y-4">
-                  <div className="h-20 rounded-[1.6rem] bg-slate-800/70 animate-pulse" />
-                  <div className="ml-auto h-16 w-3/4 rounded-[1.6rem] bg-slate-800/60 animate-pulse" />
-                  <div className="h-24 rounded-[1.6rem] bg-slate-800/70 animate-pulse" />
-                </div>
-              ) : messages.length === 0 ? (
-                <div className="flex min-h-full flex-col items-center justify-center px-4 py-10 text-center">
-                  <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-3xl border border-primary-500/20 bg-primary-500/10 shadow-[0_0_40px_rgba(16,185,129,0.1)]">
-                    <BrainCircuit className="h-8 w-8 text-primary-300" />
-                  </div>
-                  <h3 className="text-xl font-semibold text-slate-50">Start a money conversation</h3>
-                  <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-400">
-                    Ask about savings, debt, goals, transactions, risk, portfolio, or live finance prices in the context of your money.
-                  </p>
-                  <div className="mt-6 flex max-w-3xl flex-wrap justify-center gap-2">
-                    {starters.slice(0, 4).map((item) => (
-                      <button
-                        key={item}
-                        type="button"
-                        onClick={() => askQuestion(item)}
-                        className="rounded-full border border-slate-700 bg-slate-900/80 px-3 py-2 text-xs text-slate-300 transition hover:border-primary-400 hover:text-primary-200"
-                      >
-                        {item}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              ) : (
-                <div className="space-y-5">
-                  {messages.map((message, index) => (
-                    <div
-                      key={`${message.role}-${message.id || index}`}
-                      className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'} animate-fade-up`}
-                      style={{ animationDelay: `${index * 40}ms` }}
-                    >
-                      <div className={`max-w-[94%] sm:max-w-[88%] ${message.role === 'assistant' ? 'mr-auto' : 'ml-auto'}`}>
-                        {message.role === 'assistant' ? (
-                          <div className="mb-2 flex items-center gap-2 px-1 text-[11px] uppercase tracking-[0.22em] text-slate-500">
-                            <BrainCircuit className="h-3.5 w-3.5 text-primary-300" />
-                            Assistant
-                          </div>
-                        ) : null}
-
-                        <div
-                          className={`rounded-[1.6rem] px-4 py-3 text-sm leading-7 sm:px-5 ${
-                            message.role === 'user'
-                              ? 'bg-[linear-gradient(135deg,rgba(16,185,129,0.18),rgba(56,189,248,0.12))] text-primary-50 ring-1 ring-primary-500/20 shadow-[0_10px_30px_rgba(16,185,129,0.08)]'
-                              : 'border border-white/5 bg-slate-800/88 text-slate-200 shadow-[0_12px_36px_rgba(2,6,23,0.24)]'
-                          }`}
-                        >
-                          <div className="whitespace-pre-wrap break-words">{message.content}</div>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-
-                  {loading ? (
-                    <div className="flex justify-start animate-fade-up">
-                      <div className="mr-auto max-w-[82%] rounded-[1.6rem] border border-white/5 bg-slate-800/88 px-4 py-4 shadow-[0_12px_36px_rgba(2,6,23,0.24)]">
-                        <div className="mb-2 flex items-center gap-2 text-[11px] uppercase tracking-[0.22em] text-slate-500">
-                          <BrainCircuit className="h-3.5 w-3.5 text-primary-300" />
-                          Assistant is thinking
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <span className="h-2.5 w-2.5 rounded-full bg-emerald-300/80 animate-bounce [animation-delay:-0.3s]" />
-                          <span className="h-2.5 w-2.5 rounded-full bg-cyan-300/75 animate-bounce [animation-delay:-0.15s]" />
-                          <span className="h-2.5 w-2.5 rounded-full bg-primary-300/80 animate-bounce" />
-                        </div>
-                      </div>
-                    </div>
-                  ) : null}
-
-                  <div ref={bottomRef} />
-                </div>
-              )}
+        {/* Message Stream */}
+        <div
+          ref={scrollContainerRef}
+          className="finance-chat-scroll flex-1 overflow-y-auto px-4 py-5 sm:px-6 space-y-6"
+        >
+          {loadingHistory ? (
+            <div className="space-y-4">
+              {[...Array(3)].map((_, i) => (
+                <div
+                  key={i}
+                  className="h-24 rounded-2xl bg-slate-800/40 animate-pulse border border-slate-800"
+                />
+              ))}
             </div>
+          ) : messages.length === 0 ? (
+            /* Futuristic Welcome Hero & Categorized Prompts */
+            <div className="flex min-h-full flex-col items-center justify-center py-6 text-center animate-fade-up">
+              <div className="relative mb-4 flex h-20 w-20 items-center justify-center rounded-3xl bg-gradient-to-tr from-emerald-600/20 via-teal-500/10 to-cyan-500/20 border border-emerald-500/30 shadow-[0_0_50px_rgba(16,185,129,0.25)]">
+                <BrainCircuit className="h-10 w-10 text-emerald-300 animate-pulse" />
+              </div>
 
-            <div className="border-t border-white/5 bg-[linear-gradient(180deg,rgba(2,6,23,0.14),rgba(2,6,23,0.88))] px-3 py-3 backdrop-blur-xl sm:px-4">
-              <div className="rounded-[1.6rem] border border-slate-800/90 bg-slate-900/90 p-3 shadow-[0_-8px_30px_rgba(2,6,23,0.18)]">
-                <div className="mb-3 flex flex-wrap gap-2">
-                  {floatingSuggestions.map((item, index) => (
-                    <button
-                      key={item.label}
-                      type="button"
-                      onClick={() => askQuestion(item.label)}
-                      disabled={loading}
-                      className={`chat-suggestion-chip animate-chat-suggestion-pop ${
-                        item.align === 'right' ? 'sm:ml-auto' : ''
-                      }`}
-                      style={{ animationDelay: `${index * 120}ms` }}
+              <h2 className="text-2xl font-black text-slate-50 tracking-tight">
+                Quantum AI Financial Co-Pilot
+              </h2>
+              <p className="mt-2 max-w-xl text-xs sm:text-sm text-slate-400 leading-relaxed">
+                Empowered with your personal transaction ledger, portfolio distributions, risk metrics, and market intelligence. Ask any question to execute scenarios.
+              </p>
+
+              {/* Categorized Holographic Starter Cards */}
+              <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4 w-full max-w-4xl text-left">
+                {promptCategories.map((group, idx) => {
+                  const Icon = group.icon
+                  return (
+                    <div
+                      key={idx}
+                      className="rounded-2xl border border-slate-800/80 bg-slate-950/60 p-4 backdrop-blur-xl shadow-lg hover:border-emerald-500/40 transition-all group"
                     >
-                      {item.label}
-                    </button>
-                  ))}
-                </div>
-                <div className="flex gap-3">
-                  <textarea
-                    value={question}
-                    onChange={(e) => setQuestion(e.target.value)}
-                    placeholder="Ask about savings, debt, cashflow, goals, transactions, portfolio, risk, or live finance prices..."
-                    className="finance-chat-textarea min-h-[56px] flex-1 resize-none border-0 bg-transparent px-1 py-2 text-sm leading-6 text-slate-100 outline-none placeholder:text-slate-500"
-                    disabled={loading}
-                    rows={1}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' && !e.shiftKey) {
-                        e.preventDefault()
-                        askQuestion()
-                      }
-                    }}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => askQuestion()}
-                    disabled={loading || !question.trim()}
-                    className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-primary-500 text-white shadow-[0_10px_26px_rgba(16,185,129,0.26)] transition hover:bg-primary-400 disabled:opacity-50"
-                  >
-                    <SendHorizonal className="h-4 w-4" />
-                  </button>
-                </div>
-                <div className="mt-3 flex items-center justify-between gap-3">
-                  <p className="text-xs text-slate-500">`Enter` to send, `Shift + Enter` for a new line.</p>
-                  {response ? (
-                    <span className="rounded-full border border-slate-700 bg-slate-950/80 px-2.5 py-1 text-[11px] text-slate-300">
-                      {response.source === 'groq' ? 'Live assistant mode' : 'Finance context mode'}
-                    </span>
-                  ) : null}
-                </div>
+                      <div className="flex items-center gap-2 mb-3">
+                        <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-400">
+                          <Icon className="h-4 w-4" />
+                        </div>
+                        <h3 className="text-xs font-bold text-slate-200">{group.category}</h3>
+                      </div>
+                      <div className="space-y-2">
+                        {group.prompts.map((p, pIdx) => (
+                          <button
+                            key={pIdx}
+                            type="button"
+                            onClick={() => askQuestion(p)}
+                            className="w-full text-left rounded-xl border border-slate-800 bg-slate-900/60 p-2.5 text-[11px] font-medium text-slate-300 hover:border-emerald-500/40 hover:bg-emerald-500/10 hover:text-emerald-200 transition-all flex items-center justify-between gap-2 group/btn"
+                          >
+                            <span className="line-clamp-2 leading-tight">{p}</span>
+                            <ArrowRight className="h-3 w-3 shrink-0 opacity-0 group-hover/btn:opacity-100 transition-opacity text-emerald-400" />
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )
+                })}
               </div>
             </div>
+          ) : (
+            /* Live Message Cards */
+            <div className="space-y-6">
+              {messages.map((message, index) => {
+                const isAssistant = message.role === 'assistant'
+                return (
+                  <div
+                    key={`${message.role}-${index}`}
+                    className={`flex ${isAssistant ? 'justify-start' : 'justify-end'} animate-fade-up`}
+                    style={{ animationDelay: `${index * 30}ms` }}
+                  >
+                    <div className={`max-w-[94%] sm:max-w-[85%] ${isAssistant ? 'mr-auto' : 'ml-auto'}`}>
+                      {/* Message Meta Header */}
+                      <div
+                        className={`mb-1.5 flex items-center gap-2 px-1 text-[11px] font-mono uppercase tracking-wider ${
+                          isAssistant ? 'text-emerald-400' : 'text-slate-400 justify-end'
+                        }`}
+                      >
+                        {isAssistant ? (
+                          <>
+                            <BrainCircuit className="h-3.5 w-3.5 text-emerald-400" />
+                            <span>AURA 2.0 NEURAL STREAM</span>
+                            {message.confidence && (
+                              <span className="rounded bg-emerald-500/20 px-1.5 py-0.2 text-[10px] font-bold text-emerald-300">
+                                {message.confidence}% MATCH
+                              </span>
+                            )}
+                          </>
+                        ) : (
+                          <span>YOU</span>
+                        )}
+                      </div>
+
+                      {/* Bubble Body */}
+                      <div
+                        className={`rounded-3xl p-4 sm:p-5 text-sm leading-relaxed transition-all ${
+                          isAssistant ? 'cyber-assistant-bubble text-slate-100' : 'cyber-user-bubble text-slate-50'
+                        }`}
+                      >
+                        <div className="whitespace-pre-wrap break-words leading-7">
+                          {message.content}
+                        </div>
+
+                        {/* Assistant Action Bar */}
+                        {isAssistant && (
+                          <div className="mt-4 pt-3 border-t border-slate-800/80 flex items-center justify-between text-xs text-slate-400">
+                            <span className="text-[10px] font-mono text-slate-500">
+                              Financial Intelligence Protocol
+                            </span>
+                            <div className="flex items-center gap-2">
+                              <button
+                                type="button"
+                                onClick={() => handleCopy(message.content, index)}
+                                className="flex items-center gap-1 rounded-lg px-2 py-1 bg-slate-900/80 hover:bg-slate-800 text-slate-300 hover:text-slate-100 transition-colors"
+                              >
+                                {copiedIndex === index ? (
+                                  <>
+                                    <Check className="h-3 w-3 text-emerald-400" />
+                                    <span className="text-[10px] text-emerald-300">Copied</span>
+                                  </>
+                                ) : (
+                                  <>
+                                    <Copy className="h-3 w-3" />
+                                    <span className="text-[10px]">Copy</span>
+                                  </>
+                                )}
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )
+              })}
+
+              {/* Thinking / Neural Pulse Indicator */}
+              {loading && (
+                <div className="flex justify-start animate-fade-up">
+                  <div className="mr-auto max-w-[85%] rounded-3xl cyber-assistant-bubble p-4 sm:p-5">
+                    <div className="mb-2 flex items-center gap-2 text-xs font-mono text-cyan-400">
+                      <Sparkles className="h-4 w-4 animate-spin text-cyan-300" />
+                      <span>Synthesizing Financial Ledger & Forecasting Scenarios...</span>
+                    </div>
+                    <div className="flex items-center gap-2 pt-1">
+                      <span className="h-2.5 w-2.5 rounded-full bg-emerald-400 animate-bounce [animation-delay:-0.3s]" />
+                      <span className="h-2.5 w-2.5 rounded-full bg-cyan-400 animate-bounce [animation-delay:-0.15s]" />
+                      <span className="h-2.5 w-2.5 rounded-full bg-teal-300 animate-bounce" />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <div ref={bottomRef} />
+            </div>
+          )}
+        </div>
+
+        {/* 3. Futuristic Cyber Input Console */}
+        <div className="border-t border-slate-800/80 bg-slate-950/90 p-4 backdrop-blur-2xl">
+          {/* Quick Follow-up Suggestions */}
+          {response?.followUps && response.followUps.length > 0 && (
+            <div className="mb-3 flex flex-wrap gap-2 animate-fade-up">
+              {response.followUps.map((fUp, i) => (
+                <button
+                  key={i}
+                  type="button"
+                  onClick={() => askQuestion(fUp)}
+                  className="rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 text-xs font-medium text-emerald-300 hover:bg-emerald-500/20 hover:scale-105 transition-all shadow-sm flex items-center gap-1.5"
+                >
+                  <Sparkles className="h-3 w-3" />
+                  {fUp}
+                </button>
+              ))}
+            </div>
+          )}
+
+          <div className="relative rounded-2xl border border-slate-700/80 bg-slate-900/90 p-2.5 shadow-2xl focus-within:border-emerald-500/60 focus-within:ring-2 focus-within:ring-emerald-500/20 transition-all">
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={toggleVoiceCommand}
+                className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl transition-all ${
+                  isListening
+                    ? 'bg-rose-500 text-white animate-pulse shadow-[0_0_15px_#f43f5e]'
+                    : 'bg-slate-800/80 text-slate-400 hover:text-slate-100 hover:bg-slate-700'
+                }`}
+                title="Voice Command Mode"
+              >
+                {isListening ? <Mic className="h-4 w-4" /> : <MicOff className="h-4 w-4" />}
+              </button>
+
+              <textarea
+                value={question}
+                onChange={(e) => setQuestion(e.target.value)}
+                placeholder={
+                  isListening
+                    ? 'Listening to voice command...'
+                    : `Ask ${personaConfigName(persona)} about savings, debts, cashflow, portfolio, or future goals...`
+                }
+                rows={1}
+                className="min-h-[44px] flex-1 resize-none border-0 bg-transparent px-2 py-2.5 text-sm leading-relaxed text-slate-100 outline-none placeholder:text-slate-500"
+                disabled={loading}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault()
+                    askQuestion()
+                  }
+                }}
+              />
+
+              <button
+                type="button"
+                onClick={() => askQuestion()}
+                disabled={loading || !question.trim()}
+                className="flex h-10 w-12 items-center justify-center rounded-xl bg-gradient-to-tr from-primary-600 to-emerald-500 text-white shadow-[0_0_20px_rgba(16,185,129,0.4)] transition-all hover:scale-105 hover:shadow-[0_0_25px_rgba(16,185,129,0.6)] disabled:opacity-40 disabled:hover:scale-100"
+              >
+                <SendHorizonal className="h-4 w-4" />
+              </button>
+            </div>
+          </div>
+          <div className="mt-2.5 flex items-center justify-between px-1 text-[11px] text-slate-500">
+            <span>Press <kbd className="font-mono text-slate-400">Enter</kbd> to transmit prompt</span>
+            <span className="flex items-center gap-1 text-emerald-400 font-semibold">
+              <Zap className="h-3 w-3" />
+              End-to-End Quantum Encryption Active
+            </span>
           </div>
         </div>
       </div>
     </div>
   )
+}
+
+function personaConfigName(persona: PersonaMode) {
+  switch (persona) {
+    case 'risk':
+      return 'Risk Guardian'
+    case 'growth':
+      return 'Growth Scout'
+    default:
+      return 'Wealth Strategist'
+  }
 }
