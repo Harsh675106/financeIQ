@@ -17,7 +17,6 @@ import { Sparkles, Calendar, ShieldCheck, ArrowUpRight } from 'lucide-react'
 export default function DashboardPage() {
   const { user, loading, initialized } = useAuth()
   const router = useRouter()
-  const [timeframe, setTimeframe] = useState<'month' | '30d' | 'quarter' | 'ytd'>('month')
   const [greeting, setGreeting] = useState('Welcome back')
 
   useEffect(() => {
@@ -45,13 +44,6 @@ export default function DashboardPage() {
     )
   }
 
-  const timeframes = [
-    { id: 'month', label: 'This Month' },
-    { id: '30d', label: 'Last 30 Days' },
-    { id: 'quarter', label: 'Quarterly' },
-    { id: 'ytd', label: 'YTD' },
-  ] as const
-
   return (
     <DashboardLayout>
       <PageBackground variant="aurora" />
@@ -78,26 +70,6 @@ export default function DashboardPage() {
             <p className="mt-1 text-sm text-slate-400">
               Here is your comprehensive real-time wealth analysis and financial health metrics.
             </p>
-          </div>
-
-          {/* Instant Timeframe Switcher Tabs */}
-          <div className="flex items-center self-start md:self-auto rounded-2xl border border-slate-800/80 bg-slate-900/80 p-1 backdrop-blur-xl shadow-inner">
-            {timeframes.map((tf) => {
-              const active = timeframe === tf.id
-              return (
-                <button
-                  key={tf.id}
-                  onClick={() => setTimeframe(tf.id)}
-                  className={`relative rounded-xl px-3 py-1.5 text-xs font-semibold transition-all duration-300 ${
-                    active
-                      ? 'bg-gradient-to-r from-primary-600 to-primary-500 text-white shadow-[0_0_15px_rgba(16,185,129,0.3)] scale-[1.02]'
-                      : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'
-                  }`}
-                >
-                  {tf.label}
-                </button>
-              )
-            })}
           </div>
         </div>
 
