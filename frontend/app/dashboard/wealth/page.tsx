@@ -1,85 +1,66 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/hooks/useAuth'
 import DashboardLayout from '@/components/layouts/DashboardLayout'
 import PageBackground from '@/components/layouts/PageBackground'
-import { Plus, Edit, Trash2, PiggyBank, AlertCircle, TrendingUp, Zap } from 'lucide-react'
+import {
+  Plus,
+  PiggyBank,
+  AlertCircle,
+  TrendingUp,
+  Zap,
+  Search,
+  SlidersHorizontal,
+  Sparkles,
+  ArrowUpRight,
+  TrendingDown,
+  RefreshCw,
+  Coins,
+  ShieldCheck,
+  CheckCircle2,
+  PieChart,
+  Layers,
+  Flame
+} from 'lucide-react'
 import { api } from '@/lib/api'
 import DebtOptimizerCard from '@/components/wealth/DebtOptimizerCard'
-
-interface Saving {
-  id: number
-  amount: number
-  account_type: string
-  description: string
-  created_at: string
-  updated_at: string
-}
-
-interface Debt {
-  id: number
-  amount: number
-  interest_rate: number
-  debt_type: string
-  description: string
-  created_at: string
-  updated_at: string
-}
-
-interface Asset {
-  id: number
-  type: string
-  symbol?: string
-  quantity: number
-  price: number
-  purchase_date?: string
-  created_at: string
-  updated_at: string
-}
-
-interface Liability {
-  id: number
-  type: string
-  amount: number
-  rate?: number
-  due_date?: string
-  created_at: string
-  updated_at: string
-}
-
-type TabType = 'savings' | 'debts' | 'assets' | 'liabilities'
+import SavingsGrowthSimulator from '@/components/wealth/SavingsGrowthSimulator'
+import WealthHealthMeter from '@/components/wealth/WealthHealthMeter'
+import WealthItemCard, { WealthItem, WealthCategory } from '@/components/wealth/WealthItemCard'
+import WealthModal from '@/components/wealth/WealthModal'
+import QuickAdjustModal from '@/components/wealth/QuickAdjustModal'
+import ConfettiEffect from '@/components/goals/ConfettiEffect'
 
 export default function WealthPage() {
   const { user, loading } = useAuth()
   const router = useRouter()
 
-  const [savings, setSavings] = useState<Saving[]>([])
-  const [debts, setDebts] = useState<Debt[]>([])
-  const [assets, setAssets] = useState<Asset[]>([])
-  const [liabilities, setLiabilities] = useState<Liability[]>([])
+  const [savings, setSavings] = useState<WealthItem[]>([])
+  const [debts, setDebts] = useState<WealthItem[]>([])
+  const [assets, setAssets] = useState<WealthItem[]>([])
+  const [liabilities, setLiabilities] = useState<WealthItem[]>([])
   const [loadingData, setLoadingData] = useState(true)
-  const [optimizerRefreshKey, setOptimizerRefreshKey] = useState(0)
-  
-  const [activeTab, setActiveTab] = useState<TabType>('savings')
-  const [showModal, setShowModal] = useState(false)
-  const [editingItem, setEditingItem] = useState<any>(null)
+  const [refreshKey, setRefreshKey] = useState(0)
 
-  const [formData, setFormData] = useState({
-    amount: '',
-    account_type: '',
-    description: '',
-    interest_rate: '',
-    debt_type: '',
-    type: '',
-    quantity: '',
-    price: '',
-    symbol: '',
-    purchase_date: '',
-    rate: '',
-    due_date: '',
-  })
+  // Active Category & Interactive Tools
+  const [activeTab, setActiveTab] = useState<WealthCategory>('savings')
+  const [simulatorMode, setSimulatorMode] = useState<'debt' | 'savings'>('debt')
+
+  // Search, Sort & Filters
+  const [searchQuery, setSearchQuery] = useState('')
+  const [sortBy, setSortBy] = useState<'highest' | 'lowest' | 'recent' | 'apr'>('highest')
+  const [filterHighValue, setFilterHighValue] = useState(false)
+  const [filterHighAprOnly, setFilterHighAprOnly] = useState(false)
+
+  // Modals
+  const [showAddModal, setShowAddModal] = useState(false)
+  const [editingItem, setEditingItem] = useState<WealthItem | null>(null)
+  const [quickAdjustItem, setQuickAdjustItem] = useState<{ item: WealthItem; category: WealthCategory } | null>(null)
+
+  // Celebration Confetti
+  const [confettiTrigger, setConfettiTrigger] = useState(false)
 
   /* ================= AUTH ================= */
   useEffect(() => {
@@ -88,11 +69,12 @@ export default function WealthPage() {
 
   useEffect(() => {
     if (user) fetchData()
-  }, [user])
+  }, [user, refreshKey])
 
   /* ================= FETCH ================= */
   const fetchData = async () => {
     try {
+      setLoadingData(true)
       const [savingsRes, debtsRes, assetsRes, liabilitiesRes] = await Promise.all([
         api.get('/savings'),
         api.get('/debts'),
@@ -104,781 +86,460 @@ export default function WealthPage() {
       setAssets(assetsRes.data.assets || [])
       setLiabilities(liabilitiesRes.data.liabilities || [])
     } catch (err) {
-      console.error(err)
+      console.error('Failed to load wealth data', err)
     } finally {
       setLoadingData(false)
     }
   }
 
+  /* ================= AGGREGATES ================= */
+  const totalSavings = useMemo(() => savings.reduce((sum, s) => sum + (s.amount || 0), 0), [savings])
+  const totalDebts = useMemo(() => debts.reduce((sum, d) => sum + (d.amount || 0), 0), [debts])
+  const totalAssets = useMemo(
+    () => assets.reduce((sum, a) => sum + ((a.quantity || 0) * (a.price || 0)), 0),
+    [assets]
+  )
+  const totalLiabilities = useMemo(
+    () => liabilities.reduce((sum, l) => sum + (l.amount || 0), 0),
+    [liabilities]
+  )
+  const netWorth = (totalSavings + totalAssets) - (totalDebts + totalLiabilities)
+
+  // Average debt APR
+  const averageDebtApr = useMemo(() => {
+    if (debts.length === 0) return 0
+    const totalWithRate = debts.reduce((sum, d) => sum + ((d.amount || 0) * (d.interest_rate || 0)), 0)
+    return totalDebts > 0 ? (totalWithRate / totalDebts).toFixed(1) : '0.0'
+  }, [debts, totalDebts])
+
   /* ================= HANDLERS ================= */
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-
-    try {
-      if (activeTab === 'savings') {
-        const payload = {
-          amount: parseFloat(formData.amount),
-          account_type: formData.account_type || 'Savings Account',
-          description: formData.description,
-        }
-        if (editingItem && 'account_type' in editingItem) {
-          await api.put(`/savings/${editingItem.id}`, payload)
-        } else {
-          await api.post('/savings', payload)
-        }
-      } else if (activeTab === 'debts') {
-        const payload = {
-          amount: parseFloat(formData.amount),
-          interest_rate: formData.interest_rate ? parseFloat(formData.interest_rate) : 0,
-          debt_type: formData.debt_type || 'Loan',
-          description: formData.description,
-        }
-        if (editingItem && 'debt_type' in editingItem) {
-          await api.put(`/debts/${editingItem.id}`, payload)
-        } else {
-          await api.post('/debts', payload)
-        }
-      } else if (activeTab === 'assets') {
-        // Validate required fields
-        if (!formData.type || formData.type.trim() === '') {
-          alert('Asset Type is required')
-          return
-        }
-        if (!formData.quantity || parseFloat(formData.quantity) < 0) {
-          alert('Quantity is required and must be >= 0')
-          return
-        }
-        if (!formData.price || parseFloat(formData.price) < 0) {
-          alert('Price is required and must be >= 0')
-          return
-        }
-
-        const payload = {
-          type: formData.type.trim(),
-          symbol: formData.symbol?.trim() || null,
-          quantity: parseFloat(formData.quantity) || 0,
-          price: parseFloat(formData.price) || 0,
-          purchase_date: formData.purchase_date || null,
-        }
-        if (editingItem && 'quantity' in editingItem && editingItem.account_type === undefined) {
-          await api.put(`/wealth/assets/${editingItem.id}`, payload)
-        } else {
-          await api.post('/wealth/assets', payload)
-        }
-      } else if (activeTab === 'liabilities') {
-        const payload = {
-          type: formData.type || 'Loan',
-          amount: parseFloat(formData.amount),
-          rate: formData.rate ? parseFloat(formData.rate) : null,
-          due_date: formData.due_date || null,
-        }
-        if (editingItem && editingItem.account_type === undefined && editingItem.quantity === undefined) {
-          await api.put(`/wealth/liabilities/${editingItem.id}`, payload)
-        } else {
-          await api.post('/wealth/liabilities', payload)
-        }
-      }
-
-      setShowModal(false)
-      setEditingItem(null)
-      setFormData({
-        amount: '',
-        account_type: '',
-        description: '',
-        interest_rate: '',
-        debt_type: '',
-        type: '',
-        quantity: '',
-        price: '',
-        symbol: '',
-        purchase_date: '',
-        rate: '',
-        due_date: '',
-      })
-      await fetchData()
-      setOptimizerRefreshKey(key => key + 1)
-    } catch (err: any) {
-      console.error('Form submission error:', err)
-      const errorMsg = err.response?.data?.message || err.message || 'Failed to save'
-      alert(errorMsg)
-    }
+  const handleEdit = (item: WealthItem, category: WealthCategory) => {
+    setActiveTab(category)
+    setEditingItem(item)
+    setShowAddModal(true)
   }
 
-  const handleDelete = async (id: number, type: TabType) => {
-    if (!confirm(`Delete this ${type.slice(0, -1)}?`)) return
+  const handleDelete = async (id: number, category: WealthCategory) => {
+    if (!confirm(`Are you sure you want to remove this ${category.slice(0, -1)}?`)) return
     try {
-      const endpoint = type === 'savings' || type === 'debts' ? `/${type}/${id}` : `/wealth/${type}/${id}`
+      const endpoint = category === 'savings' || category === 'debts' ? `/${category}/${id}` : `/wealth/${category}/${id}`
       await api.delete(endpoint)
-      await fetchData()
-      setOptimizerRefreshKey(key => key + 1)
+      setRefreshKey((k) => k + 1)
     } catch (err) {
       console.error(err)
-      alert('Failed to delete')
+      alert('Failed to delete item')
     }
   }
 
-  const handleEdit = (item: any, type: TabType) => {
-    setActiveTab(type)
-    setEditingItem(item)
-    
-    if (type === 'savings' && 'account_type' in item) {
-      setFormData({
-        amount: item.amount.toString(),
-        account_type: item.account_type,
-        description: item.description || '',
-        interest_rate: '',
-        debt_type: '',
-        type: '',
-        quantity: '',
-        price: '',
-        symbol: '',
-        purchase_date: '',
-        rate: '',
-        due_date: '',
-      })
-    } else if (type === 'debts' && 'debt_type' in item) {
-      setFormData({
-        amount: item.amount.toString(),
-        account_type: '',
-        description: item.description || '',
-        interest_rate: item.interest_rate?.toString() || '',
-        debt_type: item.debt_type,
-        type: '',
-        quantity: '',
-        price: '',
-        symbol: '',
-        purchase_date: '',
-        rate: '',
-        due_date: '',
-      })
-    } else if (type === 'assets' && 'quantity' in item) {
-      setFormData({
-        amount: '',
-        account_type: '',
-        description: '',
-        interest_rate: '',
-        debt_type: '',
-        type: item.type,
-        quantity: item.quantity.toString(),
-        price: item.price.toString(),
-        symbol: item.symbol || '',
-        purchase_date: item.purchase_date ? item.purchase_date.split('T')[0] : '',
-        rate: '',
-        due_date: '',
-      })
-    } else if (type === 'liabilities') {
-      setFormData({
-        amount: item.amount.toString(),
-        account_type: '',
-        description: '',
-        interest_rate: '',
-        debt_type: '',
-        type: item.type,
-        quantity: '',
-        price: '',
-        symbol: '',
-        purchase_date: '',
-        rate: item.rate?.toString() || '',
-        due_date: item.due_date ? item.due_date.split('T')[0] : '',
-      })
-    }
-    setShowModal(true)
-  }
-
-  const openAddModal = (type: TabType) => {
-    setActiveTab(type)
+  const handleOpenAdd = (category?: WealthCategory) => {
+    if (category) setActiveTab(category)
     setEditingItem(null)
-    setFormData({
-      amount: '',
-      account_type: '',
-      description: '',
-      interest_rate: '',
-      debt_type: '',
-      type: '',
-      quantity: '',
-      price: '',
-      symbol: '',
-      purchase_date: '',
-      rate: '',
-      due_date: '',
-    })
-    setShowModal(true)
+    setShowAddModal(true)
   }
+
+  const handleModalSuccess = () => {
+    setRefreshKey((k) => k + 1)
+    setConfettiTrigger(true)
+  }
+
+  const handleQuickAdjustSuccess = () => {
+    setRefreshKey((k) => k + 1)
+    setConfettiTrigger(true)
+  }
+
+  /* ================= FILTERED & SORTED ACTIVE LIST ================= */
+  const activeItems = useMemo(() => {
+    let list: WealthItem[] = []
+    if (activeTab === 'savings') list = [...savings]
+    else if (activeTab === 'debts') list = [...debts]
+    else if (activeTab === 'assets') list = [...assets]
+    else if (activeTab === 'liabilities') list = [...liabilities]
+
+    // Search query filter
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase()
+      list = list.filter((item) => {
+        const title = (item.account_type || item.debt_type || item.type || item.symbol || '').toLowerCase()
+        const desc = (item.description || '').toLowerCase()
+        return title.includes(q) || desc.includes(q)
+      })
+    }
+
+    // High value filter (> ₹50,000)
+    if (filterHighValue) {
+      list = list.filter((item) => {
+        const val = activeTab === 'assets' ? (item.quantity || 0) * (item.price || 0) : item.amount || 0
+        return val >= 50000
+      })
+    }
+
+    // High APR filter (> 12% for debts)
+    if (filterHighAprOnly && activeTab === 'debts') {
+      list = list.filter((item) => (item.interest_rate || 0) >= 12)
+    }
+
+    // Sorting
+    list.sort((a, b) => {
+      const valA = activeTab === 'assets' ? (a.quantity || 0) * (a.price || 0) : a.amount || 0
+      const valB = activeTab === 'assets' ? (b.quantity || 0) * (b.price || 0) : b.amount || 0
+
+      if (sortBy === 'highest') return valB - valA
+      if (sortBy === 'lowest') return valA - valB
+      if (sortBy === 'apr') return (b.interest_rate || b.rate || 0) - (a.interest_rate || a.rate || 0)
+      return (new Date(b.created_at || 0).getTime()) - (new Date(a.created_at || 0).getTime())
+    })
+
+    return list
+  }, [activeTab, savings, debts, assets, liabilities, searchQuery, filterHighValue, filterHighAprOnly, sortBy])
 
   if (loading || !user) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin h-12 w-12 border-b-2 border-primary-600 rounded-full" />
+      <div className="min-h-screen flex items-center justify-center bg-slate-950">
+        <div className="flex flex-col items-center gap-3">
+          <div className="animate-spin h-10 w-10 border-4 border-primary-500 border-t-transparent rounded-full" />
+          <p className="text-xs font-mono text-slate-400 tracking-wider">LOADING WEALTH SUITE...</p>
+        </div>
       </div>
     )
   }
 
-  const totalSavings = savings.reduce((sum, s) => sum + s.amount, 0)
-  const totalDebts = debts.reduce((sum, d) => sum + d.amount, 0)
-
   return (
     <DashboardLayout>
       <PageBackground variant="flow" />
-      <div className="relative z-10 space-y-6">
-        {/* HEADER */}
-        <div>
-          <h1 className="text-3xl font-bold text-slate-50">Savings & Debts</h1>
-          <p className="text-slate-400 mt-1">
-            Manage your savings accounts and debts
-          </p>
+      <ConfettiEffect trigger={confettiTrigger} onComplete={() => setConfettiTrigger(false)} />
+
+      <div className="relative z-10 space-y-6 pb-12">
+        {/* ================= HEADER ================= */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-5">
+          <div>
+            <div className="flex items-center gap-2.5">
+              <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-500/20 via-teal-500/10 to-cyan-500/20 border border-emerald-500/30 shadow-lg shadow-emerald-500/10">
+                <PiggyBank className="h-5 w-5 text-emerald-400" />
+              </div>
+              <div>
+                <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-50 flex items-center gap-2">
+                  Savings, Debts & Wealth
+                  <span className="hidden sm:inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-xs font-semibold text-emerald-400 border border-emerald-500/20">
+                    <Sparkles className="h-3 w-3" /> Live Balance Matrix
+                  </span>
+                </h1>
+                <p className="text-xs sm:text-sm text-slate-400 mt-0.5">
+                  Optimize cash runway, eliminate debt drag, and compound net worth
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2.5">
+            <button
+              onClick={() => handleOpenAdd(activeTab)}
+              className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-primary-500 to-emerald-400 px-4 py-2.5 text-xs sm:text-sm font-bold text-slate-950 shadow-lg shadow-primary-500/25 transition hover:scale-105 active:scale-95"
+            >
+              <Plus className="h-4 w-4" />
+              Add Wealth Entry
+            </button>
+          </div>
         </div>
 
-        {/* SUMMARY CARDS */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="card card-pad bg-gradient-to-br from-success-900/30 to-success-800/10 border border-success-700/50">
+        {/* ================= SUMMARY STAT CARDS ================= */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {/* Total Savings */}
+          <div className="group relative overflow-hidden rounded-2xl border border-emerald-500/30 bg-gradient-to-br from-emerald-950/40 via-slate-900/80 to-slate-950/90 p-4.5 shadow-xl backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:border-emerald-500/50 hover:shadow-emerald-500/10">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-medium text-slate-400">Total Savings</span>
-              <PiggyBank className="h-5 w-5 text-success-400" />
+              <span className="text-xs font-medium text-slate-400 uppercase tracking-wider">Liquid Savings</span>
+              <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-emerald-500/10 border border-emerald-500/20 group-hover:scale-110 transition">
+                <PiggyBank className="h-4 w-4 text-emerald-400" />
+              </div>
             </div>
-            <p className="text-2xl font-bold text-success-300">
+            <p className="text-2xl font-black font-mono tracking-tight text-emerald-400">
               ₹{Math.round(totalSavings).toLocaleString('en-IN')}
             </p>
-            <p className="text-xs text-slate-500 mt-2">{savings.length} account(s)</p>
+            <div className="flex items-center justify-between mt-3 text-xs text-slate-400 border-t border-slate-800/80 pt-2.5">
+              <span>{savings.length} Active Accounts</span>
+              <span className="text-emerald-400/90 font-medium">Safe Reserve</span>
+            </div>
           </div>
 
-          <div className="card card-pad bg-gradient-to-br from-danger-900/30 to-danger-800/10 border border-danger-700/50">
+          {/* Total Debts */}
+          <div className="group relative overflow-hidden rounded-2xl border border-rose-500/30 bg-gradient-to-br from-rose-950/40 via-slate-900/80 to-slate-950/90 p-4.5 shadow-xl backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:border-rose-500/50 hover:shadow-rose-500/10">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-medium text-slate-400">Total Debt</span>
-              <AlertCircle className="h-5 w-5 text-danger-400" />
+              <span className="text-xs font-medium text-slate-400 uppercase tracking-wider">Total Debts</span>
+              <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-rose-500/10 border border-rose-500/20 group-hover:scale-110 transition">
+                <AlertCircle className="h-4 w-4 text-rose-400" />
+              </div>
             </div>
-            <p className="text-2xl font-bold text-danger-300">
+            <p className="text-2xl font-black font-mono tracking-tight text-rose-400">
               ₹{Math.round(totalDebts).toLocaleString('en-IN')}
             </p>
-            <p className="text-xs text-slate-500 mt-2">{debts.length} debt(s)</p>
+            <div className="flex items-center justify-between mt-3 text-xs text-slate-400 border-t border-slate-800/80 pt-2.5">
+              <span>{debts.length} Outstanding Loans</span>
+              <span className="text-rose-400/90 font-medium">Avg {averageDebtApr}% APR</span>
+            </div>
           </div>
 
-          <div className="card card-pad bg-gradient-to-br from-primary-900/30 to-primary-800/10 border border-primary-700/50">
+          {/* Total Assets */}
+          <div className="group relative overflow-hidden rounded-2xl border border-cyan-500/30 bg-gradient-to-br from-cyan-950/40 via-slate-900/80 to-slate-950/90 p-4.5 shadow-xl backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:border-cyan-500/50 hover:shadow-cyan-500/10">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-medium text-slate-400">Total Assets</span>
-              <TrendingUp className="h-5 w-5 text-primary-400" />
+              <span className="text-xs font-medium text-slate-400 uppercase tracking-wider">Invested Assets</span>
+              <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-cyan-500/10 border border-cyan-500/20 group-hover:scale-110 transition">
+                <TrendingUp className="h-4 w-4 text-cyan-400" />
+              </div>
             </div>
-            <p className="text-2xl font-bold text-primary-300">
-              ₹{Math.round(assets.reduce((sum, a) => sum + (a.quantity * a.price), 0)).toLocaleString('en-IN')}
+            <p className="text-2xl font-black font-mono tracking-tight text-cyan-300">
+              ₹{Math.round(totalAssets).toLocaleString('en-IN')}
             </p>
-            <p className="text-xs text-slate-500 mt-2">{assets.length} asset(s)</p>
+            <div className="flex items-center justify-between mt-3 text-xs text-slate-400 border-t border-slate-800/80 pt-2.5">
+              <span>{assets.length} Holdings & Assets</span>
+              <span className="text-cyan-400/90 font-medium">Growth Engine</span>
+            </div>
           </div>
 
-          <div className="card card-pad bg-gradient-to-br from-yellow-900/30 to-yellow-800/10 border border-yellow-700/50">
+          {/* Total Liabilities / Net Worth */}
+          <div className="group relative overflow-hidden rounded-2xl border border-indigo-500/30 bg-gradient-to-br from-indigo-950/40 via-slate-900/80 to-slate-950/90 p-4.5 shadow-xl backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:border-indigo-500/50 hover:shadow-indigo-500/10">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-medium text-slate-400">Total Liabilities</span>
-              <Zap className="h-5 w-5 text-yellow-400" />
+              <span className="text-xs font-medium text-slate-400 uppercase tracking-wider">Total Net Worth</span>
+              <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-indigo-500/10 border border-indigo-500/20 group-hover:scale-110 transition">
+                <Coins className="h-4 w-4 text-indigo-400" />
+              </div>
             </div>
-            <p className="text-2xl font-bold text-yellow-300">
-              ₹{Math.round(liabilities.reduce((sum, l) => sum + l.amount, 0)).toLocaleString('en-IN')}
+            <p className={`text-2xl font-black font-mono tracking-tight ${netWorth >= 0 ? 'text-indigo-300' : 'text-rose-400'}`}>
+              ₹{Math.round(netWorth).toLocaleString('en-IN')}
             </p>
-            <p className="text-xs text-slate-500 mt-2">{liabilities.length} liability(ies)</p>
+            <div className="flex items-center justify-between mt-3 text-xs text-slate-400 border-t border-slate-800/80 pt-2.5">
+              <span>Liabilities: ₹{Math.round(totalLiabilities).toLocaleString('en-IN')}</span>
+              <span className={netWorth >= 0 ? 'text-emerald-400 font-medium' : 'text-rose-400 font-medium'}>
+                {netWorth >= 0 ? 'Solvent' : 'Deficit'}
+              </span>
+            </div>
           </div>
         </div>
 
-        <DebtOptimizerCard refreshKey={optimizerRefreshKey} />
+        {/* ================= WEALTH HEALTH & FORTRESS METER ================= */}
+        <WealthHealthMeter
+          totalSavings={totalSavings}
+          totalDebts={totalDebts}
+          totalAssets={totalAssets}
+          totalLiabilities={totalLiabilities}
+        />
 
-        {/* TABS */}
-        <div className="card card-pad">
-          <div className="flex gap-2 mb-6 border-b border-slate-700 overflow-x-auto">
-            {(['savings', 'debts', 'assets', 'liabilities'] as const).map((tab) => (
+        {/* ================= INTERACTIVE SIMULATORS SWITCHER ================= */}
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <h3 className="text-base font-bold text-slate-100 flex items-center gap-2">
+                Interactive Intelligence & Simulators
+                <span className="rounded-full bg-slate-800 px-2 py-0.5 text-[11px] font-medium text-slate-300 border border-slate-700">
+                  What-If Analysis
+                </span>
+              </h3>
+            </div>
+
+            <div className="flex items-center gap-1 rounded-xl bg-slate-800/80 p-1 border border-slate-700/60">
               <button
-                key={tab}
-                onClick={() => setActiveTab(tab)}
-                className={`px-4 py-2 font-medium text-sm border-b-2 transition whitespace-nowrap ${
-                  activeTab === tab
-                    ? 'border-primary-400 text-primary-400'
-                    : 'border-transparent text-slate-400 hover:text-slate-300'
+                onClick={() => setSimulatorMode('debt')}
+                className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-all duration-200 ${
+                  simulatorMode === 'debt'
+                    ? 'bg-primary-500 text-slate-950 shadow-md font-bold'
+                    : 'text-slate-400 hover:text-slate-200'
                 }`}
               >
-                {tab.charAt(0).toUpperCase() + tab.slice(1)}
+                <TrendingDown className="h-3.5 w-3.5" />
+                Debt Payoff Accelerator
               </button>
-            ))}
+              <button
+                onClick={() => setSimulatorMode('savings')}
+                className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-all duration-200 ${
+                  simulatorMode === 'savings'
+                    ? 'bg-primary-500 text-slate-950 shadow-md font-bold'
+                    : 'text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                <TrendingUp className="h-3.5 w-3.5" />
+                Compounding SIP Simulator
+              </button>
+            </div>
           </div>
 
-          {/* ADD BUTTON */}
-          <div className="mb-6">
+          {simulatorMode === 'debt' ? (
+            <DebtOptimizerCard refreshKey={refreshKey} />
+          ) : (
+            <SavingsGrowthSimulator currentSavings={totalSavings} />
+          )}
+        </div>
+
+        {/* ================= MAIN BALANCE SHEET WORKSPACE ================= */}
+        <div className="rounded-2xl border border-slate-800/90 bg-gradient-to-b from-slate-900/90 via-slate-900/70 to-slate-950/90 p-5 shadow-2xl backdrop-blur-xl">
+          {/* Category Tabs */}
+          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 pb-4">
+            <div className="flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0">
+              {[
+                { id: 'savings' as WealthCategory, label: 'Savings Accounts', icon: PiggyBank, count: savings.length, total: totalSavings, color: 'text-emerald-400' },
+                { id: 'debts' as WealthCategory, label: 'Debts & Loans', icon: AlertCircle, count: debts.length, total: totalDebts, color: 'text-rose-400' },
+                { id: 'assets' as WealthCategory, label: 'Investments & Assets', icon: TrendingUp, count: assets.length, total: totalAssets, color: 'text-cyan-400' },
+                { id: 'liabilities' as WealthCategory, label: 'Other Liabilities', icon: Zap, count: liabilities.length, total: totalLiabilities, color: 'text-amber-400' },
+              ].map((tab) => {
+                const Icon = tab.icon
+                const isActive = activeTab === tab.id
+                return (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id)}
+                    className={`group flex items-center gap-2.5 rounded-xl px-3.5 py-2 text-xs font-semibold transition-all duration-200 border whitespace-nowrap ${
+                      isActive
+                        ? 'bg-slate-800 border-primary-500/50 text-slate-100 shadow-md ring-1 ring-primary-500/20'
+                        : 'border-transparent text-slate-400 hover:border-slate-700 hover:bg-slate-800/40 hover:text-slate-200'
+                    }`}
+                  >
+                    <Icon className={`h-4 w-4 ${isActive ? tab.color : 'text-slate-400 group-hover:text-slate-200'}`} />
+                    <span>{tab.label}</span>
+                    <span
+                      className={`rounded-full px-1.5 py-0.2 text-[10px] font-mono ${
+                        isActive ? 'bg-primary-500/20 text-primary-300' : 'bg-slate-800 text-slate-400'
+                      }`}
+                    >
+                      {tab.count}
+                    </span>
+                  </button>
+                )
+              })}
+            </div>
+
             <button
-              onClick={() => openAddModal(activeTab)}
-              className="btn-primary"
+              onClick={() => handleOpenAdd(activeTab)}
+              className="flex items-center gap-1.5 rounded-xl bg-slate-800 px-3 py-1.5 text-xs font-semibold text-primary-400 border border-primary-500/30 hover:bg-primary-500/10 transition"
             >
-              <Plus className="h-5 w-5" />
-              Add {activeTab === 'savings' ? 'Saving' : activeTab === 'debts' ? 'Debt' : activeTab === 'assets' ? 'Asset' : 'Liability'}
+              <Plus className="h-3.5 w-3.5" />
+              Add {activeTab.charAt(0).toUpperCase() + activeTab.slice(1, -1)}
             </button>
           </div>
 
-          {/* SAVINGS TAB */}
-          {activeTab === 'savings' && (
-            <div className="space-y-4">
-              {loadingData ? (
-                <div className="text-center py-12">
-                  <div className="animate-spin h-8 w-8 border-b-2 border-primary-600 rounded-full mx-auto" />
-                </div>
-              ) : savings.length === 0 ? (
-                <div className="text-center py-12">
-                  <PiggyBank className="h-12 w-12 text-slate-600 mx-auto mb-3" />
-                  <p className="text-slate-400">No savings yet. Add one to get started.</p>
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  {savings.map((saving) => (
-                    <div
-                      key={saving.id}
-                      className="flex items-center justify-between p-4 bg-slate-800/40 border border-slate-700 rounded-lg hover:border-slate-600 transition"
-                    >
-                      <div className="flex-1">
-                        <p className="font-medium text-slate-50">{saving.account_type}</p>
-                        <p className="text-sm text-slate-400">{saving.description || 'No description'}</p>
-                      </div>
-                      <div className="text-right mr-4">
-                        <p className="text-lg font-bold text-success-300">₹{Math.round(saving.amount).toLocaleString('en-IN')}</p>
-                      </div>
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => handleEdit(saving, 'savings')}
-                          className="p-2 text-slate-400 hover:text-primary-400 transition"
-                        >
-                          <Edit className="h-5 w-5" />
-                        </button>
-                        <button
-                          onClick={() => handleDelete(saving.id, 'savings')}
-                          className="p-2 text-slate-400 hover:text-danger-400 transition"
-                        >
-                          <Trash2 className="h-5 w-5" />
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
+          {/* Search, Sort & Quick Filter Bar */}
+          <div className="mt-4 flex flex-wrap items-center justify-between gap-3 bg-slate-950/40 p-3 rounded-xl border border-slate-800/80">
+            {/* Search Input */}
+            <div className="relative flex-1 min-w-[200px]">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
+              <input
+                type="text"
+                placeholder={`Search ${activeTab}...`}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full rounded-xl border border-slate-700/80 bg-slate-900/90 pl-9 pr-3.5 py-1.5 text-xs text-slate-200 placeholder-slate-500 focus:border-primary-500 focus:outline-none"
+              />
             </div>
-          )}
 
-          {/* DEBTS TAB */}
-          {activeTab === 'debts' && (
-            <div className="space-y-4">
-              {loadingData ? (
-                <div className="text-center py-12">
-                  <div className="animate-spin h-8 w-8 border-b-2 border-primary-600 rounded-full mx-auto" />
-                </div>
-              ) : debts.length === 0 ? (
-                <div className="text-center py-12">
-                  <AlertCircle className="h-12 w-12 text-slate-600 mx-auto mb-3" />
-                  <p className="text-slate-400">No debts added. Add one if applicable.</p>
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  {debts.map((debt) => (
-                    <div
-                      key={debt.id}
-                      className="flex items-center justify-between p-4 bg-slate-800/40 border border-slate-700 rounded-lg hover:border-slate-600 transition"
-                    >
-                      <div className="flex-1">
-                        <p className="font-medium text-slate-50">{debt.debt_type}</p>
-                        <div className="text-sm text-slate-400 mt-1">
-                          <p>{debt.description || 'No description'}</p>
-                          {debt.interest_rate > 0 && (
-                            <p>Interest Rate: {debt.interest_rate}%</p>
-                          )}
-                        </div>
-                      </div>
-                      <div className="text-right mr-4">
-                        <p className="text-lg font-bold text-danger-300">₹{Math.round(debt.amount).toLocaleString('en-IN')}</p>
-                      </div>
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => handleEdit(debt, 'debts')}
-                          className="p-2 text-slate-400 hover:text-primary-400 transition"
-                        >
-                          <Edit className="h-5 w-5" />
-                        </button>
-                        <button
-                          onClick={() => handleDelete(debt.id, 'debts')}
-                          className="p-2 text-slate-400 hover:text-danger-400 transition"
-                        >
-                          <Trash2 className="h-5 w-5" />
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+            {/* Sort Dropdown & Quick Filter Chips */}
+            <div className="flex items-center gap-2 flex-wrap">
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value as any)}
+                className="rounded-xl border border-slate-700/80 bg-slate-900/90 px-3 py-1.5 text-xs text-slate-300 focus:border-primary-500 focus:outline-none"
+              >
+                <option value="highest">Highest Amount</option>
+                <option value="lowest">Lowest Amount</option>
+                <option value="recent">Recently Added</option>
+                {activeTab === 'debts' && <option value="apr">Highest APR %</option>}
+              </select>
+
+              <button
+                onClick={() => setFilterHighValue(!filterHighValue)}
+                className={`rounded-xl px-2.5 py-1.5 text-xs font-medium border transition ${
+                  filterHighValue
+                    ? 'bg-primary-500/20 text-primary-300 border-primary-500/40'
+                    : 'border-slate-700/70 bg-slate-900 text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                ≥ ₹50,000
+              </button>
+
+              {activeTab === 'debts' && (
+                <button
+                  onClick={() => setFilterHighAprOnly(!filterHighAprOnly)}
+                  className={`rounded-xl px-2.5 py-1.5 text-xs font-medium border transition ${
+                    filterHighAprOnly
+                      ? 'bg-rose-500/20 text-rose-300 border-rose-500/40 font-bold'
+                      : 'border-slate-700/70 bg-slate-900 text-slate-400 hover:text-slate-200'
+                  }`}
+                >
+                  High APR (≥12%)
+                </button>
               )}
-            </div>
-          )}
-
-          {/* ASSETS TAB */}
-          {activeTab === 'assets' && (
-            <div className="space-y-4">
-              {loadingData ? (
-                <div className="text-center py-12">
-                  <div className="animate-spin h-8 w-8 border-b-2 border-primary-600 rounded-full mx-auto" />
-                </div>
-              ) : assets.length === 0 ? (
-                <div className="text-center py-12">
-                  <TrendingUp className="h-12 w-12 text-slate-600 mx-auto mb-3" />
-                  <p className="text-slate-400">No assets yet. Add one to get started.</p>
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  {assets.map((asset) => (
-                    <div
-                      key={asset.id}
-                      className="flex items-center justify-between p-4 bg-slate-800/40 border border-slate-700 rounded-lg hover:border-slate-600 transition"
-                    >
-                      <div className="flex-1">
-                        <p className="font-medium text-slate-50">{asset.type}{asset.symbol ? ` - ${asset.symbol}` : ''}</p>
-                        <p className="text-sm text-slate-400">Qty: {asset.quantity} × ₹{Math.round(asset.price).toLocaleString('en-IN')}</p>
-                      </div>
-                      <div className="text-right mr-4">
-                        <p className="text-lg font-bold text-primary-300">₹{Math.round(asset.quantity * asset.price).toLocaleString('en-IN')}</p>
-                      </div>
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => handleEdit(asset, 'assets')}
-                          className="p-2 text-slate-400 hover:text-primary-400 transition"
-                        >
-                          <Edit className="h-5 w-5" />
-                        </button>
-                        <button
-                          onClick={() => handleDelete(asset.id, 'assets')}
-                          className="p-2 text-slate-400 hover:text-danger-400 transition"
-                        >
-                          <Trash2 className="h-5 w-5" />
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* LIABILITIES TAB */}
-          {activeTab === 'liabilities' && (
-            <div className="space-y-4">
-              {loadingData ? (
-                <div className="text-center py-12">
-                  <div className="animate-spin h-8 w-8 border-b-2 border-primary-600 rounded-full mx-auto" />
-                </div>
-              ) : liabilities.length === 0 ? (
-                <div className="text-center py-12">
-                  <Zap className="h-12 w-12 text-slate-600 mx-auto mb-3" />
-                  <p className="text-slate-400">No liabilities added.</p>
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  {liabilities.map((liability) => (
-                    <div
-                      key={liability.id}
-                      className="flex items-center justify-between p-4 bg-slate-800/40 border border-slate-700 rounded-lg hover:border-slate-600 transition"
-                    >
-                      <div className="flex-1">
-                        <p className="font-medium text-slate-50">{liability.type}</p>
-                        <div className="text-sm text-slate-400 mt-1">
-                          {liability.rate && <p>Rate: {liability.rate}%</p>}
-                          {liability.due_date && <p>Due: {new Date(liability.due_date).toLocaleDateString('en-IN')}</p>}
-                        </div>
-                      </div>
-                      <div className="text-right mr-4">
-                        <p className="text-lg font-bold text-yellow-300">₹{Math.round(liability.amount).toLocaleString('en-IN')}</p>
-                      </div>
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => handleEdit(liability, 'liabilities')}
-                          className="p-2 text-slate-400 hover:text-primary-400 transition"
-                        >
-                          <Edit className="h-5 w-5" />
-                        </button>
-                        <button
-                          onClick={() => handleDelete(liability.id, 'liabilities')}
-                          className="p-2 text-slate-400 hover:text-danger-400 transition"
-                        >
-                          <Trash2 className="h-5 w-5" />
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-
-        {/* MODAL */}
-        {showModal && (
-          <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
-            <div className="bg-slate-900 rounded-lg p-6 max-w-md w-full border border-slate-700 form-shell">
-              <h2 className="text-xl font-bold text-slate-50 mb-4">
-                {editingItem 
-                  ? `Edit ${activeTab === 'savings' ? 'Saving' : activeTab === 'debts' ? 'Debt' : activeTab === 'assets' ? 'Asset' : 'Liability'}` 
-                  : `Add ${activeTab === 'savings' ? 'Saving' : activeTab === 'debts' ? 'Debt' : activeTab === 'assets' ? 'Asset' : 'Liability'}`}
-              </h2>
-
-              <form onSubmit={handleSubmit} className="space-y-4 form-shell">
-                {/* Amount */}
-                <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-2">
-                    Amount (₹)
-                  </label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    min="0"
-                    required
-                    value={formData.amount}
-                    onChange={(e) =>
-                      setFormData({ ...formData, amount: e.target.value })
-                    }
-                    className="input"
-                    placeholder="0.00"
-                  />
-                </div>
-
-                {/* Savings-specific fields */}
-                {activeTab === 'savings' && (
-                  <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-2">
-                      Account Type
-                    </label>
-                    <input
-                      type="text"
-                      value={formData.account_type}
-                      onChange={(e) =>
-                        setFormData({ ...formData, account_type: e.target.value })
-                      }
-                      className="input"
-                      placeholder="e.g., Savings Account, Fixed Deposit"
-                    />
-                  </div>
-                )}
-
-                {/* Debts-specific fields */}
-                {activeTab === 'debts' && (
-                  <>
-                    <div>
-                      <label className="block text-sm font-medium text-slate-300 mb-2">
-                        Debt Type
-                      </label>
-                      <input
-                        type="text"
-                        value={formData.debt_type}
-                        onChange={(e) =>
-                          setFormData({ ...formData, debt_type: e.target.value })
-                        }
-                        className="input"
-                        placeholder="e.g., Loan, Credit Card, Mortgage"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-slate-300 mb-2">
-                        Interest Rate (%)
-                      </label>
-                      <input
-                        type="number"
-                        step="0.01"
-                        min="0"
-                        max="100"
-                        value={formData.interest_rate}
-                        onChange={(e) =>
-                          setFormData({ ...formData, interest_rate: e.target.value })
-                        }
-                        className="input"
-                        placeholder="0.00"
-                      />
-                    </div>
-                  </>
-                )}
-
-                {/* Assets-specific fields */}
-                {activeTab === 'assets' && (
-                  <>
-                    <div>
-                      <label className="block text-sm font-medium text-slate-300 mb-2">
-                        Asset Type
-                      </label>
-                      <input
-                        type="text"
-                        value={formData.type}
-                        onChange={(e) =>
-                          setFormData({ ...formData, type: e.target.value })
-                        }
-                        className="input"
-                        placeholder="e.g., Stock, Mutual Fund, Gold"
-                        required
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-slate-300 mb-2">
-                        Symbol (optional)
-                      </label>
-                      <input
-                        type="text"
-                        value={formData.symbol}
-                        onChange={(e) =>
-                          setFormData({ ...formData, symbol: e.target.value })
-                        }
-                        className="input"
-                        placeholder="e.g., TCS, MSFT"
-                      />
-                    </div>
-                    <div className="grid grid-cols-2 gap-3">
-                      <div>
-                        <label className="block text-sm font-medium text-slate-300 mb-2">
-                          Quantity
-                        </label>
-                        <input
-                          type="number"
-                          step="0.01"
-                          min="0"
-                          value={formData.quantity}
-                          onChange={(e) =>
-                            setFormData({ ...formData, quantity: e.target.value })
-                          }
-                          className="input"
-                          placeholder="0"
-                          required
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-slate-300 mb-2">
-                          Price (₹)
-                        </label>
-                        <input
-                          type="number"
-                          step="0.01"
-                          min="0"
-                          value={formData.price}
-                          onChange={(e) =>
-                            setFormData({ ...formData, price: e.target.value })
-                          }
-                          className="input"
-                          placeholder="0.00"
-                          required
-                        />
-                      </div>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-slate-300 mb-2">
-                        Purchase Date (optional)
-                      </label>
-                      <input
-                        type="date"
-                        value={formData.purchase_date}
-                        onChange={(e) =>
-                          setFormData({ ...formData, purchase_date: e.target.value })
-                        }
-                        className="input"
-                      />
-                    </div>
-                  </>
-                )}
-
-                {/* Liabilities-specific fields */}
-                {activeTab === 'liabilities' && (
-                  <>
-                    <div>
-                      <label className="block text-sm font-medium text-slate-300 mb-2">
-                        Liability Type
-                      </label>
-                      <input
-                        type="text"
-                        value={formData.type}
-                        onChange={(e) =>
-                          setFormData({ ...formData, type: e.target.value })
-                        }
-                        className="input"
-                        placeholder="e.g., Loan, Credit Card, Mortgage"
-                        required
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-slate-300 mb-2">
-                        Amount (₹)
-                      </label>
-                      <input
-                        type="number"
-                        step="0.01"
-                        min="0"
-                        value={formData.amount}
-                        onChange={(e) =>
-                          setFormData({ ...formData, amount: e.target.value })
-                        }
-                        className="input"
-                        placeholder="0.00"
-                        required
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-slate-300 mb-2">
-                        Interest Rate (%) (optional)
-                      </label>
-                      <input
-                        type="number"
-                        step="0.01"
-                        min="0"
-                        value={formData.rate}
-                        onChange={(e) =>
-                          setFormData({ ...formData, rate: e.target.value })
-                        }
-                        className="input"
-                        placeholder="0.00"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-slate-300 mb-2">
-                        Due Date (optional)
-                      </label>
-                      <input
-                        type="date"
-                        value={formData.due_date}
-                        onChange={(e) =>
-                          setFormData({ ...formData, due_date: e.target.value })
-                        }
-                        className="input"
-                      />
-                    </div>
-                  </>
-                )}
-
-                {/* Description */}
-                <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-2">
-                    Description (optional)
-                  </label>
-                  <textarea
-                    value={formData.description}
-                    onChange={(e) =>
-                      setFormData({ ...formData, description: e.target.value })
-                    }
-                    className="input"
-                    placeholder="Add notes..."
-                    rows={2}
-                  />
-                </div>
-
-                {/* Buttons */}
-                <div className="flex gap-3 pt-4">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setShowModal(false)
-                      setEditingItem(null)
-                    }}
-                    className="flex-1 px-4 py-2 bg-slate-700 hover:bg-slate-600 text-slate-50 rounded-lg transition"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    className="flex-1 px-4 py-2 bg-primary-600 hover:bg-primary-700 text-slate-50 rounded-lg transition"
-                  >
-                    Save
-                  </button>
-                </div>
-              </form>
             </div>
           </div>
-        )}
+
+          {/* Cards Grid / Empty States */}
+          <div className="mt-5">
+            {loadingData ? (
+              <div className="py-16 text-center">
+                <div className="animate-spin h-8 w-8 border-3 border-primary-500 border-t-transparent rounded-full mx-auto" />
+                <p className="text-xs text-slate-400 mt-2 font-mono">Syncing balance matrix...</p>
+              </div>
+            ) : activeItems.length === 0 ? (
+              <div className="py-14 text-center border border-dashed border-slate-800 rounded-2xl bg-slate-900/30 p-6">
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-800/80 mx-auto mb-3 border border-slate-700">
+                  {activeTab === 'savings' ? (
+                    <PiggyBank className="h-6 w-6 text-slate-500" />
+                  ) : activeTab === 'debts' ? (
+                    <AlertCircle className="h-6 w-6 text-slate-500" />
+                  ) : activeTab === 'assets' ? (
+                    <TrendingUp className="h-6 w-6 text-slate-500" />
+                  ) : (
+                    <Zap className="h-6 w-6 text-slate-500" />
+                  )}
+                </div>
+                <h4 className="text-sm font-semibold text-slate-200">
+                  No {activeTab} matching criteria
+                </h4>
+                <p className="text-xs text-slate-400 mt-1 max-w-sm mx-auto">
+                  {searchQuery
+                    ? 'No entries matched your search query or active filters.'
+                    : `Start tracking your ${activeTab} to unlock automated analytics and payoff strategies.`}
+                </p>
+                <button
+                  onClick={() => handleOpenAdd(activeTab)}
+                  className="mt-4 inline-flex items-center gap-1.5 rounded-xl bg-primary-500 px-4 py-2 text-xs font-bold text-slate-950 shadow-md transition hover:bg-primary-400"
+                >
+                  <Plus className="h-3.5 w-3.5" />
+                  Add First {activeTab.charAt(0).toUpperCase() + activeTab.slice(1, -1)}
+                </button>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {activeItems.map((item, index) => (
+                  <WealthItemCard
+                    key={item.id}
+                    item={item}
+                    category={activeTab}
+                    index={index}
+                    onEdit={handleEdit}
+                    onDelete={handleDelete}
+                    onQuickAdjust={(it, cat) => setQuickAdjustItem({ item: it, category: cat })}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
       </div>
+
+      {/* ================= MODALS ================= */}
+      <WealthModal
+        isOpen={showAddModal}
+        initialCategory={activeTab}
+        editingItem={editingItem}
+        onClose={() => {
+          setShowAddModal(false)
+          setEditingItem(null)
+        }}
+        onSuccess={handleModalSuccess}
+      />
+
+      <QuickAdjustModal
+        isOpen={!!quickAdjustItem}
+        item={quickAdjustItem?.item || null}
+        category={quickAdjustItem?.category || 'savings'}
+        onClose={() => setQuickAdjustItem(null)}
+        onSuccess={handleQuickAdjustSuccess}
+      />
     </DashboardLayout>
   )
 }
