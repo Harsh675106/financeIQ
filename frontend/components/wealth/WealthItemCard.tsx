@@ -17,7 +17,9 @@ import {
   ArrowUpRight,
   PlusCircle,
   MinusCircle,
-  Sparkles
+  Sparkles,
+  Wallet,
+  Clock
 } from 'lucide-react'
 
 export interface WealthItem {
@@ -61,7 +63,7 @@ export default function WealthItemCard({
 
   // Determine title, subtitle, amount, and badge info
   let title = 'Item'
-  let subtitle = item.description || 'No description'
+  let subtitle = item.description || 'No description added'
   let amount = 0
   let badgeText = ''
   let isHighApr = false
@@ -85,14 +87,14 @@ export default function WealthItemCard({
     amount = (item.quantity || 0) * (item.price || 0)
     subtitle = `Qty: ${item.quantity} × ₹${Math.round(item.price || 0).toLocaleString('en-IN')}`
     if (item.purchase_date) {
-      subtitle += ` • Bought: ${new Date(item.purchase_date).toLocaleDateString('en-IN')}`
+      subtitle += ` • Acquired: ${new Date(item.purchase_date).toLocaleDateString('en-IN')}`
     }
   } else if (category === 'liabilities') {
     title = item.type || 'Liability'
     amount = item.amount || 0
     if (item.rate) badgeText = `${item.rate}% Rate`
     if (item.due_date) {
-      subtitle = `Due: ${new Date(item.due_date).toLocaleDateString('en-IN')}`
+      subtitle = `Due date: ${new Date(item.due_date).toLocaleDateString('en-IN')}`
     }
   }
 
@@ -117,36 +119,44 @@ export default function WealthItemCard({
     if (category === 'savings') {
       return {
         amountColor: 'text-emerald-400',
-        glowBg: 'hover:border-emerald-500/40 hover:shadow-emerald-500/5',
-        iconBg: 'bg-emerald-500/10 border-emerald-500/20',
-        badgeClass: 'bg-emerald-500/10 text-emerald-300 border-emerald-500/30',
+        glowBg: 'hover:border-emerald-500/50 hover:shadow-emerald-500/10',
+        iconBg: 'bg-emerald-500/15 border-emerald-500/30 text-emerald-400',
+        badgeClass: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30',
+        cardBorder: 'border-slate-800/90 hover:border-emerald-500/40',
+        accentGlow: 'from-emerald-500/5 to-transparent',
       }
     }
     if (category === 'debts') {
       return {
         amountColor: isHighApr ? 'text-rose-400' : 'text-rose-300',
         glowBg: isHighApr
-          ? 'border-rose-500/40 shadow-rose-500/10 hover:border-rose-500/60'
-          : 'hover:border-rose-500/40 hover:shadow-rose-500/5',
-        iconBg: 'bg-rose-500/10 border-rose-500/20',
+          ? 'border-rose-500/50 shadow-rose-500/15 hover:border-rose-500/70'
+          : 'hover:border-rose-500/50 hover:shadow-rose-500/10',
+        iconBg: 'bg-rose-500/15 border-rose-500/30 text-rose-400',
         badgeClass: isHighApr
-          ? 'bg-rose-500/20 text-rose-300 border-rose-500/40 font-bold'
-          : 'bg-rose-500/10 text-rose-300 border-rose-500/20',
+          ? 'bg-rose-500/20 text-rose-300 border-rose-500/50 font-bold animate-pulse'
+          : 'bg-rose-500/15 text-rose-300 border-rose-500/30',
+        cardBorder: isHighApr ? 'border-rose-500/40' : 'border-slate-800/90 hover:border-rose-500/40',
+        accentGlow: 'from-rose-500/5 to-transparent',
       }
     }
     if (category === 'assets') {
       return {
         amountColor: 'text-cyan-300',
-        glowBg: 'hover:border-cyan-500/40 hover:shadow-cyan-500/5',
-        iconBg: 'bg-cyan-500/10 border-cyan-500/20',
-        badgeClass: 'bg-cyan-500/10 text-cyan-300 border-cyan-500/30',
+        glowBg: 'hover:border-cyan-500/50 hover:shadow-cyan-500/10',
+        iconBg: 'bg-cyan-500/15 border-cyan-500/30 text-cyan-400',
+        badgeClass: 'bg-cyan-500/15 text-cyan-300 border-cyan-500/30',
+        cardBorder: 'border-slate-800/90 hover:border-cyan-500/40',
+        accentGlow: 'from-cyan-500/5 to-transparent',
       }
     }
     return {
       amountColor: 'text-amber-300',
-      glowBg: 'hover:border-amber-500/40 hover:shadow-amber-500/5',
-      iconBg: 'bg-amber-500/10 border-amber-500/20',
-      badgeClass: 'bg-amber-500/10 text-amber-300 border-amber-500/30',
+      glowBg: 'hover:border-amber-500/50 hover:shadow-amber-500/10',
+      iconBg: 'bg-amber-500/15 border-amber-500/30 text-amber-400',
+      badgeClass: 'bg-amber-500/15 text-amber-300 border-amber-500/30',
+      cardBorder: 'border-slate-800/90 hover:border-amber-500/40',
+      accentGlow: 'from-amber-500/5 to-transparent',
     }
   }
 
@@ -156,92 +166,98 @@ export default function WealthItemCard({
     <div
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      style={{ animationDelay: `${index * 60}ms` }}
-      className={`group relative overflow-hidden rounded-2xl border border-slate-800/80 bg-gradient-to-br from-slate-900/90 via-slate-900/70 to-slate-950/90 p-4.5 shadow-lg backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl animate-fade-up ${theme.glowBg}`}
+      style={{ animationDelay: `${index * 50}ms` }}
+      className={`group relative overflow-hidden rounded-2xl border ${theme.cardBorder} bg-gradient-to-br from-slate-900/95 via-slate-900/85 to-slate-950/95 p-5 md:p-6 shadow-xl backdrop-blur-xl stage-card-lift ${theme.glowBg}`}
     >
-      {/* High APR top warning bar */}
+      {/* Top subtle light accent */}
+      <div className={`pointer-events-none absolute inset-x-0 top-0 h-24 bg-gradient-to-b ${theme.accentGlow}`} />
+
+      {/* High APR top warning stripe */}
       {isHighApr && (
-        <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-rose-500 via-amber-500 to-rose-500" />
+        <div className="absolute top-0 inset-x-0 h-1.5 bg-gradient-to-r from-rose-500 via-amber-400 to-rose-500 shadow-sm" />
       )}
 
-      <div className="flex items-start justify-between gap-3">
-        {/* Left icon & details */}
-        <div className="flex items-start gap-3.5 flex-1 min-w-0">
+      {/* Main Content Layout */}
+      <div className="relative z-10 flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+        {/* Left Side: Icon & Details */}
+        <div className="flex items-start gap-4 flex-1 min-w-0">
           <div
-            className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border transition-transform duration-300 group-hover:scale-105 shadow-inner ${theme.iconBg}`}
+            className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border shadow-lg transition-transform duration-300 group-hover:scale-110 ${theme.iconBg}`}
           >
             {getCategoryIcon()}
           </div>
 
-          <div className="min-w-0 flex-1">
+          <div className="min-w-0 flex-1 space-y-1">
             <div className="flex items-center gap-2 flex-wrap">
-              <h4 className="font-semibold text-slate-100 text-sm sm:text-base truncate group-hover:text-white transition">
+              <h4 className="font-bold text-slate-100 text-base group-hover:text-white transition tracking-tight">
                 {title}
               </h4>
               {badgeText && (
                 <span
-                  className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold border tracking-wide uppercase ${theme.badgeClass}`}
+                  className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[11px] font-semibold border tracking-wide uppercase ${theme.badgeClass}`}
                 >
-                  {isHighApr && <ShieldAlert className="h-3 w-3 text-rose-400 animate-pulse" />}
+                  {isHighApr && <ShieldAlert className="h-3 w-3 text-rose-400" />}
                   {badgeText}
                 </span>
               )}
             </div>
 
-            <p className="text-xs text-slate-400 mt-1 line-clamp-1 leading-relaxed">
+            <p className="text-xs text-slate-400 leading-relaxed line-clamp-2">
               {subtitle}
             </p>
           </div>
         </div>
 
-        {/* Right Balance & Quick Actions */}
-        <div className="text-right shrink-0">
-          <p className={`text-base sm:text-lg font-bold font-mono tracking-tight ${theme.amountColor}`}>
+        {/* Right Side: Big Numeric Balance */}
+        <div className="text-left sm:text-right shrink-0 bg-slate-950/40 sm:bg-transparent p-3 sm:p-0 rounded-xl sm:rounded-none border sm:border-0 border-slate-800/80">
+          <p className={`text-xl sm:text-2xl font-black font-mono tracking-tight ${theme.amountColor}`}>
             ₹{Math.round(amount).toLocaleString('en-IN')}
           </p>
-          <span className="text-[10px] uppercase tracking-wider text-slate-500 font-medium">
-            {category === 'savings' || category === 'assets' ? 'Asset Value' : 'Outstanding Balance'}
+          <span className="text-[10px] uppercase tracking-wider text-slate-500 font-bold block mt-0.5">
+            {category === 'savings' || category === 'assets' ? 'Total Asset Value' : 'Principal Balance'}
           </span>
         </div>
       </div>
 
-      {/* Action Footer Bar */}
-      <div className="mt-4 flex items-center justify-between border-t border-slate-800/80 pt-3">
+      {/* Action Footer Bar with Generous Padding */}
+      <div className="relative z-10 mt-5 flex items-center justify-between border-t border-slate-800/90 pt-3.5">
         <div className="flex items-center gap-2">
           {onQuickAdjust && (category === 'savings' || category === 'debts') && (
             <button
               onClick={() => onQuickAdjust(item, category)}
-              className="flex items-center gap-1.5 rounded-lg bg-slate-800/80 px-2.5 py-1 text-xs font-medium text-slate-300 transition hover:bg-slate-700 hover:text-white border border-slate-700/60"
+              className="flex items-center gap-1.5 rounded-xl bg-slate-800/90 px-3 py-1.5 text-xs font-semibold text-slate-200 transition hover:bg-slate-700 hover:text-white border border-slate-700/80 shadow-sm active:scale-95"
             >
               {category === 'savings' ? (
                 <>
                   <PlusCircle className="h-3.5 w-3.5 text-emerald-400" />
-                  Quick Deposit
+                  <span>Deposit Funds</span>
                 </>
               ) : (
                 <>
                   <MinusCircle className="h-3.5 w-3.5 text-rose-400" />
-                  Record Paydown
+                  <span>Record Payment</span>
                 </>
               )}
             </button>
           )}
         </div>
 
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-2">
           <button
             onClick={() => onEdit(item, category)}
-            className="rounded-lg p-1.5 text-slate-400 transition hover:bg-slate-800 hover:text-primary-300 border border-transparent hover:border-slate-700"
-            title="Edit Item"
+            className="flex items-center gap-1 rounded-xl p-2 text-slate-400 transition hover:bg-slate-800 hover:text-primary-300 border border-transparent hover:border-slate-700"
+            title="Edit Entry"
           >
             <Edit className="h-4 w-4" />
+            <span className="text-xs font-medium hidden sm:inline">Edit</span>
           </button>
           <button
             onClick={() => onDelete(item.id, category)}
-            className="rounded-lg p-1.5 text-slate-400 transition hover:bg-rose-950/40 hover:text-rose-400 border border-transparent hover:border-rose-800/50"
-            title="Delete Item"
+            className="flex items-center gap-1 rounded-xl p-2 text-slate-400 transition hover:bg-rose-950/40 hover:text-rose-400 border border-transparent hover:border-rose-800/50"
+            title="Delete Entry"
           >
             <Trash2 className="h-4 w-4" />
+            <span className="text-xs font-medium hidden sm:inline">Delete</span>
           </button>
         </div>
       </div>

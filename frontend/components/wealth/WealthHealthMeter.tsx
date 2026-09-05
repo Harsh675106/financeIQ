@@ -82,38 +82,38 @@ export default function WealthHealthMeter({
   const strokeDashoffset = circumference - (circumference * healthScore) / 100
 
   return (
-    <div className="relative overflow-hidden rounded-2xl border border-slate-700/60 bg-gradient-to-br from-slate-900/90 via-slate-900/80 to-slate-950/90 p-5 shadow-2xl backdrop-blur-xl transition-all duration-300 hover:border-slate-600/70">
+    <div className="relative overflow-hidden rounded-3xl border border-slate-700/80 bg-gradient-to-br from-slate-900/95 via-slate-900/85 to-slate-950/95 p-6 md:p-8 shadow-2xl backdrop-blur-xl transition-all duration-300 stage-card-lift">
       {/* Background ambient glow */}
       <div
-        className="pointer-events-none absolute -right-12 -top-12 h-44 w-44 rounded-full blur-3xl opacity-20"
+        className="pointer-events-none absolute -right-12 -top-12 h-52 w-52 rounded-full blur-3xl opacity-20"
         style={{ backgroundColor: strokeColor }}
       />
 
       {/* Header bar */}
-      <div className="flex flex-wrap items-center justify-between gap-3 mb-5">
-        <div className="flex items-center gap-2.5">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-500/10 border border-emerald-500/20 shadow-inner">
-            <ShieldCheck className="h-5 w-5 text-emerald-400 animate-pulse" />
+      <div className="flex flex-wrap items-center justify-between gap-4 mb-6 border-b border-slate-800/80 pb-4">
+        <div className="flex items-center gap-3">
+          <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-emerald-500/15 border border-emerald-500/30 shadow-lg">
+            <ShieldCheck className="h-6 w-6 text-emerald-400 animate-pulse" />
           </div>
           <div>
-            <h3 className="text-base font-semibold text-slate-100 flex items-center gap-2">
+            <h3 className="text-base sm:text-lg font-bold text-slate-100 flex items-center gap-2">
               Wealth Health & Fortress Index
-              <span className="inline-flex items-center gap-1 rounded-full bg-slate-800/80 px-2 py-0.5 text-[11px] font-medium text-slate-300 border border-slate-700">
-                <Sparkles className="h-3 w-3 text-emerald-400" />
+              <span className="inline-flex items-center gap-1 rounded-full bg-slate-800/90 px-2.5 py-0.5 text-xs font-semibold text-slate-300 border border-slate-700">
+                <Sparkles className="h-3.5 w-3.5 text-emerald-400" />
                 AI Diagnostic
               </span>
             </h3>
-            <p className="text-xs text-slate-400">Live balance resilience & solvency rating</p>
+            <p className="text-xs text-slate-400 mt-0.5">Live solvency resilience & balance sheet stability index</p>
           </div>
         </div>
 
         {/* View toggle pills */}
-        <div className="flex items-center gap-1 rounded-xl bg-slate-800/70 p-1 border border-slate-700/50">
+        <div className="flex items-center gap-1.5 rounded-2xl bg-slate-800/90 p-1.5 border border-slate-700/60 shadow-inner">
           <button
             onClick={() => setActiveView('score')}
-            className={`rounded-lg px-3 py-1 text-xs font-medium transition-all duration-200 ${
+            className={`rounded-xl px-3.5 py-1.5 text-xs font-bold transition-all duration-200 ${
               activeView === 'score'
-                ? 'bg-emerald-500 text-slate-950 shadow-md font-semibold'
+                ? 'bg-emerald-400 text-slate-950 shadow-md font-black'
                 : 'text-slate-400 hover:text-slate-200'
             }`}
           >
@@ -121,9 +121,9 @@ export default function WealthHealthMeter({
           </button>
           <button
             onClick={() => setActiveView('ratios')}
-            className={`rounded-lg px-3 py-1 text-xs font-medium transition-all duration-200 ${
+            className={`rounded-xl px-3.5 py-1.5 text-xs font-bold transition-all duration-200 ${
               activeView === 'ratios'
-                ? 'bg-emerald-500 text-slate-950 shadow-md font-semibold'
+                ? 'bg-emerald-400 text-slate-950 shadow-md font-black'
                 : 'text-slate-400 hover:text-slate-200'
             }`}
           >
@@ -131,9 +131,9 @@ export default function WealthHealthMeter({
           </button>
           <button
             onClick={() => setActiveView('tips')}
-            className={`rounded-lg px-3 py-1 text-xs font-medium transition-all duration-200 ${
+            className={`rounded-xl px-3.5 py-1.5 text-xs font-bold transition-all duration-200 ${
               activeView === 'tips'
-                ? 'bg-emerald-500 text-slate-950 shadow-md font-semibold'
+                ? 'bg-emerald-400 text-slate-950 shadow-md font-black'
                 : 'text-slate-400 hover:text-slate-200'
             }`}
           >

@@ -88,25 +88,25 @@ export default function DebtOptimizerCard({ refreshKey = 0 }: DebtOptimizerCardP
   }, [activeStrat, extraPayment, data?.monthlyPaymentBudget])
 
   return (
-    <div className="relative overflow-hidden rounded-2xl border border-slate-700/60 bg-gradient-to-br from-slate-900/90 via-slate-900/80 to-slate-950/90 p-5 shadow-2xl backdrop-blur-xl transition-all duration-300 hover:border-slate-600/70">
+    <div className="relative overflow-hidden rounded-3xl border border-slate-700/80 bg-gradient-to-br from-slate-900/95 via-slate-900/85 to-slate-950/95 p-6 md:p-8 shadow-2xl backdrop-blur-xl transition-all duration-300 stage-card-lift">
       {/* Background glow */}
-      <div className="pointer-events-none absolute -right-12 -top-12 h-44 w-44 rounded-full bg-primary-500/10 blur-3xl" />
+      <div className="pointer-events-none absolute -right-12 -top-12 h-52 w-52 rounded-full bg-primary-500/15 blur-3xl" />
 
       {/* Header */}
-      <div className="flex flex-wrap items-center justify-between gap-3 mb-5 border-b border-slate-800 pb-4">
-        <div className="flex items-center gap-2.5">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-primary-500/20 to-teal-500/10 border border-primary-500/30">
-            <BrainCircuit className="h-5 w-5 text-primary-400 animate-pulse" />
+      <div className="flex flex-wrap items-center justify-between gap-4 mb-6 border-b border-slate-800/80 pb-4">
+        <div className="flex items-center gap-3">
+          <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-primary-500/25 to-teal-500/15 border border-primary-500/40 shadow-lg">
+            <BrainCircuit className="h-6 w-6 text-primary-400 animate-pulse" />
           </div>
           <div>
-            <h3 className="text-base font-semibold text-slate-100 flex items-center gap-2">
+            <h3 className="text-base sm:text-lg font-bold text-slate-100 flex items-center gap-2">
               AI Debt Payoff Engine & Accelerator
-              <span className="inline-flex items-center gap-1 rounded-full bg-primary-500/10 px-2 py-0.5 text-[11px] font-medium text-primary-300 border border-primary-500/20">
-                <Sparkles className="h-3 w-3" />
+              <span className="inline-flex items-center gap-1 rounded-full bg-primary-500/15 px-2.5 py-0.5 text-xs font-semibold text-primary-300 border border-primary-500/30">
+                <Sparkles className="h-3.5 w-3.5" />
                 Optimized Matrix
               </span>
             </h3>
-            <p className="text-xs text-slate-400">Mathematical avalanche & psychological snowball simulations</p>
+            <p className="text-xs text-slate-400 mt-0.5">Mathematical avalanche & psychological snowball simulations</p>
           </div>
         </div>
 
