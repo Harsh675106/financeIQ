@@ -1,13 +1,33 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/hooks/useAuth'
 import DashboardLayout from '@/components/layouts/DashboardLayout'
 import PageBackground from '@/components/layouts/PageBackground'
-import { Target, Plus, Edit, Trash2, CheckCircle } from 'lucide-react'
+import {
+  Target,
+  Plus,
+  Compass,
+  Trophy,
+  Zap,
+  TrendingUp,
+  Sparkles,
+  Layers,
+  Filter,
+  Flame,
+  ShieldCheck,
+  Coins,
+  CheckCircle2,
+  Calendar,
+  X,
+} from 'lucide-react'
 import { api } from '@/lib/api'
 import GoalProjections from '@/components/goals/GoalProjections'
+import GoalStorylineMap from '@/components/goals/GoalStorylineMap'
+import GoalStoryCard from '@/components/goals/GoalStoryCard'
+import GoalSimulatorModal from '@/components/goals/GoalSimulatorModal'
+import ConfettiEffect from '@/components/goals/ConfettiEffect'
 
 interface Goal {
   id: number
@@ -19,6 +39,9 @@ interface Goal {
   status: 'active' | 'completed' | 'paused'
 }
 
+type FilterTab = 'all' | 'active' | 'completed' | 'urgent'
+type ViewMode = 'storyline' | 'grid'
+
 export default function GoalsPage() {
   const { user, loading } = useAuth()
   const router = useRouter()
@@ -26,11 +49,22 @@ export default function GoalsPage() {
   const [goals, setGoals] = useState<Goal[]>([])
   const [loadingGoals, setLoadingGoals] = useState(true)
   const [goalRefreshKey, setGoalRefreshKey] = useState(0)
+
+  // Modals & Active selections
   const [showModal, setShowModal] = useState(false)
   const [editingGoal, setEditingGoal] = useState<Goal | null>(null)
   const [showContributeModal, setShowContributeModal] = useState(false)
   const [contributingGoal, setContributingGoal] = useState<Goal | null>(null)
   const [contributionAmount, setContributionAmount] = useState('')
+
+  // Storyline & Simulator States
+  const [selectedGoalId, setSelectedGoalId] = useState<number | null>(null)
+  const [simulatorGoal, setSimulatorGoal] = useState<Goal | null>(null)
+  const [viewMode, setViewMode] = useState<ViewMode>('storyline')
+  const [activeFilter, setActiveFilter] = useState<FilterTab>('all')
+
+  // Confetti trigger
+  const [confettiTrigger, setConfettiTrigger] = useState(false)
 
   const [formData, setFormData] = useState({
     name: '',
@@ -52,12 +86,20 @@ export default function GoalsPage() {
   const fetchGoals = async () => {
     try {
       const res = await api.get('/goals')
-      setGoals(res.data.goals || [])
+      const fetched: Goal[] = res.data.goals || []
+      setGoals(fetched)
+      if (fetched.length > 0 && !selectedGoalId) {
+        setSelectedGoalId(fetched[0].id)
+      }
     } catch (err) {
       console.error(err)
     } finally {
       setLoadingGoals(false)
     }
+  }
+
+  const triggerCelebration = () => {
+    setConfettiTrigger(true)
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -68,6 +110,7 @@ export default function GoalsPage() {
         await api.put(`/goals/${editingGoal.id}`, formData)
       } else {
         await api.post('/goals', formData)
+        triggerCelebration()
       }
 
       setShowModal(false)
@@ -80,17 +123,17 @@ export default function GoalsPage() {
       })
 
       await fetchGoals()
-      setGoalRefreshKey(key => key + 1)
+      setGoalRefreshKey((k) => k + 1)
     } catch {
       alert('Failed to save goal')
     }
   }
 
   const handleDelete = async (id: number) => {
-    if (!confirm('Delete this goal?')) return
+    if (!confirm('Delete this financial goal quest?')) return
     await api.delete(`/goals/${id}`)
     await fetchGoals()
-    setGoalRefreshKey(key => key + 1)
+    setGoalRefreshKey((k) => k + 1)
   }
 
   const handleContribute = async (e: React.FormEvent) => {
@@ -104,18 +147,29 @@ export default function GoalsPage() {
         return
       }
 
-      await api.post(`/goals/${contributingGoal.id}/contribute`, {
-        amount,
-      })
+      await api.post(`/goals/${contributingGoal.id}/contribute`, { amount })
 
       setShowContributeModal(false)
       setContributingGoal(null)
       setContributionAmount('')
+      triggerCelebration()
       await fetchGoals()
-      setGoalRefreshKey(key => key + 1)
+      setGoalRefreshKey((k) => k + 1)
     } catch (err) {
       console.error(err)
       alert('Failed to contribute to goal')
+    }
+  }
+
+  const handleQuickContribute = async (goal: Goal, amount: number) => {
+    try {
+      await api.post(`/goals/${goal.id}/contribute`, { amount })
+      triggerCelebration()
+      await fetchGoals()
+      setGoalRefreshKey((k) => k + 1)
+    } catch (err) {
+      console.error(err)
+      alert('Failed to add quick contribution')
     }
   }
 
@@ -130,283 +184,398 @@ export default function GoalsPage() {
     setFormData({
       name: goal.name,
       target_amount: goal.target_amount.toString(),
-      target_date: goal.target_date
-        ? goal.target_date.split('T')[0]
-        : '',
-      monthly_contribution:
-        goal.monthly_contribution?.toString() || '',
+      target_date: goal.target_date ? goal.target_date.split('T')[0] : '',
+      monthly_contribution: goal.monthly_contribution?.toString() || '',
     })
     setShowModal(true)
   }
 
-  /* ================= HELPERS ================= */
-  const calculateProgress = (goal: Goal) =>
-    Math.min(100, (goal.current_amount / goal.target_amount) * 100)
+  /* ================= TELEMETRY STATS ================= */
+  const telemetry = useMemo(() => {
+    const totalTarget = goals.reduce((acc, g) => acc + (Number(g.target_amount) || 0), 0)
+    const totalSaved = goals.reduce((acc, g) => acc + (Number(g.current_amount) || 0), 0)
+    const totalMonthly = goals.reduce((acc, g) => acc + (Number(g.monthly_contribution) || 0), 0)
+    const overallProgress = totalTarget > 0 ? (totalSaved / totalTarget) * 100 : 0
+    const completedCount = goals.filter((g) => (g.current_amount / g.target_amount) >= 1).length
 
-  const getDaysRemaining = (date: string | null) => {
-    if (!date) return null
-    const diff =
-      new Date(date).getTime() - new Date().getTime()
-    return Math.ceil(diff / (1000 * 60 * 60 * 24))
-  }
+    return {
+      totalTarget,
+      totalSaved,
+      totalMonthly,
+      overallProgress,
+      completedCount,
+      activeCount: goals.length - completedCount,
+    }
+  }, [goals])
+
+  /* ================= FILTERED GOALS ================= */
+  const filteredGoals = useMemo(() => {
+    return goals.filter((g) => {
+      const progress = (g.current_amount / g.target_amount) * 100
+      const isCompleted = progress >= 100
+
+      if (activeFilter === 'completed') return isCompleted
+      if (activeFilter === 'active') return !isCompleted
+      if (activeFilter === 'urgent') {
+        if (!g.target_date) return false
+        const diffDays = Math.ceil((new Date(g.target_date).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))
+        return diffDays <= 30 && !isCompleted
+      }
+      return true
+    })
+  }, [goals, activeFilter])
 
   if (loading || !user) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin h-12 w-12 border-b-2 border-primary-600 rounded-full" />
+      <div className="min-h-screen flex flex-col items-center justify-center bg-slate-950">
+        <div className="h-12 w-12 rounded-full border-4 border-slate-800 border-t-primary-500 animate-spin" />
+        <p className="mt-4 text-slate-400 text-sm animate-pulse">Initializing Financial Odyssey...</p>
       </div>
     )
   }
 
   return (
     <DashboardLayout>
-      <PageBackground variant="upward" />
-      <div className="relative z-10 space-y-6">
+      <PageBackground variant="aurora" />
 
-        {/* HEADER */}
-        <div className="flex justify-between items-center">
+      {/* Confetti Particle Layer */}
+      <ConfettiEffect
+        trigger={confettiTrigger}
+        onComplete={() => setConfettiTrigger(false)}
+      />
+
+      <div className="relative z-10 space-y-7 pb-12">
+        {/* ================= HERO HEADER ================= */}
+        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between animate-fade-up">
           <div>
-            <h1 className="text-3xl font-bold text-slate-50">
-              Financial Goals
+            <div className="flex items-center gap-2">
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-0.5 text-xs font-semibold text-emerald-300">
+                <Sparkles className="h-3.5 w-3.5 animate-pulse" />
+                Odyssey Command Center
+              </span>
+              <span className="text-xs text-slate-400">
+                {goals.length} {goals.length === 1 ? 'Objective' : 'Objectives'} Registered
+              </span>
+            </div>
+            <h1 className="mt-1.5 text-3xl font-extrabold tracking-tight text-slate-50 sm:text-4xl flex items-center gap-3">
+              Financial Goals Odyssey
             </h1>
-            <p className="text-slate-400">
-              Track and achieve your financial objectives
+            <p className="mt-1 text-sm text-slate-400 max-w-xl">
+              Turn abstract aspirations into tangible milestones through storyline progression, velocity forecasts, and discipline.
             </p>
           </div>
 
-          <button
-            onClick={() => {
-              setEditingGoal(null)
-              setShowModal(true)
-            }}
-            className="btn-primary"
-          >
-            <Plus className="h-5 w-5" />
-            New Goal
-          </button>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => {
+                setEditingGoal(null)
+                setFormData({
+                  name: '',
+                  target_amount: '',
+                  target_date: '',
+                  monthly_contribution: '',
+                })
+                setShowModal(true)
+              }}
+              className="rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-500 px-5 py-2.5 text-sm font-bold text-slate-950 shadow-[0_0_20px_rgba(16,185,129,0.35)] transition-all hover:brightness-110 hover:shadow-[0_0_25px_rgba(16,185,129,0.5)] flex items-center gap-2"
+            >
+              <Plus className="h-4 w-4 stroke-[3]" />
+              New Goal Quest
+            </button>
+          </div>
         </div>
 
-        {/* EMPTY */}
+        {/* ================= TELEMETRY HERO METRICS ================= */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 animate-fade-up [animation-delay:100ms]">
+          {/* Card 1: Total Saved */}
+          <div className="story-glass-card rounded-3xl p-4 sm:p-5">
+            <div className="flex items-center justify-between text-slate-400 text-xs">
+              <span>Capital Conquered</span>
+              <Coins className="h-4 w-4 text-emerald-400" />
+            </div>
+            <div className="mt-2 text-xl sm:text-2xl font-black text-slate-50">
+              ₹{telemetry.totalSaved.toLocaleString('en-IN')}
+            </div>
+            <span className="text-[11px] text-slate-400 font-mono">
+              of ₹{telemetry.totalTarget.toLocaleString('en-IN')} Target
+            </span>
+          </div>
+
+          {/* Card 2: Global Progress Index */}
+          <div className="story-glass-card rounded-3xl p-4 sm:p-5">
+            <div className="flex items-center justify-between text-slate-400 text-xs">
+              <span>Global Victory Index</span>
+              <Trophy className="h-4 w-4 text-yellow-400" />
+            </div>
+            <div className="mt-2 text-xl sm:text-2xl font-black text-yellow-300">
+              {telemetry.overallProgress.toFixed(1)}%
+            </div>
+            <div className="mt-1.5 w-full bg-slate-900 rounded-full h-1.5 overflow-hidden">
+              <div
+                className="h-full bg-gradient-to-r from-yellow-400 to-amber-400 transition-all duration-1000"
+                style={{ width: `${Math.min(100, telemetry.overallProgress)}%` }}
+              />
+            </div>
+          </div>
+
+          {/* Card 3: Monthly Fuel */}
+          <div className="story-glass-card rounded-3xl p-4 sm:p-5">
+            <div className="flex items-center justify-between text-slate-400 text-xs">
+              <span>Monthly Fuel Velocity</span>
+              <Zap className="h-4 w-4 text-cyan-400" />
+            </div>
+            <div className="mt-2 text-xl sm:text-2xl font-black text-cyan-300">
+              ₹{telemetry.totalMonthly.toLocaleString('en-IN')}
+            </div>
+            <span className="text-[11px] text-slate-400 font-mono">
+              Committed per month
+            </span>
+          </div>
+
+          {/* Card 4: Quests Mastered */}
+          <div className="story-glass-card rounded-3xl p-4 sm:p-5">
+            <div className="flex items-center justify-between text-slate-400 text-xs">
+              <span>Conquered Quests</span>
+              <CheckCircle2 className="h-4 w-4 text-emerald-400" />
+            </div>
+            <div className="mt-2 text-xl sm:text-2xl font-black text-emerald-300">
+              {telemetry.completedCount}{' '}
+              <span className="text-xs font-normal text-slate-400">/ {goals.length} goals</span>
+            </div>
+            <span className="text-[11px] text-emerald-400/90 font-mono">
+              {telemetry.activeCount} currently in flight
+            </span>
+          </div>
+        </div>
+
+        {/* ================= VIEW SELECTOR & FILTERS ================= */}
+        {goals.length > 0 && (
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            {/* Filter Tabs */}
+            <div className="flex items-center gap-1.5 bg-slate-950/80 border border-slate-800/90 p-1 rounded-2xl">
+              {[
+                { id: 'all', label: 'All Quests', count: goals.length },
+                { id: 'active', label: 'In Flight', count: telemetry.activeCount },
+                { id: 'completed', label: 'Conquered', count: telemetry.completedCount },
+                { id: 'urgent', label: 'Due Soon' },
+              ].map((tab) => (
+                <button
+                  key={tab.id}
+                  type="button"
+                  onClick={() => setActiveFilter(tab.id as FilterTab)}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
+                    activeFilter === tab.id
+                      ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 shadow-sm'
+                      : 'text-slate-400 hover:text-slate-200'
+                  }`}
+                >
+                  <span>{tab.label}</span>
+                  {tab.count !== undefined && (
+                    <span className="rounded-full bg-slate-800 px-1.5 py-0.2 text-[10px] font-mono text-slate-400">
+                      {tab.count}
+                    </span>
+                  )}
+                </button>
+              ))}
+            </div>
+
+            {/* View Mode Toggle (Storyline vs Grid) */}
+            <div className="flex items-center gap-1 bg-slate-950/80 border border-slate-800/90 p-1 rounded-2xl self-start sm:self-auto">
+              <button
+                type="button"
+                onClick={() => setViewMode('storyline')}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
+                  viewMode === 'storyline'
+                    ? 'bg-gradient-to-r from-emerald-600/30 to-teal-500/30 text-emerald-300 border border-emerald-500/40 shadow-sm'
+                    : 'text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                <Compass className="h-3.5 w-3.5" />
+                <span>Storyline Map</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setViewMode('grid')}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
+                  viewMode === 'grid'
+                    ? 'bg-gradient-to-r from-emerald-600/30 to-teal-500/30 text-emerald-300 border border-emerald-500/40 shadow-sm'
+                    : 'text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                <Layers className="h-3.5 w-3.5" />
+                <span>Card Grid</span>
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* ================= EMPTY STATE ================= */}
         {loadingGoals ? (
-          <p className="text-center text-slate-400">
-            Loading goals...
-          </p>
+          <div className="story-glass-card rounded-3xl p-12 text-center">
+            <div className="h-12 w-12 rounded-full border-4 border-slate-800 border-t-emerald-500 animate-spin mx-auto mb-4" />
+            <p className="text-slate-400 text-sm">Consulting the Financial Star Chart...</p>
+          </div>
         ) : goals.length === 0 ? (
-          <div className="card card-pad text-center">
-            <Target className="mx-auto h-16 w-16 text-slate-400 mb-4" />
-            <h2 className="text-xl font-semibold text-slate-50">
-              No Goals Yet
-            </h2>
+          <div className="story-glass-card rounded-3xl p-12 text-center animate-fade-up max-w-xl mx-auto">
+            <div className="relative mx-auto mb-5 flex h-20 w-20 items-center justify-center rounded-3xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 shadow-[0_0_30px_rgba(16,185,129,0.2)]">
+              <Compass className="h-10 w-10 animate-spin [animation-duration:20s]" />
+            </div>
+            <h2 className="text-2xl font-black text-slate-100">No Financial Quests Declared Yet</h2>
+            <p className="mt-2 text-sm text-slate-400 leading-relaxed">
+              Every grand wealth empire begins with an intention. Declare your first financial goal quest—whether buying a home, planning a vacation, or building a safety fund.
+            </p>
+            <button
+              onClick={() => {
+                setEditingGoal(null)
+                setShowModal(true)
+              }}
+              className="mt-6 inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 px-6 py-3 text-sm font-bold text-slate-950 shadow-[0_0_20px_rgba(16,185,129,0.4)] transition-all hover:brightness-110"
+            >
+              <Plus className="h-4 w-4 stroke-[3]" />
+              Start Your First Quest
+            </button>
           </div>
         ) : (
           <>
-          <GoalProjections refreshKey={goalRefreshKey} />
-          <div className="grid md:grid-cols-2 gap-6">
-            {goals.map((goal) => {
-              const progress = calculateProgress(goal)
-              const daysRemaining = getDaysRemaining(
-                goal.target_date
-              )
-              const isOverdue = daysRemaining !== null && daysRemaining < 0
-              const isCompleted = progress >= 100
+            {/* ================= INTERACTIVE STORYLINE ODYSSEY MAP ================= */}
+            {viewMode === 'storyline' && (
+              <GoalStorylineMap
+                goals={goals}
+                selectedGoalId={selectedGoalId}
+                onSelectGoal={(id) => setSelectedGoalId(id)}
+                onContributeModal={openContributeModal}
+                onOpenSimulator={(goal) => setSimulatorGoal(goal)}
+              />
+            )}
 
-              return (
-                <div
-                  key={goal.id}
-                  className={`card card-pad card-hover border-l-4 ${
-                    isCompleted
-                      ? 'border-l-emerald-500'
-                      : isOverdue
-                        ? 'border-l-rose-500'
-                        : 'border-l-primary-500'
-                  }`}
-                >
-                  <div className="flex justify-between items-start mb-3">
-                    <div>
-                      <h3 className="font-bold text-lg text-slate-50">
-                        {goal.name}
-                      </h3>
-                      <p className="text-slate-400 text-xs mt-1">
-                        ₹{goal.current_amount.toLocaleString('en-IN')} / ₹{goal.target_amount.toLocaleString('en-IN')}
-                      </p>
-                    </div>
-                    <div className={`text-xs font-semibold px-2 py-1 rounded ${
-                      isCompleted
-                        ? 'bg-emerald-500/20 text-emerald-300'
-                        : isOverdue
-                          ? 'bg-rose-500/20 text-rose-300'
-                          : 'bg-primary-500/20 text-primary-300'
-                    }`}>
-                      {progress.toFixed(0)}%
-                    </div>
-                  </div>
+            {/* ================= GOAL CARDS SECTION ================= */}
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-bold text-slate-100 flex items-center gap-2">
+                  <Flame className="h-4 w-4 text-emerald-400" />
+                  Active Goal Quests ({filteredGoals.length})
+                </h3>
+              </div>
 
-                  {/* PROGRESS */}
-                  <div className="mb-4">
-                    <div className="w-full bg-slate-800/70 h-3 rounded-full overflow-hidden">
-                      <div
-                        className={`h-3 rounded-full transition-all ${
-                          isCompleted
-                            ? 'bg-emerald-400'
-                            : isOverdue
-                              ? 'bg-rose-400'
-                              : 'bg-primary-400'
-                        }`}
-                        style={{ width: `${Math.min(100, progress)}%` }}
-                      />
-                    </div>
-                  </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+                {filteredGoals.map((goal) => (
+                  <GoalStoryCard
+                    key={goal.id}
+                    goal={goal}
+                    isSelected={goal.id === selectedGoalId}
+                    onSelect={() => setSelectedGoalId(goal.id)}
+                    onContribute={openContributeModal}
+                    onQuickContribute={handleQuickContribute}
+                    onEdit={handleEdit}
+                    onDelete={handleDelete}
+                    onOpenSimulator={(g) => setSimulatorGoal(g)}
+                  />
+                ))}
+              </div>
+            </div>
 
-                  {/* INFO GRID */}
-                  <div className="grid grid-cols-2 gap-2 mb-4 text-xs">
-                    {goal.monthly_contribution > 0 && (
-                      <div className="bg-slate-900/40 rounded p-2 border border-slate-800/50">
-                        <div className="text-slate-400">Monthly Contribution</div>
-                        <div className="font-semibold text-slate-200 mt-1">
-                          ₹{goal.monthly_contribution.toLocaleString('en-IN')}
-                        </div>
-                      </div>
-                    )}
-
-                    {daysRemaining !== null && (
-                      <div className={`rounded p-2 border ${
-                        isOverdue
-                          ? 'bg-rose-900/30 border-rose-800/50'
-                          : 'bg-slate-900/40 border-slate-800/50'
-                      }`}>
-                        <div className={isOverdue ? 'text-rose-300' : 'text-slate-400'}>
-                          Time Remaining
-                        </div>
-                        <div className={`font-semibold mt-1 ${isOverdue ? 'text-rose-200' : 'text-slate-200'}`}>
-                          {daysRemaining < 0
-                            ? `${Math.abs(daysRemaining)}d Overdue`
-                            : daysRemaining === 0
-                              ? 'Due Today'
-                              : `${daysRemaining}d Left`}
-                        </div>
-                      </div>
-                    )}
-
-                    {!goal.target_date && (
-                      <div className="bg-slate-900/40 rounded p-2 border border-slate-800/50 col-span-2">
-                        <div className="text-slate-400 text-xs">No target date set</div>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* ACTIONS */}
-                  <div className="flex gap-2 mt-4 pt-4 border-t border-slate-800/70">
-                    <button
-                      onClick={() => openContributeModal(goal)}
-                      className="flex items-center gap-1 text-success-300 hover:text-success-200 text-sm"
-                    >
-                      <Plus size={16} />
-                      Contribute
-                    </button>
-
-                    <button
-                      onClick={() => handleEdit(goal)}
-                      className="flex items-center gap-1 text-primary-200 hover:text-primary-100 text-sm"
-                    >
-                      <Edit size={16} />
-                      Edit
-                    </button>
-
-                    <button
-                      onClick={() =>
-                        handleDelete(goal.id)
-                      }
-                      className="flex items-center gap-1 text-danger-300 hover:text-danger-200 text-sm"
-                    >
-                      <Trash2 size={16} />
-                      Delete
-                    </button>
-                  </div>
-                </div>
-              )
-            })}
-          </div>
+            {/* ================= AI PROJECTIONS MATRIX ================= */}
+            <div className="mt-8">
+              <GoalProjections refreshKey={goalRefreshKey} />
+            </div>
           </>
         )}
 
-        {/* ================= MODAL ================= */}
+        {/* ================= CREATE / EDIT MODAL ================= */}
         {showModal && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-            <div className="card card-pad w-full max-w-md shadow-lg form-shell">
-              <h2 className="text-xl font-bold mb-4">
-                {editingGoal
-                  ? 'Edit Goal'
-                  : 'Create Goal'}
-              </h2>
+          <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-md flex items-center justify-center z-50 p-4 animate-fade-in">
+            <div className="story-glass-card w-full max-w-lg rounded-3xl p-6 sm:p-7 shadow-2xl border border-emerald-500/30 animate-pop-in">
+              <div className="flex items-center justify-between pb-4 border-b border-slate-800">
+                <div className="flex items-center gap-2.5">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                    <Target className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-bold text-slate-100">
+                      {editingGoal ? 'Refine Goal Quest' : 'Declare New Goal Quest'}
+                    </h2>
+                    <p className="text-xs text-slate-400">Set your coordinates, target summit, and monthly fuel.</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setShowModal(false)}
+                  className="rounded-xl p-1.5 text-slate-400 hover:bg-slate-800 hover:text-slate-100"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
 
-              <form
-                onSubmit={handleSubmit}
-                className="space-y-4 form-shell"
-              >
-                {/* INPUT STYLE FIXED */}
-                <input
-                  type="text"
-                  placeholder="Goal Name"
-                  required
-                  value={formData.name}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      name: e.target.value,
-                    })
-                  }
-                  className="input"
-                />
+              <form onSubmit={handleSubmit} className="mt-5 space-y-4">
+                <div>
+                  <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                    Goal Quest Title
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Dream House Downpayment, Himalayan Expedition, Tesla Model 3"
+                    required
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    className="w-full rounded-2xl border border-slate-700/80 bg-slate-900/90 px-4 py-3 text-sm text-slate-100 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
+                  />
+                </div>
 
-                <input
-                  type="number"
-                  placeholder="Target Amount"
-                  required
-                  value={formData.target_amount}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      target_amount: e.target.value,
-                    })
-                  }
-                  className="input"
-                />
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                      Target Capital Summit (₹)
+                    </label>
+                    <input
+                      type="number"
+                      placeholder="e.g. 500000"
+                      required
+                      min="1"
+                      value={formData.target_amount}
+                      onChange={(e) => setFormData({ ...formData, target_amount: e.target.value })}
+                      className="w-full rounded-2xl border border-slate-700/80 bg-slate-900/90 px-4 py-3 text-sm text-slate-100 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
+                    />
+                  </div>
 
-                <input
-                  type="date"
-                  value={formData.target_date}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      target_date: e.target.value,
-                    })
-                  }
-                  className="input"
-                />
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                      Monthly Fuel Deposit (₹)
+                    </label>
+                    <input
+                      type="number"
+                      placeholder="e.g. 10000"
+                      min="0"
+                      value={formData.monthly_contribution}
+                      onChange={(e) => setFormData({ ...formData, monthly_contribution: e.target.value })}
+                      className="w-full rounded-2xl border border-slate-700/80 bg-slate-900/90 px-4 py-3 text-sm text-slate-100 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
+                    />
+                  </div>
+                </div>
 
-                <input
-                  type="number"
-                  placeholder="Monthly Contribution"
-                  value={formData.monthly_contribution}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      monthly_contribution:
-                        e.target.value,
-                    })
-                  }
-                  className="input"
-                />
+                <div>
+                  <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                    Target Conquest Date (Optional)
+                  </label>
+                  <input
+                    type="date"
+                    value={formData.target_date}
+                    onChange={(e) => setFormData({ ...formData, target_date: e.target.value })}
+                    className="w-full rounded-2xl border border-slate-700/80 bg-slate-900/90 px-4 py-3 text-sm text-slate-100 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
+                  />
+                </div>
 
-                <div className="flex gap-3">
-                  <button className="btn-primary flex-1">
-                    Save
+                <div className="pt-3 flex gap-3">
+                  <button
+                    type="submit"
+                    className="flex-1 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 px-4 py-3 text-sm font-bold text-slate-950 shadow-[0_0_20px_rgba(16,185,129,0.35)] transition-all hover:brightness-110"
+                  >
+                    {editingGoal ? 'Save Modifications' : 'Launch Goal Quest'}
                   </button>
 
                   <button
                     type="button"
                     onClick={() => setShowModal(false)}
-                    className="btn-ghost flex-1"
+                    className="rounded-2xl border border-slate-800 bg-slate-900 px-4 py-3 text-sm font-semibold text-slate-400 hover:text-slate-200"
                   >
                     Cancel
                   </button>
@@ -416,47 +585,82 @@ export default function GoalsPage() {
           </div>
         )}
 
-        {/* ================= CONTRIBUTE MODAL ================= */}
+        {/* ================= CONTRIBUTE CUSTOM MODAL ================= */}
         {showContributeModal && contributingGoal && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-            <div className="card card-pad w-full max-w-md shadow-lg form-shell">
-              <h2 className="text-xl font-bold mb-2">
-                Contribute to {contributingGoal.name}
-              </h2>
-              <p className="text-slate-400 text-sm mb-4">
-                Current: ₹{contributingGoal.current_amount.toLocaleString('en-IN')} / ₹{contributingGoal.target_amount.toLocaleString('en-IN')}
-              </p>
+          <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-md flex items-center justify-center z-50 p-4 animate-fade-in">
+            <div className="story-glass-card w-full max-w-md rounded-3xl p-6 sm:p-7 shadow-2xl border border-emerald-500/30 animate-pop-in">
+              <div className="flex items-center justify-between pb-4 border-b border-slate-800">
+                <div className="flex items-center gap-2.5">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                    <Coins className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-bold text-slate-100">Add Capital Deposit</h2>
+                    <p className="text-xs text-slate-400 font-semibold text-emerald-300">
+                      {contributingGoal.name}
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setShowContributeModal(false)}
+                  className="rounded-xl p-1.5 text-slate-400 hover:bg-slate-800 hover:text-slate-100"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
 
-              <form
-                onSubmit={handleContribute}
-                className="space-y-4 form-shell"
-              >
-                <input
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  placeholder="Contribution Amount"
-                  required
-                  value={contributionAmount}
-                  onChange={(e) =>
-                    setContributionAmount(e.target.value)
-                  }
-                  className="input"
-                />
+              <div className="my-4 rounded-2xl border border-slate-800 bg-slate-900/60 p-3.5 flex justify-between items-center text-xs">
+                <span className="text-slate-400">Current Progress</span>
+                <span className="font-mono font-bold text-slate-200">
+                  ₹{contributingGoal.current_amount.toLocaleString('en-IN')} / ₹{contributingGoal.target_amount.toLocaleString('en-IN')} (
+                  {((contributingGoal.current_amount / contributingGoal.target_amount) * 100).toFixed(0)}%)
+                </span>
+              </div>
 
-                <div className="flex gap-3">
-                  <button className="btn-primary flex-1">
-                    Add Funds
+              {/* Quick preset chips */}
+              <div className="flex gap-2 mb-4">
+                {[500, 1000, 2500, 5000].map((preset) => (
+                  <button
+                    key={preset}
+                    type="button"
+                    onClick={() => setContributionAmount(preset.toString())}
+                    className="flex-1 rounded-xl border border-slate-800 bg-slate-900 py-1.5 text-xs font-semibold text-slate-300 hover:border-emerald-500/40 hover:bg-emerald-500/10 hover:text-emerald-200 transition-all"
+                  >
+                    +₹{preset.toLocaleString('en-IN')}
+                  </button>
+                ))}
+              </div>
+
+              <form onSubmit={handleContribute} className="space-y-4">
+                <div>
+                  <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                    Deposit Amount (₹)
+                  </label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    min="1"
+                    placeholder="Enter amount"
+                    required
+                    value={contributionAmount}
+                    onChange={(e) => setContributionAmount(e.target.value)}
+                    className="w-full rounded-2xl border border-slate-700/80 bg-slate-900/90 px-4 py-3 text-sm text-slate-100 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
+                    autoFocus
+                  />
+                </div>
+
+                <div className="pt-2 flex gap-3">
+                  <button
+                    type="submit"
+                    className="flex-1 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 px-4 py-3 text-sm font-bold text-slate-950 shadow-[0_0_20px_rgba(16,185,129,0.35)] transition-all hover:brightness-110"
+                  >
+                    Confirm Deposit
                   </button>
 
                   <button
                     type="button"
-                    onClick={() => {
-                      setShowContributeModal(false)
-                      setContributingGoal(null)
-                      setContributionAmount('')
-                    }}
-                    className="btn-ghost flex-1"
+                    onClick={() => setShowContributeModal(false)}
+                    className="rounded-2xl border border-slate-800 bg-slate-900 px-4 py-3 text-sm font-semibold text-slate-400 hover:text-slate-200"
                   >
                     Cancel
                   </button>
@@ -464,6 +668,16 @@ export default function GoalsPage() {
               </form>
             </div>
           </div>
+        )}
+
+        {/* ================= STORYLINE SPEEDUP SIMULATOR MODAL ================= */}
+        {simulatorGoal && (
+          <GoalSimulatorModal
+            goal={simulatorGoal}
+            isOpen={!!simulatorGoal}
+            onClose={() => setSimulatorGoal(null)}
+            onContributeQuick={(g, amt) => handleQuickContribute(g, amt)}
+          />
         )}
       </div>
     </DashboardLayout>

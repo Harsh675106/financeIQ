@@ -1111,4 +1111,96 @@ input[type="date"]::-webkit-datetime-edit-year-field {
   border-color: rgba(52, 211, 153, 0.4);
 }
 
+/* ================= GOAL STORYLINE ODYSSEY ANIMATIONS ================= */
+@keyframes odyssey-dash {
+  0% {
+    stroke-dashoffset: 200;
+  }
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes beacon-ripple {
+  0% {
+    transform: scale(0.9);
+    opacity: 0.9;
+  }
+  50% {
+    transform: scale(1.6);
+    opacity: 0.3;
+  }
+  100% {
+    transform: scale(2.2);
+    opacity: 0;
+  }
+}
+
+@keyframes milestone-float {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-6px) rotate(1deg);
+  }
+}
+
+@keyframes star-twinkle {
+  0%, 100% {
+    opacity: 0.3;
+    transform: scale(0.8);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+}
+
+@keyframes progress-neon-shimmer {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.odyssey-animated-track {
+  stroke-dasharray: 8 8;
+  animation: odyssey-dash 20s linear infinite;
+}
+
+.odyssey-beacon-ripple {
+  animation: beacon-ripple 2.4s cubic-bezier(0.25, 1, 0.5, 1) infinite;
+}
+
+.milestone-floating-node {
+  animation: milestone-float 4s ease-in-out infinite;
+}
+
+.star-twinkle-anim {
+  animation: star-twinkle 3s ease-in-out infinite;
+}
+
+.neon-progress-bar {
+  background-size: 200% 200%;
+  animation: progress-neon-shimmer 3s ease infinite;
+}
+
+.story-glass-card {
+  background: radial-gradient(130% 130% at 20% 0%, rgba(15, 23, 42, 0.9) 0%, rgba(3, 7, 18, 0.96) 100%);
+  border: 1px solid rgba(52, 211, 153, 0.22);
+  box-shadow: 0 16px 40px -10px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(20px);
+}
+
+.story-glass-card:hover {
+  border-color: rgba(52, 211, 153, 0.45);
+  box-shadow: 0 20px 50px -8px rgba(16, 185, 129, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+
 
