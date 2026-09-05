@@ -114,17 +114,22 @@ export default function GoalStorylineMap({
 }: GoalStorylineMapProps) {
   if (goals.length === 0) return null
 
-  // Current active selected goal
-  const activeGoal = goals.find((g) => g.id === selectedGoalId) || goals[0]
-  const progress = Math.min(100, (activeGoal.current_amount / activeGoal.target_amount) * 100)
+  // Current active selected goal - prioritize selected or the first active in-flight goal
+  const inFlightGoal = goals.find((g) => (Number(g.current_amount) / Number(g.target_amount)) < 1)
+  const activeGoal =
+    goals.find((g) => g.id === selectedGoalId) || inFlightGoal || goals[0]
+
+  const currentAmt = Number(activeGoal.current_amount || 0)
+  const targetAmt = Number(activeGoal.target_amount || 1)
+  const progress = Math.min(100, (currentAmt / targetAmt) * 100)
 
   // Find active chapter
   const currentChapter =
     STORY_CHAPTERS.find((ch) => progress >= ch.range[0] && progress <= ch.range[1]) ||
     (progress >= 100 ? STORY_CHAPTERS[4] : STORY_CHAPTERS[0])
 
-  const remaining = Math.max(0, activeGoal.target_amount - activeGoal.current_amount)
-  const monthlyPace = activeGoal.monthly_contribution || 0
+  const remaining = Math.max(0, targetAmt - currentAmt)
+  const monthlyPace = Number(activeGoal.monthly_contribution || 0)
   const estimatedMonths = monthlyPace > 0 ? Math.ceil(remaining / monthlyPace) : null
 
   return (
@@ -160,7 +165,7 @@ export default function GoalStorylineMap({
         <div className="flex items-center gap-1.5 overflow-x-auto pb-1 max-w-full">
           {goals.map((g) => {
             const isSelected = g.id === activeGoal.id
-            const gProgress = Math.min(100, (g.current_amount / g.target_amount) * 100)
+            const gProgress = Math.min(100, (Number(g.current_amount) / Number(g.target_amount)) * 100)
             return (
               <button
                 key={g.id}
@@ -307,7 +312,7 @@ export default function GoalStorylineMap({
                   {currentChapter.name}
                 </span>
                 <span className="text-xs text-slate-400 font-mono">
-                  Coordinates: <strong className="text-slate-200">₹{activeGoal.current_amount.toLocaleString('en-IN')}</strong> of ₹{activeGoal.target_amount.toLocaleString('en-IN')} ({progress.toFixed(1)}%)
+                  Coordinates: <strong className="text-slate-200">₹{currentAmt.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</strong> of ₹{targetAmt.toLocaleString('en-IN', { maximumFractionDigits: 0 })} ({progress.toFixed(1)}%)
                 </span>
               </div>
 
@@ -323,12 +328,12 @@ export default function GoalStorylineMap({
               <div className="pt-2 flex flex-wrap items-center gap-4 text-xs font-mono text-slate-400">
                 <span className="flex items-center gap-1 text-slate-300">
                   <Coins className="h-3.5 w-3.5 text-emerald-400" />
-                  Remaining: ₹{remaining.toLocaleString('en-IN')}
+                  Remaining: ₹{remaining.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
                 </span>
                 {monthlyPace > 0 && (
                   <span className="flex items-center gap-1 text-slate-300">
                     <Zap className="h-3.5 w-3.5 text-cyan-400" />
-                    Pace: ₹{monthlyPace.toLocaleString('en-IN')}/mo
+                    Pace: ₹{monthlyPace.toLocaleString('en-IN', { maximumFractionDigits: 0 })}/mo
                   </span>
                 )}
                 {estimatedMonths !== null && (

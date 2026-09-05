@@ -153,13 +153,13 @@ export default function GoalStoryCard({
           <div>
             <span className="text-xs text-slate-400">Current Capital</span>
             <div className="text-xl font-extrabold text-slate-50 tracking-tight">
-              ₹{goal.current_amount.toLocaleString('en-IN')}
+              ₹{Number(goal.current_amount || 0).toLocaleString('en-IN', { maximumFractionDigits: 0 })}
             </div>
           </div>
           <div className="text-right">
             <span className="text-xs text-slate-400">Target Summit</span>
             <div className="text-base font-bold text-slate-300">
-              ₹{goal.target_amount.toLocaleString('en-IN')}
+              ₹{Number(goal.target_amount || 0).toLocaleString('en-IN', { maximumFractionDigits: 0 })}
             </div>
           </div>
         </div>
@@ -193,8 +193,8 @@ export default function GoalStoryCard({
           <div className="rounded-xl border border-slate-800/70 bg-slate-950/60 p-2.5">
             <span className="text-[10px] text-slate-400 block">Monthly Fuel</span>
             <span className="font-bold text-slate-200 mt-0.5 block">
-              {goal.monthly_contribution > 0
-                ? `₹${goal.monthly_contribution.toLocaleString('en-IN')}/mo`
+              {Number(goal.monthly_contribution || 0) > 0
+                ? `₹${Number(goal.monthly_contribution).toLocaleString('en-IN', { maximumFractionDigits: 0 })}/mo`
                 : 'Not Set'}
             </span>
           </div>

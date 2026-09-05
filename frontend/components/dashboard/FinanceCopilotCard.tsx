@@ -516,7 +516,7 @@ export default function FinanceCopilotCard({ fullPage = false }: FinanceCopilotC
     : 'idle'
 
   return (
-    <div className="flex h-full min-h-[calc(100dvh-5.5rem)] flex-col gap-3.5 pb-2">
+    <div className="flex h-full min-h-[calc(100vh-6rem)] flex-col gap-4 pb-4">
       {/* 1. Futuristic AI Avatar & Neural Stage */}
       <NeuralAIAvatar
         status={avatarStatus}
@@ -547,7 +547,7 @@ export default function FinanceCopilotCard({ fullPage = false }: FinanceCopilotC
       )}
 
       {/* 2. Main Holographic Interaction Panel */}
-      <div className="cyber-glass-panel flex flex-1 flex-col overflow-hidden rounded-3xl relative min-h-[580px] lg:min-h-[680px] xl:min-h-[760px] shadow-2xl">
+      <div className="cyber-glass-panel flex flex-1 flex-col overflow-hidden rounded-3xl relative">
         {/* Terminal Header Bar */}
         <div className="flex items-center justify-between border-b border-slate-800/80 px-5 py-3.5 bg-slate-950/60">
           <div className="flex items-center gap-3">
@@ -588,7 +588,7 @@ export default function FinanceCopilotCard({ fullPage = false }: FinanceCopilotC
         {/* Message Stream */}
         <div
           ref={scrollContainerRef}
-          className="finance-chat-scroll flex-1 overflow-y-auto px-4 py-6 sm:px-6 space-y-6 min-h-[440px] lg:min-h-[560px] xl:min-h-[640px]"
+          className="finance-chat-scroll flex-1 overflow-y-auto px-4 py-5 sm:px-6 space-y-6"
         >
           {loadingHistory ? (
             <div className="space-y-4">

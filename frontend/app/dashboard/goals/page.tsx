@@ -192,26 +192,39 @@ export default function GoalsPage() {
 
   /* ================= TELEMETRY STATS ================= */
   const telemetry = useMemo(() => {
+    // Separate active (in-flight) goals and conquered (completed) goals
+    const activeGoals = goals.filter((g) => (Number(g.current_amount) / Number(g.target_amount)) < 1)
+    const completedGoals = goals.filter((g) => (Number(g.current_amount) / Number(g.target_amount)) >= 1)
+
+    const activeTarget = activeGoals.reduce((acc, g) => acc + (Number(g.target_amount) || 0), 0)
+    const activeSaved = activeGoals.reduce((acc, g) => acc + (Number(g.current_amount) || 0), 0)
+    const activeMonthly = activeGoals.reduce((acc, g) => acc + (Number(g.monthly_contribution) || 0), 0)
+    const activeProgress = activeTarget > 0 ? (activeSaved / activeTarget) * 100 : 0
+
+    const conqueredTarget = completedGoals.reduce((acc, g) => acc + (Number(g.target_amount) || 0), 0)
+    const conqueredSaved = completedGoals.reduce((acc, g) => acc + (Number(g.current_amount) || 0), 0)
+
     const totalTarget = goals.reduce((acc, g) => acc + (Number(g.target_amount) || 0), 0)
     const totalSaved = goals.reduce((acc, g) => acc + (Number(g.current_amount) || 0), 0)
-    const totalMonthly = goals.reduce((acc, g) => acc + (Number(g.monthly_contribution) || 0), 0)
-    const overallProgress = totalTarget > 0 ? (totalSaved / totalTarget) * 100 : 0
-    const completedCount = goals.filter((g) => (g.current_amount / g.target_amount) >= 1).length
 
     return {
+      activeTarget,
+      activeSaved,
+      activeMonthly,
+      activeProgress,
+      conqueredTarget,
+      conqueredSaved,
       totalTarget,
       totalSaved,
-      totalMonthly,
-      overallProgress,
-      completedCount,
-      activeCount: goals.length - completedCount,
+      completedCount: completedGoals.length,
+      activeCount: activeGoals.length,
     }
   }, [goals])
 
   /* ================= FILTERED GOALS ================= */
   const filteredGoals = useMemo(() => {
     return goals.filter((g) => {
-      const progress = (g.current_amount / g.target_amount) * 100
+      const progress = (Number(g.current_amount) / Number(g.target_amount)) * 100
       const isCompleted = progress >= 100
 
       if (activeFilter === 'completed') return isCompleted
@@ -254,7 +267,7 @@ export default function GoalsPage() {
                 Odyssey Command Center
               </span>
               <span className="text-xs text-slate-400">
-                {goals.length} {goals.length === 1 ? 'Objective' : 'Objectives'} Registered
+                {telemetry.activeCount} In Flight • {telemetry.completedCount} Conquered
               </span>
             </div>
             <h1 className="mt-1.5 text-3xl font-extrabold tracking-tight text-slate-50 sm:text-4xl flex items-center gap-3">
@@ -287,63 +300,62 @@ export default function GoalsPage() {
 
         {/* ================= TELEMETRY HERO METRICS ================= */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 animate-fade-up [animation-delay:100ms]">
-          {/* Card 1: Total Saved */}
+          {/* Card 1: Active Goals Capital (or Total Conquered if none active) */}
           <div className="story-glass-card rounded-3xl p-4 sm:p-5">
             <div className="flex items-center justify-between text-slate-400 text-xs">
-              <span>Capital Conquered</span>
+              <span>{telemetry.activeCount > 0 ? 'Active Quests Capital' : 'Conquered Vault'}</span>
               <Coins className="h-4 w-4 text-emerald-400" />
             </div>
             <div className="mt-2 text-xl sm:text-2xl font-black text-slate-50">
-              ₹{telemetry.totalSaved.toLocaleString('en-IN')}
+              ₹{(telemetry.activeCount > 0 ? telemetry.activeSaved : telemetry.conqueredSaved).toLocaleString('en-IN')}
             </div>
             <span className="text-[11px] text-slate-400 font-mono">
-              of ₹{telemetry.totalTarget.toLocaleString('en-IN')} Target
+              of ₹{(telemetry.activeCount > 0 ? telemetry.activeTarget : telemetry.conqueredTarget).toLocaleString('en-IN')} Target
             </span>
           </div>
 
-          {/* Card 2: Global Progress Index */}
+          {/* Card 2: Active Quests Victory Index */}
           <div className="story-glass-card rounded-3xl p-4 sm:p-5">
             <div className="flex items-center justify-between text-slate-400 text-xs">
-              <span>Global Victory Index</span>
+              <span>{telemetry.activeCount > 0 ? 'Active Quests Index' : 'All Quests Conquered'}</span>
               <Trophy className="h-4 w-4 text-yellow-400" />
             </div>
             <div className="mt-2 text-xl sm:text-2xl font-black text-yellow-300">
-              {telemetry.overallProgress.toFixed(1)}%
+              {telemetry.activeCount > 0 ? `${telemetry.activeProgress.toFixed(1)}%` : '100%'}
             </div>
             <div className="mt-1.5 w-full bg-slate-900 rounded-full h-1.5 overflow-hidden">
               <div
                 className="h-full bg-gradient-to-r from-yellow-400 to-amber-400 transition-all duration-1000"
-                style={{ width: `${Math.min(100, telemetry.overallProgress)}%` }}
+                style={{ width: `${Math.min(100, telemetry.activeCount > 0 ? telemetry.activeProgress : 100)}%` }}
               />
             </div>
           </div>
 
-          {/* Card 3: Monthly Fuel */}
+          {/* Card 3: Monthly Fuel (Active in-flight goals only) */}
           <div className="story-glass-card rounded-3xl p-4 sm:p-5">
             <div className="flex items-center justify-between text-slate-400 text-xs">
-              <span>Monthly Fuel Velocity</span>
+              <span>Active Monthly Fuel</span>
               <Zap className="h-4 w-4 text-cyan-400" />
             </div>
             <div className="mt-2 text-xl sm:text-2xl font-black text-cyan-300">
-              ₹{telemetry.totalMonthly.toLocaleString('en-IN')}
+              ₹{telemetry.activeMonthly.toLocaleString('en-IN')}
             </div>
             <span className="text-[11px] text-slate-400 font-mono">
-              Committed per month
+              {telemetry.activeCount > 0 ? 'Committed for active quests' : 'All goals reached'}
             </span>
           </div>
 
-          {/* Card 4: Quests Mastered */}
+          {/* Card 4: Conquered Vault & Mastered Goals */}
           <div className="story-glass-card rounded-3xl p-4 sm:p-5">
             <div className="flex items-center justify-between text-slate-400 text-xs">
-              <span>Conquered Quests</span>
+              <span>Conquered Treasury</span>
               <CheckCircle2 className="h-4 w-4 text-emerald-400" />
             </div>
             <div className="mt-2 text-xl sm:text-2xl font-black text-emerald-300">
-              {telemetry.completedCount}{' '}
-              <span className="text-xs font-normal text-slate-400">/ {goals.length} goals</span>
+              ₹{telemetry.conqueredSaved.toLocaleString('en-IN')}
             </div>
             <span className="text-[11px] text-emerald-400/90 font-mono">
-              {telemetry.activeCount} currently in flight
+              {telemetry.completedCount} Mastered • {telemetry.activeCount} In Flight
             </span>
           </div>
         </div>
@@ -454,7 +466,13 @@ export default function GoalsPage() {
               <div className="flex items-center justify-between">
                 <h3 className="text-lg font-bold text-slate-100 flex items-center gap-2">
                   <Flame className="h-4 w-4 text-emerald-400" />
-                  Active Goal Quests ({filteredGoals.length})
+                  {activeFilter === 'all'
+                    ? `All Financial Quests (${filteredGoals.length})`
+                    : activeFilter === 'active'
+                    ? `In-Flight Goals (${filteredGoals.length})`
+                    : activeFilter === 'completed'
+                    ? `Conquered Goals (${filteredGoals.length})`
+                    : `Urgent Quests (${filteredGoals.length})`}
                 </h3>
               </div>
 

@@ -32,7 +32,7 @@ export default function ChatPage() {
   return (
     <DashboardLayout>
       <PageBackground variant="sparkles" />
-      <div className="relative z-10 chat-page-bleed h-[calc(100dvh-4.25rem)] min-h-[720px] xl:h-[calc(100dvh-4rem)] xl:min-h-0 xl:overflow-hidden flex flex-col">
+      <div className="relative z-10 chat-page-bleed xl:h-[calc(100dvh-4.75rem)] xl:min-h-0 xl:overflow-hidden">
         <FinanceCopilotCard fullPage />
       </div>
     </DashboardLayout>

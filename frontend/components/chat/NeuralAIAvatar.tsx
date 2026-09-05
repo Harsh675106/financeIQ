@@ -62,14 +62,14 @@ export default function NeuralAIAvatar({
   const currentPersona = personaConfig[persona]
 
   return (
-    <div className="relative overflow-hidden rounded-3xl cyber-glass-panel p-3.5 sm:p-4 animate-fade-up">
+    <div className="relative overflow-hidden rounded-3xl cyber-glass-panel p-5 animate-fade-up">
       {/* Background Holographic Scanline */}
       <div className="pointer-events-none absolute inset-0 opacity-10 bg-[linear-gradient(to_bottom,transparent_50%,rgba(52,211,153,0.3)_51%)] bg-[length:100%_4px]" />
 
-      <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-4">
+      <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
         {/* Left: 3D Holographic Quantum Core Avatar */}
-        <div className="flex items-center gap-4">
-          <div className="relative flex h-16 w-16 sm:h-18 sm:w-18 shrink-0 items-center justify-center">
+        <div className="flex items-center gap-5">
+          <div className="relative flex h-24 w-24 shrink-0 items-center justify-center">
             {/* Outer Orbit Ring 1 */}
             <div
               className={`absolute inset-0 rounded-full border border-emerald-400/40 ${
@@ -79,14 +79,14 @@ export default function NeuralAIAvatar({
                   ? 'animate-spin [animation-duration:5s]'
                   : 'neural-avatar-orbit-1'
               }`}
-              style={{ boxShadow: `0 0 16px ${currentPersona.glow}` }}
+              style={{ boxShadow: `0 0 20px ${currentPersona.glow}` }}
             >
-              <div className="absolute top-0 left-1/2 -translate-x-1/2 h-1.5 w-1.5 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399]" />
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399]" />
             </div>
 
             {/* Inner Orbit Ring 2 */}
             <div
-              className={`absolute inset-1.5 rounded-full border border-cyan-400/40 ${
+              className={`absolute inset-2 rounded-full border border-cyan-400/40 ${
                 status === 'thinking'
                   ? 'animate-spin [animation-duration:1.8s] [animation-direction:reverse]'
                   : status === 'speaking'
@@ -99,13 +99,13 @@ export default function NeuralAIAvatar({
 
             {/* Glowing Quantum Core Sphere */}
             <div
-              className="relative flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-full bg-gradient-to-tr from-slate-950 via-emerald-950 to-teal-900 border-2 border-emerald-400/80 shadow-2xl neural-avatar-core transition-transform duration-500"
+              className="relative flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-tr from-slate-950 via-emerald-950 to-teal-900 border-2 border-emerald-400/80 shadow-2xl neural-avatar-core transition-transform duration-500"
               style={{
-                boxShadow: `0 0 20px ${currentPersona.glow}, inset 0 0 12px rgba(52, 211, 153, 0.4)`,
+                boxShadow: `0 0 25px ${currentPersona.glow}, inset 0 0 15px rgba(52, 211, 153, 0.4)`,
               }}
             >
               <BrainCircuit
-                className={`h-5 w-5 sm:h-6 sm:w-6 ${
+                className={`h-7 w-7 ${
                   status === 'thinking'
                     ? 'text-cyan-300 animate-pulse'
                     : status === 'speaking'
@@ -115,9 +115,9 @@ export default function NeuralAIAvatar({
               />
 
               {/* Ping Ring for Live State */}
-              <span className="absolute -top-0.5 -right-0.5 flex h-3 w-3">
+              <span className="absolute -top-1 -right-1 flex h-3.5 w-3.5">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500 border border-slate-900"></span>
+                <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-emerald-500 border border-slate-900"></span>
               </span>
             </div>
           </div>
@@ -125,7 +125,7 @@ export default function NeuralAIAvatar({
           {/* Persona Identity & Telemetry Details */}
           <div>
             <div className="flex items-center gap-2">
-              <span className={`inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-[11px] font-bold ${currentPersona.badgeBg}`}>
+              <span className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-bold ${currentPersona.badgeBg}`}>
                 <Radio className="h-3 w-3 animate-pulse" />
                 {status === 'thinking'
                   ? 'NEURAL COMPUTE ACTIVE'
@@ -133,16 +133,16 @@ export default function NeuralAIAvatar({
                   ? 'VOICE SPEECH STREAMING'
                   : 'NEURAL CORE SYNCHRONIZED'}
               </span>
-              <span className="hidden sm:inline-flex items-center gap-1 rounded-md bg-slate-900/90 px-2 py-0.5 text-[10px] font-mono text-slate-400 border border-slate-800">
+              <span className="hidden sm:inline-flex items-center gap-1 rounded-md bg-slate-900/90 px-2 py-0.5 text-[11px] font-mono text-slate-400 border border-slate-800">
                 <Cpu className="h-3 w-3 text-emerald-400" />
                 {confidenceScore}% ACCURACY
               </span>
             </div>
 
-            <h1 className="mt-1 text-lg sm:text-xl font-black tracking-tight text-slate-50 flex items-center gap-2">
+            <h1 className="mt-1.5 text-xl font-black tracking-tight text-slate-50 flex items-center gap-2">
               {currentPersona.name}
             </h1>
-            <p className="text-[11px] sm:text-xs text-slate-400 leading-tight">
+            <p className="text-xs text-slate-400 leading-tight">
               {currentPersona.role} • Real-time AI Financial Synthesis
             </p>
           </div>
