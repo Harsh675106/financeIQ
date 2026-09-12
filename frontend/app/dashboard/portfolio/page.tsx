@@ -1,315 +1,350 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/hooks/useAuth'
 import DashboardLayout from '@/components/layouts/DashboardLayout'
 import PageBackground from '@/components/layouts/PageBackground'
-import PortfolioAllocation from '@/components/dashboard/PortfolioAllocation'
-import PortfolioLiveAnalysis from '@/components/portfolio/PortfolioLiveAnalysis'
+import PortfolioHero from '@/components/portfolio/PortfolioHero'
+import AllocationStudio, {
+  type BucketRow,
+  type RebalanceSuggestion,
+} from '@/components/portfolio/AllocationStudio'
+import ProjectionLab, { type ProjectionForm } from '@/components/portfolio/ProjectionLab'
+import ProjectionResults from '@/components/portfolio/ProjectionResults'
 import PortfolioExplainabilityCard from '@/components/portfolio/PortfolioExplainabilityCard'
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-} from 'recharts'
-import { TrendingUp, Play } from 'lucide-react'
+import { AlertTriangle, Sparkles } from 'lucide-react'
 import { api } from '@/lib/api'
+import { safeNumber } from '@/lib/formatters'
+import {
+  ASSET_CLASS_MODEL,
+  BUCKETS,
+  blendProfile,
+  summariseCashflow,
+  type AssetBucket,
+  type Weights,
+} from '@/lib/portfolioMath'
+
+/** Fallback target mixes, mirroring the backend's defaults. */
+const FALLBACK_TARGETS: Record<string, Record<AssetBucket, number>> = {
+  Conservative: { equity: 20, debt: 60, gold: 10, liquid: 10 },
+  Balanced: { equity: 50, debt: 30, gold: 10, liquid: 10 },
+  Aggressive: { equity: 70, debt: 15, gold: 10, liquid: 5 },
+}
+
+const EMPTY_SUMS: Record<AssetBucket, number> = { equity: 0, debt: 0, gold: 0, liquid: 0 }
 
 export default function PortfolioPage() {
   const { user, loading } = useAuth()
   const router = useRouter()
 
-  const [simulationData, setSimulationData] = useState<any>(null)
-  const [loadingSimulation, setLoadingSimulation] = useState(false)
+  const [loadingData, setLoadingData] = useState(true)
+  const [refreshing, setRefreshing] = useState(false)
+  const [loadError, setLoadError] = useState<string | null>(null)
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null)
 
-  const [formData, setFormData] = useState({
-    initialAmount: '10000',
-    monthlyContribution: '500',
+  /** Per-bucket rupee totals, summed directly from the user's holdings. */
+  const [bucketSums, setBucketSums] = useState<Record<AssetBucket, number>>(EMPTY_SUMS)
+  const [holdingsCount, setHoldingsCount] = useState(0)
+  const [targetAllocation, setTargetAllocation] = useState<Record<AssetBucket, number> | null>(null)
+  const [suggestions, setSuggestions] = useState<RebalanceSuggestion[]>([])
+  const [cashflow, setCashflow] = useState(summariseCashflow(null))
+
+  const [simulation, setSimulation] = useState<any>(null)
+  const [simulationParams, setSimulationParams] = useState<{
+    initialAmount: number
+    monthlyContribution: number
+    years: number
+    expectedReturn: number
+  } | null>(null)
+  const [running, setRunning] = useState(false)
+  const [simError, setSimError] = useState<string | null>(null)
+
+  const [form, setForm] = useState<ProjectionForm>({
+    initialAmount: '0',
+    monthlyContribution: '0',
     years: '10',
-    expectedReturn: '8',
-    volatility: '15',
+    expectedReturn: '10.0',
+    volatility: '12.0',
   })
+
+  /** Prefill from real data only once, so a manual edit survives a refresh. */
+  const prefilled = useRef(false)
 
   /* ================= AUTH ================= */
   useEffect(() => {
     if (!loading && !user) router.push('/')
   }, [user, loading, router])
 
-  /* ================= LOAD USER DATA ================= */
+  /* ================= DERIVED VALUES ================= */
+  const totalValue = useMemo(
+    () => BUCKETS.reduce((sum, b) => sum + bucketSums[b], 0),
+    [bucketSums]
+  )
+
+  /** Exact weights (%) straight from the rupee sums — never double counted. */
+  const weightsPct = useMemo(() => {
+    const out = {} as Weights
+    BUCKETS.forEach((b) => {
+      out[b] = totalValue > 0 ? (bucketSums[b] / totalValue) * 100 : 0
+    })
+    return out
+  }, [bucketSums, totalValue])
+
+  const profile = useMemo(() => blendProfile(weightsPct), [weightsPct])
+
+  const target = useMemo(
+    () => targetAllocation ?? FALLBACK_TARGETS[profile.riskLevel] ?? FALLBACK_TARGETS.Balanced,
+    [targetAllocation, profile.riskLevel]
+  )
+
+  const bucketRows: BucketRow[] = useMemo(
+    () =>
+      BUCKETS.map((bucket) => {
+        const currentPct = weightsPct[bucket]
+        const targetPct = safeNumber(target[bucket], 0)
+        return {
+          bucket,
+          label: ASSET_CLASS_MODEL[bucket].label,
+          color: ASSET_CLASS_MODEL[bucket].color,
+          value: bucketSums[bucket],
+          currentPct,
+          targetPct,
+          drift: currentPct - targetPct,
+        }
+      }),
+    [weightsPct, target, bucketSums]
+  )
+
+  const investedValue = bucketSums.equity + bucketSums.debt + bucketSums.gold
+  const liquidValue = bucketSums.liquid
+
+  /* ================= DATA LOADING ================= */
+  const loadData = useCallback(async (isRefresh = false) => {
+    if (isRefresh) setRefreshing(true)
+    setLoadError(null)
+
+    const [holdingsRes, analysisRes, txRes] = await Promise.allSettled([
+      api.get('/portfolio/holdings'),
+      api.get('/portfolio/analysis'),
+      api.get('/transactions', { params: { limit: 500 } }),
+    ])
+
+    // --- Holdings: the single source of truth for portfolio value.
+    // /portfolio/holdings already includes savings accounts, so savings must NOT be added again.
+    if (holdingsRes.status === 'fulfilled') {
+      const items: any[] = Array.isArray(holdingsRes.value.data?.holdings)
+        ? holdingsRes.value.data.holdings
+        : []
+
+      const sums = { ...EMPTY_SUMS }
+      for (const item of items) {
+        const bucket = (item?.assetClass ?? 'equity') as AssetBucket
+        const value = safeNumber(item?.value, 0)
+        if (BUCKETS.includes(bucket)) sums[bucket] += value
+      }
+
+      setBucketSums(sums)
+      setHoldingsCount(items.length)
+    } else {
+      setLoadError('Could not load your holdings. Values shown may be incomplete.')
+    }
+
+    // --- Analysis: target mix and rebalancing actions.
+    if (analysisRes.status === 'fulfilled') {
+      const data = analysisRes.value.data
+      const ta = data?.targetAllocation
+      if (ta) {
+        setTargetAllocation({
+          equity: safeNumber(ta.equity, 0),
+          debt: safeNumber(ta.debt, 0),
+          gold: safeNumber(ta.gold, 0),
+          liquid: safeNumber(ta.liquid, 0),
+        })
+      }
+      const raw = data?.rebalance?.suggestions
+      setSuggestions(
+        Array.isArray(raw)
+          ? raw
+              .filter((s: any) => safeNumber(s?.amount, 0) > 0)
+              .map((s: any) => ({
+                action: s.action === 'sell' ? 'sell' : 'buy',
+                bucket: String(s.bucket),
+                amount: safeNumber(s.amount, 0),
+              }))
+          : []
+      )
+    }
+
+    // --- Transactions: real monthly investable surplus.
+    if (txRes.status === 'fulfilled') {
+      setCashflow(summariseCashflow(txRes.value.data?.transactions))
+    }
+
+    setLastUpdated(new Date())
+    setLoadingData(false)
+    setRefreshing(false)
+  }, [])
+
   useEffect(() => {
-    if (user) {
-      loadUserPortfolioData()
-    }
-  }, [user])
+    if (user) loadData()
+  }, [user, loadData])
 
-  const loadUserPortfolioData = async () => {
-    try {
-      // Get total current portfolio value (assets + savings combined)
-      const [assetsRes, savingsRes] = await Promise.all([
-        api.get('/portfolio/holdings'),
-        api.get('/savings'),
-      ])
+  /* ================= PREFILL FROM REAL DATA ================= */
+  const applyMyData = useCallback(() => {
+    setForm((prev) => ({
+      ...prev,
+      initialAmount: String(Math.round(totalValue)),
+      monthlyContribution: String(Math.max(0, Math.round(cashflow.monthlySurplus))),
+      expectedReturn: (profile.expectedReturn * 100).toFixed(1),
+      volatility: (profile.volatility * 100).toFixed(1),
+    }))
+  }, [totalValue, cashflow.monthlySurplus, profile])
 
-      let totalValue = parseFloat(assetsRes.data?.total) || 0
-      const rawSavings = savingsRes.data?.savings || []
-      const totalSavings = Array.isArray(rawSavings)
-        ? rawSavings.reduce((sum: number, s: any) => sum + (parseFloat(s.amount) || 0), 0)
-        : parseFloat(savingsRes.data?.total) || 0
-
-      // Add savings to total portfolio value
-      totalValue += totalSavings
-
-      // Estimate average monthly contribution (use 10% of current assets as default monthly)
-      const estimatedMonthly = Math.round(totalValue * 0.1)
-
-      // Pre-fill form with actual user data
-      setFormData((prev) => ({
-        ...prev,
-        initialAmount: totalValue > 0 ? Math.round(totalValue).toString() : '10000',
-        monthlyContribution: estimatedMonthly > 0 ? estimatedMonthly.toString() : '500',
-      }))
-    } catch (error) {
-      console.error('Failed to load portfolio data:', error)
-      // Keep defaults if fetch fails
-    }
-  }
+  useEffect(() => {
+    if (loadingData || prefilled.current) return
+    prefilled.current = true
+    applyMyData()
+  }, [loadingData, applyMyData])
 
   /* ================= SIMULATION ================= */
+  const handleChange = (patch: Partial<ProjectionForm>) =>
+    setForm((prev) => ({ ...prev, ...patch }))
+
   const runSimulation = async () => {
-    setLoadingSimulation(true)
+    const initialAmount = Math.max(0, safeNumber(form.initialAmount, 0))
+    const monthlyContribution = Math.max(0, safeNumber(form.monthlyContribution, 0))
+    const years = Math.max(1, Math.min(40, Math.round(safeNumber(form.years, 10))))
+    const expectedReturn = safeNumber(form.expectedReturn, 0) / 100
+    const volatility = Math.max(0, safeNumber(form.volatility, 0)) / 100
+
+    if (initialAmount <= 0 && monthlyContribution <= 0) {
+      setSimError('Add a starting amount or a monthly contribution before running a projection.')
+      return
+    }
+
+    setRunning(true)
+    setSimError(null)
 
     try {
       const res = await api.post('/portfolio/simulation', {
-        initialAmount: parseFloat(formData.initialAmount),
-        monthlyContribution: parseFloat(formData.monthlyContribution),
-        years: parseInt(formData.years),
-        expectedReturn: parseFloat(formData.expectedReturn) / 100,
-        volatility: parseFloat(formData.volatility) / 100,
+        initialAmount,
+        monthlyContribution,
+        years,
+        expectedReturn,
+        volatility,
       })
 
-      setSimulationData(res.data)
+      setSimulation(res.data)
+      setSimulationParams({ initialAmount, monthlyContribution, years, expectedReturn })
     } catch (err) {
-      console.error(err)
-      alert('Failed to run simulation')
+      console.error('Simulation failed:', err)
+      setSimError('The projection engine did not respond. Please try again in a moment.')
     } finally {
-      setLoadingSimulation(false)
+      setRunning(false)
     }
   }
 
+  /* ================= LOADING STATES ================= */
   if (loading || !user) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin h-12 w-12 border-b-2 border-primary-600 rounded-full" />
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-primary-500" />
       </div>
     )
   }
 
-  const chartData = simulationData
-    ? [
-        { name: '5th Percentile', value: simulationData.percentile5 || simulationData.worstCase },
-        { name: 'Median', value: simulationData.median },
-        { name: 'Mean', value: simulationData.mean },
-        { name: '95th Percentile', value: simulationData.percentile95 || simulationData.bestCase },
-      ]
-    : []
+  if (loadingData) {
+    return (
+      <DashboardLayout>
+        <PageBackground variant="grid" />
+        <div className="relative z-10 space-y-5">
+          <div className="pf-skeleton h-56 w-full" />
+          <div className="grid gap-5 xl:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)]">
+            <div className="pf-skeleton h-96 w-full" />
+            <div className="pf-skeleton h-96 w-full" />
+          </div>
+        </div>
+      </DashboardLayout>
+    )
+  }
 
   /* ================= UI ================= */
   return (
     <DashboardLayout>
       <PageBackground variant="grid" />
-      <div className="relative z-10 space-y-6">
 
-        {/* HEADER */}
-        <div>
-          <h1 className="text-3xl font-bold text-slate-50">
-            Portfolio Analysis
-          </h1>
-          <p className="text-slate-400">
-            Monte Carlo simulation and portfolio allocation
-          </p>
-        </div>
-
-        {/* TOP GRID */}
-        <div className="grid lg:grid-cols-2 gap-6">
-          <div className="space-y-6">
-            <PortfolioAllocation />
-            <PortfolioLiveAnalysis />
-            <PortfolioExplainabilityCard />
-          </div>
-
-          {/* SIMULATION CARD */}
-          <div className="card card-pad card-hover">
-
-            <div className="flex items-center gap-2 mb-6">
-              <TrendingUp className="h-6 w-6 text-primary-300" />
-              <h2 className="text-lg font-semibold text-slate-50">
-                Monte Carlo Simulation
-              </h2>
-            </div>
-
-            <div className="space-y-4">
-
-              {/* INPUT STYLE FIXED */}
-              {[
-                ['Initial Amount (₹)', 'initialAmount'],
-                ['Monthly Contribution (₹)', 'monthlyContribution'],
-                ['Years', 'years'],
-              ].map(([label, key]) => (
-                <div key={key}>
-                  <label className="block text-sm font-medium text-slate-400 mb-1">
-                    {label}
-                  </label>
-
-                  <input
-                    type="number"
-                    value={(formData as any)[key]}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        [key]: e.target.value,
-                      })
-                    }
-                    className="input"
-                  />
-                </div>
-              ))}
-
-              {/* RETURN + VOLATILITY */}
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-slate-400 mb-1">
-                    Expected Return (%)
-                  </label>
-                  <input
-                    type="number"
-                    step="0.1"
-                    value={formData.expectedReturn}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        expectedReturn: e.target.value,
-                      })
-                    }
-                    className="input"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-slate-400 mb-1">
-                    Volatility (%)
-                  </label>
-                  <input
-                    type="number"
-                    step="0.1"
-                    value={formData.volatility}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        volatility: e.target.value,
-                      })
-                    }
-                    className="input"
-                  />
-                </div>
-              </div>
-
-              {/* BUTTON */}
-              <button
-                onClick={runSimulation}
-                disabled={loadingSimulation}
-                className="btn-primary w-full"
-              >
-                <Play className="h-5 w-5" />
-                {loadingSimulation
-                  ? 'Running Simulation...'
-                  : 'Run Simulation'}
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* RESULTS */}
-        {simulationData && (
-          <div className="card card-pad card-hover">
-
-            <h2 className="text-lg font-semibold text-slate-50 mb-6">
-              Simulation Results
-            </h2>
-
-            {/* STATS GRID */}
-            <div className="grid md:grid-cols-3 gap-4 mb-6">
-
-              {[
-                ['Minimum Observed', simulationData.minimum || Math.min(simulationData.worstCase, simulationData.percentile5), 'bg-rose-900/30', 'text-rose-200'],
-                ['5th Percentile', simulationData.percentile5 || simulationData.worstCase, 'bg-yellow-900/30', 'text-yellow-200'],
-                ['25th Percentile', simulationData.percentile25, 'bg-slate-900/50', 'text-slate-300'],
-                ['Median (50th)', simulationData.median, 'bg-primary-500/10', 'text-primary-200'],
-                ['Mean', simulationData.mean, 'bg-success-500/10', 'text-success-200'],
-                ['75th Percentile', simulationData.percentile75, 'bg-slate-900/50', 'text-slate-300'],
-                ['95th Percentile', simulationData.percentile95 || simulationData.bestCase, 'bg-purple-900/30', 'text-purple-200'],
-                ['Maximum Observed', simulationData.maximum || Math.max(simulationData.bestCase, simulationData.percentile95), 'bg-emerald-900/30', 'text-emerald-200'],
-                ['Std Deviation', simulationData.stdDev, 'bg-slate-900/50', 'text-slate-300'],
-              ].map(([title, value, bg, color]) => (
-                value !== undefined && (
-                  <div key={title as string} className={`${bg} rounded-xl p-4 border border-slate-800/60`}>
-                    <p className="text-xs text-slate-400 mb-2">{title}</p>
-                    <p className={`text-xl font-bold ${color}`}>
-                      ₹{(value as number)?.toLocaleString('en-IN')}
-                    </p>
-                  </div>
-                )
-              ))}
-            </div>
-
-            {/* INFO BOX */}
-            <div className="mb-6 p-4 bg-blue-900/20 border border-blue-800/50 rounded-lg text-xs text-slate-300">
-              <p className="font-semibold text-blue-200 mb-2">📊 Understanding These Results:</p>
-              <ul className="space-y-1 ml-4 list-disc">
-                <li><strong>5th & 95th Percentile:</strong> Range containing 90% of likely outcomes</li>
-                <li><strong>Median:</strong> Middle value - 50% chance to be above/below this</li>
-                <li><strong>Mean:</strong> Average outcome - affected by extreme scenarios</li>
-                <li><strong>Min/Max:</strong> Extreme outcomes from all 10,000 simulations (unlikely)</li>
-                <li><strong>Std Dev:</strong> Measure of uncertainty - higher = more volatile outcomes</li>
-              </ul>
-            </div>
-
-            {/* CHART */}
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={chartData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis stroke="#374151" dataKey="name" />
-                <YAxis stroke="#374151" />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: 'rgba(2, 6, 23, 0.9)',
-                    borderRadius: '8px',
-                    border: '1px solid rgba(16,185,129,0.25)',
-                    color: '#e2e8f0',
-                  }}
-                  formatter={(value: number) =>
-                    `₹${value.toLocaleString('en-IN')}`
-                  }
-                />
-                <Legend />
-                <Bar dataKey="value" fill="#34d399" />
-              </BarChart>
-            </ResponsiveContainer>
-
-            <div className="mt-4 text-sm text-slate-400">
-              <p>Simulations: {simulationData.simulations || 10000}</p>
-              <p>
-                Standard Deviation: ₹
-                {simulationData.stdDev?.toLocaleString('en-IN')}
-              </p>
-            </div>
+      <div className="relative z-10 space-y-5 pb-4">
+        {loadError && (
+          <div className="pf-rise flex items-center gap-2.5 rounded-xl border border-amber-500/30 bg-amber-500/10 p-3">
+            <AlertTriangle className="h-4 w-4 shrink-0 text-amber-300" />
+            <p className="text-xs text-amber-100">{loadError}</p>
           </div>
         )}
+
+        <PortfolioHero
+          totalValue={totalValue}
+          investedValue={investedValue}
+          liquidValue={liquidValue}
+          holdingsCount={holdingsCount}
+          profile={profile}
+          monthlySurplus={cashflow.monthlySurplus}
+          savingsRate={cashflow.savingsRate}
+          cashflowMonths={cashflow.months}
+          lastUpdated={lastUpdated}
+          refreshing={refreshing}
+          onRefresh={() => loadData(true)}
+        />
+
+        {/* ---------- Allocation + projection inputs ---------- */}
+        <div className="grid gap-5 xl:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)]">
+          <AllocationStudio
+            rows={bucketRows}
+            totalValue={totalValue}
+            profile={profile}
+            suggestions={suggestions}
+          />
+
+          <ProjectionLab
+            form={form}
+            onChange={handleChange}
+            onRun={runSimulation}
+            onResetToMyData={applyMyData}
+            running={running}
+            derived={{
+              portfolioValue: totalValue,
+              monthlySurplus: cashflow.monthlySurplus,
+              profile,
+              hasCashflow: cashflow.hasData,
+            }}
+          />
+        </div>
+
+        {simError && (
+          <div className="pf-rise flex items-center gap-2.5 rounded-xl border border-danger-500/30 bg-danger-500/10 p-3">
+            <AlertTriangle className="h-4 w-4 shrink-0 text-danger-300" />
+            <p className="text-xs text-danger-100">{simError}</p>
+          </div>
+        )}
+
+        {/* ---------- Results ---------- */}
+        {simulation && simulationParams ? (
+          <ProjectionResults sim={simulation} params={simulationParams} />
+        ) : (
+          <div className="pf-panel pf-rise flex flex-col items-center justify-center p-10 text-center">
+            <div className="pf-orbit mb-3 flex h-12 w-12 items-center justify-center rounded-2xl border border-primary-500/20 bg-primary-500/10 text-primary-400">
+              <Sparkles className="h-6 w-6" />
+            </div>
+            <p className="text-sm font-bold text-slate-200">Run a projection to see your outcome range</p>
+            <p className="mt-1 max-w-md text-xs text-slate-500">
+              The Projection Lab is already seeded with your portfolio value, your average monthly surplus and the
+              return your current asset mix implies. Hit Run Simulation to model 10,000 possible futures.
+            </p>
+          </div>
+        )}
+
+        {/* ---------- AI explainability ---------- */}
+        <PortfolioExplainabilityCard />
       </div>
     </DashboardLayout>
   )
