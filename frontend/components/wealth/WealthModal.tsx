@@ -13,6 +13,7 @@ import {
   Coins
 } from 'lucide-react'
 import { api } from '@/lib/api'
+import { safeNumber, formatINR } from '@/lib/formatters'
 import { WealthCategory, WealthItem } from './WealthItemCard'
 
 interface WealthModalProps {
@@ -249,8 +250,8 @@ export default function WealthModal({
   // Live calculation preview
   const previewAmount =
     activeTab === 'assets'
-      ? (parseFloat(formData.quantity) || 0) * (parseFloat(formData.price) || 0)
-      : parseFloat(formData.amount) || 0
+      ? safeNumber(formData.quantity, 0) * safeNumber(formData.price, 0)
+      : safeNumber(formData.amount, 0)
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-md animate-fade-in overflow-y-auto">
@@ -324,7 +325,7 @@ export default function WealthModal({
               Live Card Preview
             </span>
             <span className="font-mono text-sm font-bold text-slate-100">
-              ₹{Math.round(previewAmount).toLocaleString('en-IN')}
+              ₹{formatINR(previewAmount)}
             </span>
           </div>
           <div className="text-xs">

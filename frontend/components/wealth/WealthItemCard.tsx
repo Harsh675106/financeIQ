@@ -22,6 +22,8 @@ import {
   Clock
 } from 'lucide-react'
 
+import { safeNumber, formatINR } from '@/lib/formatters'
+
 export interface WealthItem {
   id: number
   type?: string
@@ -70,29 +72,36 @@ export default function WealthItemCard({
 
   if (category === 'savings') {
     title = item.account_type || 'Savings Account'
-    amount = item.amount || 0
+    amount = safeNumber(item.amount, 0)
     badgeText = 'Liquid Asset'
   } else if (category === 'debts') {
     title = item.debt_type || 'Debt / Loan'
-    amount = item.amount || 0
-    if (item.interest_rate && item.interest_rate > 0) {
-      badgeText = `${item.interest_rate}% APR`
-      if (item.interest_rate >= 14) isHighApr = true
+    amount = safeNumber(item.amount, 0)
+    const apr = safeNumber(item.interest_rate ?? item.rate, 0)
+    if (apr > 0) {
+      badgeText = `${apr}% APR`
+      if (apr >= 14) isHighApr = true
     } else {
       badgeText = '0% Interest'
     }
   } else if (category === 'assets') {
     title = item.type || 'Asset'
     if (item.symbol) title += ` (${item.symbol.toUpperCase()})`
-    amount = (item.quantity || 0) * (item.price || 0)
-    subtitle = `Qty: ${item.quantity} × ₹${Math.round(item.price || 0).toLocaleString('en-IN')}`
+    const qty = safeNumber(item.quantity, 0)
+    const prc = safeNumber(item.price, 0)
+    const itemAmt = item.amount !== undefined && item.amount !== null ? safeNumber(item.amount, 0) : 0
+    amount = itemAmt > 0 && qty * prc === 0 ? itemAmt : qty * prc > 0 ? qty * prc : itemAmt
+    subtitle = qty > 0 && prc > 0
+      ? `Qty: ${qty} × ₹${formatINR(prc)}`
+      : item.description || 'Investment holding'
     if (item.purchase_date) {
       subtitle += ` • Acquired: ${new Date(item.purchase_date).toLocaleDateString('en-IN')}`
     }
   } else if (category === 'liabilities') {
     title = item.type || 'Liability'
-    amount = item.amount || 0
-    if (item.rate) badgeText = `${item.rate}% Rate`
+    amount = safeNumber(item.amount, 0)
+    const rateVal = safeNumber(item.rate ?? item.interest_rate, 0)
+    if (rateVal > 0) badgeText = `${rateVal}% Rate`
     if (item.due_date) {
       subtitle = `Due date: ${new Date(item.due_date).toLocaleDateString('en-IN')}`
     }
@@ -211,7 +220,7 @@ export default function WealthItemCard({
         {/* Right Side: Big Numeric Balance */}
         <div className="text-left sm:text-right shrink-0 bg-slate-950/40 sm:bg-transparent p-3 sm:p-0 rounded-xl sm:rounded-none border sm:border-0 border-slate-800/80">
           <p className={`text-xl sm:text-2xl font-black font-mono tracking-tight ${theme.amountColor}`}>
-            ₹{Math.round(amount).toLocaleString('en-IN')}
+            ₹{formatINR(amount)}
           </p>
           <span className="text-[10px] uppercase tracking-wider text-slate-500 font-bold block mt-0.5">
             {category === 'savings' || category === 'assets' ? 'Total Asset Value' : 'Principal Balance'}

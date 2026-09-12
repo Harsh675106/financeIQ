@@ -13,17 +13,20 @@ export function useCountUp(
   options: UseCountUpOptions = {}
 ): number {
   const { duration = 900, decimals = 0, startVal = 0 } = options
-  const [value, setValue] = useState<number>(startVal)
+  const sanitizedStartVal = typeof startVal === 'number' && !isNaN(startVal) && isFinite(startVal) ? startVal : 0
+  const sanitizedEndValue = typeof endValue === 'number' && !isNaN(endValue) && isFinite(endValue) ? endValue : sanitizedStartVal
+
+  const [value, setValue] = useState<number>(sanitizedStartVal)
   const startTimeRef = useRef<number | null>(null)
-  const initialValueRef = useRef<number>(startVal)
-  const targetValueRef = useRef<number>(endValue)
+  const initialValueRef = useRef<number>(sanitizedStartVal)
+  const targetValueRef = useRef<number>(sanitizedEndValue)
 
   useEffect(() => {
     initialValueRef.current = value
-    targetValueRef.current = endValue
+    targetValueRef.current = sanitizedEndValue
     startTimeRef.current = null
 
-    if (initialValueRef.current === endValue) {
+    if (initialValueRef.current === sanitizedEndValue) {
       return
     }
 
@@ -64,7 +67,7 @@ export function useCountUp(
         cancelAnimationFrame(animationFrameId)
       }
     }
-  }, [endValue, duration, decimals])
+  }, [sanitizedEndValue, duration, decimals])
 
-  return value
+  return typeof value === 'number' && !isNaN(value) && isFinite(value) ? value : sanitizedEndValue
 }

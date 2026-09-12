@@ -12,6 +12,7 @@ import {
   CheckCircle2,
   PieChart
 } from 'lucide-react'
+import { safeNumber, formatINR, formatINRAmount, formatPercent } from '@/lib/formatters'
 
 interface WealthHealthMeterProps {
   totalSavings: number
@@ -28,16 +29,29 @@ export default function WealthHealthMeter({
 }: WealthHealthMeterProps) {
   const [activeView, setActiveView] = useState<'score' | 'ratios' | 'tips'>('score')
 
-  // Calculations
-  const grossAssets = totalAssets + totalSavings
-  const grossDebts = totalDebts + totalLiabilities
+  // Clean numeric conversions
+  const safeSavings = Math.max(0, safeNumber(totalSavings, 0))
+  const safeDebts = Math.max(0, safeNumber(totalDebts, 0))
+  const safeAssets = Math.max(0, safeNumber(totalAssets, 0))
+  const safeLiabilities = Math.max(0, safeNumber(totalLiabilities, 0))
+
+  // Solvency Calculations
+  const grossAssets = safeAssets + safeSavings
+  const grossDebts = safeDebts + safeLiabilities
   const netWorth = grossAssets - grossDebts
 
   // Debt to Asset Ratio (%)
-  const leverageRatio = grossAssets > 0 ? (grossDebts / grossAssets) * 100 : grossDebts > 0 ? 100 : 0
+  let rawLeverage = 0
+  if (grossAssets > 0) {
+    rawLeverage = (grossDebts / grossAssets) * 100
+  } else if (grossDebts > 0) {
+    rawLeverage = 100
+  }
+  const leverageRatio = Math.max(0, safeNumber(rawLeverage, 0))
 
   // Savings to Debt Buffer Ratio
-  const savingsToDebtRatio = grossDebts > 0 ? (totalSavings / grossDebts) * 100 : 100
+  const savingsToDebtRatio = grossDebts > 0 ? (safeSavings / grossDebts) * 100 : 100
+  const cleanSavingsToDebtRatio = Math.max(0, safeNumber(savingsToDebtRatio, 100))
 
   // Health Score (0 - 100)
   let score = 50
@@ -47,13 +61,16 @@ export default function WealthHealthMeter({
     else if (leverageRatio < 40) score += 20
     else if (leverageRatio < 60) score += 5
     else score -= 25
+  } else if (grossDebts > 0) {
+    score -= 30
   }
-  if (totalSavings > 50000) score += 15
-  else if (totalSavings > 10000) score += 10
-  else if (totalSavings === 0 && grossDebts > 0) score -= 15
+
+  if (safeSavings > 50000) score += 15
+  else if (safeSavings > 10000) score += 10
+  else if (safeSavings === 0 && grossDebts > 0) score -= 15
 
   // Bound score
-  const healthScore = Math.max(10, Math.min(100, Math.round(score)))
+  const healthScore = Math.max(10, Math.min(100, Math.round(safeNumber(score, 50))))
 
   // Health status
   let healthLabel = 'Moderate Position'
@@ -193,7 +210,7 @@ export default function WealthHealthMeter({
                 </div>
                 <span className="text-xs text-slate-300 font-mono">
                   Net Worth: <strong className={netWorth >= 0 ? 'text-emerald-400' : 'text-rose-400'}>
-                    ₹{Math.round(netWorth).toLocaleString('en-IN')}
+                    ₹{formatINR(netWorth)}
                   </strong>
                 </span>
               </div>
@@ -218,7 +235,7 @@ export default function WealthHealthMeter({
                     className={`h-full rounded-full transition-all duration-700 ${
                       leverageRatio > 50 ? 'bg-rose-500' : leverageRatio > 30 ? 'bg-amber-500' : 'bg-emerald-500'
                     }`}
-                    style={{ width: `${Math.min(100, leverageRatio)}%` }}
+                    style={{ width: `${Math.min(100, Math.max(0, leverageRatio))}%` }}
                   />
                 </div>
               </div>
@@ -227,14 +244,14 @@ export default function WealthHealthMeter({
                 <div className="flex items-center justify-between text-xs mb-1">
                   <span className="text-slate-400">Liquid Savings Shield</span>
                   <span className="font-semibold text-emerald-400">
-                    ₹{Math.round(totalSavings).toLocaleString('en-IN')}
+                    ₹{formatINR(safeSavings)}
                   </span>
                 </div>
                 <div className="h-1.5 w-full rounded-full bg-slate-800 overflow-hidden">
                   <div
                     className="h-full rounded-full bg-gradient-to-r from-emerald-500 to-cyan-400 transition-all duration-700"
                     style={{
-                      width: `${Math.min(100, (totalSavings / (grossDebts > 0 ? grossDebts : 100000)) * 100)}%`
+                      width: `${Math.min(100, Math.max(0, (safeSavings / (grossDebts > 0 ? grossDebts : 100000)) * 100))}%`
                     }}
                   />
                 </div>
@@ -276,7 +293,7 @@ export default function WealthHealthMeter({
               </span>
             </div>
             <p className="text-xl font-bold text-slate-100">
-              ₹{Math.round(Math.abs(grossAssets - grossDebts)).toLocaleString('en-IN')}
+              ₹{formatINR(Math.abs(grossAssets - grossDebts))}
             </p>
             <p className="text-[11px] text-slate-400">
               {grossAssets >= grossDebts
@@ -293,10 +310,10 @@ export default function WealthHealthMeter({
               </span>
             </div>
             <p className="text-xl font-bold text-cyan-300">
-              ₹{Math.round(totalSavings).toLocaleString('en-IN')}
+              ₹{formatINR(safeSavings)}
             </p>
             <p className="text-[11px] text-slate-400">
-              {totalSavings > 100000
+              {safeSavings > 100000
                 ? 'Healthy cash reserves ready for immediate opportunities.'
                 : 'Grow liquid savings to at least 3 months of baseline expenses.'}
             </p>

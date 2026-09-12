@@ -56,8 +56,11 @@ export default function PortfolioPage() {
         api.get('/savings'),
       ])
 
-      let totalValue = assetsRes.data?.total || 0
-      const totalSavings = savingsRes.data?.total || 0
+      let totalValue = parseFloat(assetsRes.data?.total) || 0
+      const rawSavings = savingsRes.data?.savings || []
+      const totalSavings = Array.isArray(rawSavings)
+        ? rawSavings.reduce((sum: number, s: any) => sum + (parseFloat(s.amount) || 0), 0)
+        : parseFloat(savingsRes.data?.total) || 0
 
       // Add savings to total portfolio value
       totalValue += totalSavings

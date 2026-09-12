@@ -22,23 +22,30 @@ import {
   ResponsiveContainer,
   CartesianGrid
 } from 'recharts'
+import { safeNumber, formatINR } from '@/lib/formatters'
 
 interface SavingsGrowthSimulatorProps {
   currentSavings: number
 }
 
 export default function SavingsGrowthSimulator({ currentSavings }: SavingsGrowthSimulatorProps) {
+  const safeCurrentSavings = Math.max(0, safeNumber(currentSavings, 0))
   const [monthlyContribution, setMonthlyContribution] = useState(15000)
   const [expectedReturn, setExpectedReturn] = useState(12) // 12% CAGR
   const [years, setYears] = useState(10)
-  const [initialAmount, setInitialAmount] = useState(currentSavings > 0 ? Math.round(currentSavings) : 50000)
+  const [initialAmount, setInitialAmount] = useState(safeCurrentSavings > 0 ? Math.round(safeCurrentSavings) : 50000)
 
   // Calculate year-by-year compounding projection
   const projectionData = useMemo(() => {
     const data = []
-    const monthlyRate = expectedReturn / 100 / 12
-    let currentBalance = initialAmount
-    let totalInvested = initialAmount
+    const safeInit = Math.max(0, safeNumber(initialAmount, 0))
+    const safeMonthly = Math.max(0, safeNumber(monthlyContribution, 0))
+    const safeReturn = Math.max(0, safeNumber(expectedReturn, 12))
+    const safeYears = Math.max(1, Math.min(50, Math.round(safeNumber(years, 10))))
+
+    const monthlyRate = safeReturn / 100 / 12
+    let currentBalance = safeInit
+    let totalInvested = safeInit
 
     data.push({
       year: 'Year 0',
@@ -47,17 +54,17 @@ export default function SavingsGrowthSimulator({ currentSavings }: SavingsGrowth
       interest: 0,
     })
 
-    for (let yr = 1; yr <= years; yr++) {
+    for (let yr = 1; yr <= safeYears; yr++) {
       for (let m = 0; m < 12; m++) {
-        currentBalance = (currentBalance + monthlyContribution) * (1 + monthlyRate)
-        totalInvested += monthlyContribution
+        currentBalance = (currentBalance + safeMonthly) * (1 + monthlyRate)
+        totalInvested += safeMonthly
       }
       const gains = Math.max(0, currentBalance - totalInvested)
       data.push({
         year: `Y${yr}`,
-        invested: Math.round(totalInvested),
-        wealth: Math.round(currentBalance),
-        interest: Math.round(gains),
+        invested: Math.round(safeNumber(totalInvested, 0)),
+        wealth: Math.round(safeNumber(currentBalance, 0)),
+        interest: Math.round(safeNumber(gains, 0)),
       })
     }
 
@@ -65,13 +72,13 @@ export default function SavingsGrowthSimulator({ currentSavings }: SavingsGrowth
   }, [initialAmount, monthlyContribution, expectedReturn, years])
 
   const finalState = projectionData[projectionData.length - 1]
-  const finalWealth = finalState?.wealth || 0
-  const finalInvested = finalState?.invested || 0
-  const finalInterestGained = finalState?.interest || 0
+  const finalWealth = safeNumber(finalState?.wealth, 0)
+  const finalInvested = safeNumber(finalState?.invested, 0)
+  const finalInterestGained = safeNumber(finalState?.interest, 0)
 
   // Emergency Fund milestones (assuming ~₹40k monthly living expense)
   const monthlyExpenseEstimate = 35000
-  const runwayMonths = Math.floor(currentSavings / (monthlyExpenseEstimate || 1))
+  const runwayMonths = Math.floor(safeCurrentSavings / (monthlyExpenseEstimate || 1))
 
   return (
     <div className="relative overflow-hidden rounded-3xl border border-slate-700/80 bg-gradient-to-br from-slate-900/95 via-slate-900/85 to-slate-950/95 p-6 md:p-8 shadow-2xl backdrop-blur-xl transition-all duration-300 stage-card-lift">
@@ -100,7 +107,7 @@ export default function SavingsGrowthSimulator({ currentSavings }: SavingsGrowth
         <div className="flex items-center gap-2 rounded-xl bg-slate-800/60 px-3 py-1.5 border border-slate-700/50">
           <PiggyBank className="h-4 w-4 text-cyan-400" />
           <span className="text-xs text-slate-300">
-            Current Reserve: <strong className="text-cyan-300 font-mono">₹{Math.round(currentSavings).toLocaleString('en-IN')}</strong>
+            Current Reserve: <strong className="text-cyan-300 font-mono">₹{formatINR(safeCurrentSavings)}</strong>
           </span>
         </div>
       </div>
@@ -219,21 +226,21 @@ export default function SavingsGrowthSimulator({ currentSavings }: SavingsGrowth
             <div className="rounded-xl border border-slate-800 bg-slate-900/60 p-3">
               <p className="text-[11px] text-slate-400">Total Invested</p>
               <p className="text-sm sm:text-base font-bold text-slate-200 mt-0.5">
-                ₹{Math.round(finalInvested).toLocaleString('en-IN')}
+                ₹{formatINR(finalInvested)}
               </p>
             </div>
 
             <div className="rounded-xl border border-slate-800 bg-slate-900/60 p-3">
               <p className="text-[11px] text-emerald-400">Compound Returns</p>
               <p className="text-sm sm:text-base font-bold text-emerald-400 mt-0.5">
-                +₹{Math.round(finalInterestGained).toLocaleString('en-IN')}
+                +₹{formatINR(finalInterestGained)}
               </p>
             </div>
 
             <div className="rounded-xl border border-emerald-500/30 bg-gradient-to-br from-emerald-950/40 to-slate-900/80 p-3 shadow-inner">
               <p className="text-[11px] text-slate-300 font-medium">Future Portfolio</p>
               <p className="text-sm sm:text-base font-extrabold text-emerald-300 mt-0.5">
-                ₹{Math.round(finalWealth).toLocaleString('en-IN')}
+                ₹{formatINR(finalWealth)}
               </p>
             </div>
           </div>
@@ -280,7 +287,7 @@ export default function SavingsGrowthSimulator({ currentSavings }: SavingsGrowth
                                 Future Value:
                               </span>
                               <span className="font-bold text-slate-100">
-                                ₹{Number(wealthVal).toLocaleString('en-IN')}
+                                ₹{formatINR(wealthVal)}
                               </span>
                             </div>
                             <div className="flex items-center justify-between gap-4">
@@ -289,7 +296,7 @@ export default function SavingsGrowthSimulator({ currentSavings }: SavingsGrowth
                                 Principal Invested:
                               </span>
                               <span className="font-semibold text-slate-300">
-                                ₹{Number(investedVal).toLocaleString('en-IN')}
+                                ₹{formatINR(investedVal)}
                               </span>
                             </div>
                           </div>

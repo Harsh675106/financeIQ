@@ -34,6 +34,7 @@ import {
   Filter
 } from 'lucide-react'
 import { api } from '@/lib/api'
+import { safeNumber, formatINR, formatPercent } from '@/lib/formatters'
 import DebtOptimizerCard from '@/components/wealth/DebtOptimizerCard'
 import SavingsGrowthSimulator from '@/components/wealth/SavingsGrowthSimulator'
 import WealthHealthMeter from '@/components/wealth/WealthHealthMeter'
@@ -136,24 +137,41 @@ export default function WealthPage() {
   }
 
   /* ================= AGGREGATES ================= */
-  const totalSavings = useMemo(() => savings.reduce((sum, s) => sum + (s.amount || 0), 0), [savings])
-  const totalDebts = useMemo(() => debts.reduce((sum, d) => sum + (d.amount || 0), 0), [debts])
+  const totalSavings = useMemo(
+    () => savings.reduce((sum, s) => sum + safeNumber(s.amount, 0), 0),
+    [savings]
+  )
+  const totalDebts = useMemo(
+    () => debts.reduce((sum, d) => sum + safeNumber(d.amount, 0), 0),
+    [debts]
+  )
   const totalAssets = useMemo(
-    () => assets.reduce((sum, a) => sum + ((a.quantity || 0) * (a.price || 0)), 0),
+    () =>
+      assets.reduce((sum, a) => {
+        const itemAmt = a.amount !== undefined && a.amount !== null ? safeNumber(a.amount, 0) : 0
+        const qtyPrc = safeNumber(a.quantity, 0) * safeNumber(a.price, 0)
+        const val = itemAmt > 0 && qtyPrc === 0 ? itemAmt : qtyPrc > 0 ? qtyPrc : itemAmt
+        return sum + val
+      }, 0),
     [assets]
   )
   const totalLiabilities = useMemo(
-    () => liabilities.reduce((sum, l) => sum + (l.amount || 0), 0),
+    () => liabilities.reduce((sum, l) => sum + safeNumber(l.amount, 0), 0),
     [liabilities]
   )
   const netWorth = (totalSavings + totalAssets) - (totalDebts + totalLiabilities)
 
   // Average debt APR
   const averageDebtApr = useMemo(() => {
-    if (debts.length === 0) return 0
-    const totalWithRate = debts.reduce((sum, d) => sum + ((d.amount || 0) * (d.interest_rate || 0)), 0)
-    return totalDebts > 0 ? (totalWithRate / totalDebts).toFixed(1) : '0.0'
-  }, [debts, totalDebts])
+    if (!debts || debts.length === 0) return '0.0'
+    const totalWithRate = debts.reduce((sum, d) => {
+      const amt = safeNumber(d.amount, 0)
+      const rate = safeNumber(d.interest_rate ?? d.rate, 0)
+      return sum + amt * rate
+    }, 0)
+    const validDebtsTotal = debts.reduce((sum, d) => sum + safeNumber(d.amount, 0), 0)
+    return validDebtsTotal > 0 ? (totalWithRate / validDebtsTotal).toFixed(1) : '0.0'
+  }, [debts])
 
   /* ================= TAB HANDLER ================= */
   const handleTabChange = (newTab: WealthCategory) => {
@@ -226,24 +244,31 @@ export default function WealthPage() {
     // High value filter (> ₹50,000)
     if (filterHighValue) {
       list = list.filter((item) => {
-        const val = activeTab === 'assets' ? (item.quantity || 0) * (item.price || 0) : item.amount || 0
+        const itemAmt = item.amount !== undefined && item.amount !== null ? safeNumber(item.amount, 0) : 0
+        const qtyPrc = safeNumber(item.quantity, 0) * safeNumber(item.price, 0)
+        const val = activeTab === 'assets' ? (itemAmt > 0 && qtyPrc === 0 ? itemAmt : qtyPrc > 0 ? qtyPrc : itemAmt) : safeNumber(item.amount, 0)
         return val >= 50000
       })
     }
 
     // High APR filter (> 12% for debts)
     if (filterHighAprOnly && activeTab === 'debts') {
-      list = list.filter((item) => (item.interest_rate || 0) >= 12)
+      list = list.filter((item) => safeNumber(item.interest_rate ?? item.rate, 0) >= 12)
     }
 
     // Sorting
     list.sort((a, b) => {
-      const valA = activeTab === 'assets' ? (a.quantity || 0) * (a.price || 0) : a.amount || 0
-      const valB = activeTab === 'assets' ? (b.quantity || 0) * (b.price || 0) : b.amount || 0
+      const getVal = (item: WealthItem) => {
+        const itemAmt = item.amount !== undefined && item.amount !== null ? safeNumber(item.amount, 0) : 0
+        const qtyPrc = safeNumber(item.quantity, 0) * safeNumber(item.price, 0)
+        return activeTab === 'assets' ? (itemAmt > 0 && qtyPrc === 0 ? itemAmt : qtyPrc > 0 ? qtyPrc : itemAmt) : safeNumber(item.amount, 0)
+      }
+      const valA = getVal(a)
+      const valB = getVal(b)
 
       if (sortBy === 'highest') return valB - valA
       if (sortBy === 'lowest') return valA - valB
-      if (sortBy === 'apr') return (b.interest_rate || b.rate || 0) - (a.interest_rate || a.rate || 0)
+      if (sortBy === 'apr') return safeNumber(b.interest_rate ?? b.rate, 0) - safeNumber(a.interest_rate ?? a.rate, 0)
       return (new Date(b.created_at || 0).getTime()) - (new Date(a.created_at || 0).getTime())
     })
 
@@ -317,7 +342,7 @@ export default function WealthPage() {
               </div>
             </div>
             <p className="text-2xl sm:text-3xl font-black font-mono tracking-tight text-emerald-400">
-              ₹{Math.round(totalSavings).toLocaleString('en-IN')}
+              ₹{formatINR(totalSavings)}
             </p>
             <div className="flex items-center justify-between mt-4 text-xs text-slate-400 border-t border-slate-800/90 pt-3">
               <span>{savings.length} Active Accounts</span>
@@ -343,7 +368,7 @@ export default function WealthPage() {
               </div>
             </div>
             <p className="text-2xl sm:text-3xl font-black font-mono tracking-tight text-rose-400">
-              ₹{Math.round(totalDebts).toLocaleString('en-IN')}
+              ₹{formatINR(totalDebts)}
             </p>
             <div className="flex items-center justify-between mt-4 text-xs text-slate-400 border-t border-slate-800/90 pt-3">
               <span>{debts.length} Active Debts</span>
@@ -367,7 +392,7 @@ export default function WealthPage() {
               </div>
             </div>
             <p className="text-2xl sm:text-3xl font-black font-mono tracking-tight text-cyan-300">
-              ₹{Math.round(totalAssets).toLocaleString('en-IN')}
+              ₹{formatINR(totalAssets)}
             </p>
             <div className="flex items-center justify-between mt-4 text-xs text-slate-400 border-t border-slate-800/90 pt-3">
               <span>{assets.length} Holdings</span>
@@ -391,10 +416,10 @@ export default function WealthPage() {
               </div>
             </div>
             <p className={`text-2xl sm:text-3xl font-black font-mono tracking-tight ${netWorth >= 0 ? 'text-indigo-300' : 'text-rose-400'}`}>
-              ₹{Math.round(netWorth).toLocaleString('en-IN')}
+              ₹{formatINR(netWorth)}
             </p>
             <div className="flex items-center justify-between mt-4 text-xs text-slate-400 border-t border-slate-800/90 pt-3">
-              <span>Liabilities: ₹{Math.round(totalLiabilities).toLocaleString('en-IN')}</span>
+              <span>Liabilities: ₹{formatINR(totalLiabilities)}</span>
               <span className={`font-bold uppercase ${netWorth >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
                 {netWorth >= 0 ? 'Surplus' : 'Deficit'}
               </span>

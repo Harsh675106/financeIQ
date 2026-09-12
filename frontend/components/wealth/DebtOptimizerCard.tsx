@@ -15,6 +15,7 @@ import {
   Clock,
   Coins
 } from 'lucide-react'
+import { safeNumber, formatINR } from '@/lib/formatters'
 
 interface Strategy {
   strategy: 'avalanche' | 'snowball'
@@ -70,12 +71,13 @@ export default function DebtOptimizerCard({ refreshKey = 0 }: DebtOptimizerCardP
   const acceleratedMetrics = useMemo(() => {
     if (!activeStrat || !activeStrat.monthsToDebtFree) return null
 
-    const baseMonths = activeStrat.monthsToDebtFree
-    const baseInterest = activeStrat.totalInterest
-    const baseBudget = data?.monthlyPaymentBudget || 10000
+    const baseMonths = safeNumber(activeStrat.monthsToDebtFree, 12)
+    const baseInterest = safeNumber(activeStrat.totalInterest, 0)
+    const baseBudget = safeNumber(data?.monthlyPaymentBudget, 10000)
+    const safeExtra = safeNumber(extraPayment, 0)
 
     // Acceleration factor
-    const speedRatio = (baseBudget + extraPayment) / (baseBudget || 1)
+    const speedRatio = (baseBudget + safeExtra) / (baseBudget || 1)
     const newMonths = Math.max(1, Math.round(baseMonths / Math.pow(speedRatio, 0.75)))
     const monthsSaved = Math.max(0, baseMonths - newMonths)
     const interestSaved = Math.max(0, Math.round(baseInterest * (1 - newMonths / baseMonths) * 0.85))
@@ -168,7 +170,7 @@ export default function DebtOptimizerCard({ refreshKey = 0 }: DebtOptimizerCardP
                 )}
               </div>
               <span className="text-xs text-slate-300">
-                Monthly Budget: <strong className="text-primary-300 font-mono">₹{Math.round(data.monthlyPaymentBudget).toLocaleString('en-IN')}</strong>
+                Monthly Budget: <strong className="text-primary-300 font-mono">₹{formatINR(data.monthlyPaymentBudget)}</strong>
               </span>
             </div>
             <p className="mt-2 text-xs text-slate-300 leading-relaxed">{data.summary}</p>
@@ -217,7 +219,7 @@ export default function DebtOptimizerCard({ refreshKey = 0 }: DebtOptimizerCardP
                     <div className="rounded-lg bg-slate-800/50 p-2 border border-slate-800">
                       <span className="text-slate-400">Total Interest</span>
                       <p className="font-bold text-amber-300 text-sm mt-0.5">
-                        ₹{Math.round(strategy.totalInterest).toLocaleString('en-IN')}
+                        ₹{formatINR(strategy.totalInterest)}
                       </p>
                     </div>
                   </div>
@@ -236,7 +238,7 @@ export default function DebtOptimizerCard({ refreshKey = 0 }: DebtOptimizerCardP
                 </span>
               </div>
               <span className="font-mono text-sm font-bold text-emerald-400">
-                +₹{extraPayment.toLocaleString('en-IN')}/mo
+                +₹{formatINR(extraPayment)}/mo
               </span>
             </div>
 
@@ -269,7 +271,7 @@ export default function DebtOptimizerCard({ refreshKey = 0 }: DebtOptimizerCardP
                 <div className="col-span-2 sm:col-span-1 rounded-xl bg-emerald-500/10 p-2.5 border border-emerald-500/20">
                   <span className="text-[11px] text-emerald-300">Interest Saved</span>
                   <p className="text-sm font-bold text-emerald-300 mt-0.5">
-                    ₹{acceleratedMetrics.interestSaved.toLocaleString('en-IN')}
+                    ₹{formatINR(acceleratedMetrics.interestSaved)}
                   </p>
                 </div>
               </div>

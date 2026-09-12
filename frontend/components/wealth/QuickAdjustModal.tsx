@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { X, Sparkles, PlusCircle, MinusCircle, CheckCircle2 } from 'lucide-react'
 import { api } from '@/lib/api'
+import { safeNumber, formatINR } from '@/lib/formatters'
 import { WealthItem, WealthCategory } from './WealthItemCard'
 
 interface QuickAdjustModalProps {
@@ -27,9 +28,9 @@ export default function QuickAdjustModal({
   if (!isOpen || !item) return null
 
   const isSaving = category === 'savings'
-  const currentAmount = item.amount || 0
+  const currentAmount = safeNumber(item.amount, 0)
   const title = isSaving ? (item.account_type || 'Savings') : (item.debt_type || 'Debt')
-  const adjustValue = parseFloat(amountInput) || 0
+  const adjustValue = Math.max(0, safeNumber(amountInput, 0))
 
   const previewNewAmount = isSaving
     ? currentAmount + adjustValue
@@ -115,20 +116,20 @@ export default function QuickAdjustModal({
         <div className="mb-4 rounded-xl border border-slate-800 bg-slate-950/60 p-3.5 space-y-2">
           <div className="flex items-center justify-between text-xs text-slate-400">
             <span>Current Balance:</span>
-            <span className="font-mono text-slate-200">₹{Math.round(currentAmount).toLocaleString('en-IN')}</span>
+            <span className="font-mono text-slate-200">₹{formatINR(currentAmount)}</span>
           </div>
 
           <div className="flex items-center justify-between text-xs text-slate-400">
             <span>{isSaving ? 'Deposit Amount:' : 'Payment Applied:'}</span>
             <span className={`font-mono font-semibold ${isSaving ? 'text-emerald-400' : 'text-rose-400'}`}>
-              {isSaving ? '+' : '-'}₹{Math.round(adjustValue).toLocaleString('en-IN')}
+              {isSaving ? '+' : '-'}₹{formatINR(adjustValue)}
             </span>
           </div>
 
           <div className="border-t border-slate-800 pt-2 flex items-center justify-between text-xs font-bold">
             <span className="text-slate-300">Updated Balance:</span>
             <span className="font-mono text-sm text-slate-50">
-              ₹{Math.round(previewNewAmount).toLocaleString('en-IN')}
+              ₹{formatINR(previewNewAmount)}
             </span>
           </div>
         </div>
