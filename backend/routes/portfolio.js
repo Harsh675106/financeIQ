@@ -8,13 +8,13 @@ const router = express.Router()
 
 router.use(authenticateToken)
 
-function mapTypeToBucket(type) {
+function mapTypeToBucket(type, category = 'assets') {
   const t = (type || '').toLowerCase()
-  if (['stock','stocks','equity','mutualfund','mutual fund','mf','crypto','cryptocurrency','etf'].some(k => t.includes(k))) return 'equity'
-  if (['debt','bond','bonds','fixed income','fd'].some(k => t.includes(k))) return 'debt'
-  if (['gold'].some(k => t.includes(k))) return 'gold'
-  if (['cash','liquid','savings','bank'].some(k => t.includes(k))) return 'liquid'
-  return 'equity'
+  if (['stock','stocks','equity','mutualfund','mutual fund','mf','crypto','cryptocurrency','etf','share','nifty','equity stocks'].some(k => t.includes(k))) return 'equity'
+  if (['debt','bond','bonds','fixed income','fd','fixed deposit','ppf','provident','nsc','rd','recurring deposit','g-sec'].some(k => t.includes(k))) return 'debt'
+  if (['gold','silver','bullion','sgb','commodity','commodities','jewellery','gold asset'].some(k => t.includes(k))) return 'gold'
+  if (['cash','liquid','savings','saving','emergency','bank','wallet','current','checking','deposit','high-yield'].some(k => t.includes(k))) return 'liquid'
+  return category === 'savings' ? 'liquid' : 'equity'
 }
 
 function defaultTargetFromRisk(riskLevel) {
@@ -39,24 +39,38 @@ function computeRiskScore(weights) {
 }
 
 async function getCurrentAllocation(userId, pool) {
-  const assets = await pool.query('SELECT type, quantity, price FROM assets WHERE user_id=$1', [userId])
+  const [assetsRes, savingsRes] = await Promise.all([
+    pool.query('SELECT type, quantity, price FROM assets WHERE user_id=$1', [userId]),
+    pool.query('SELECT amount, account_type, description FROM savings WHERE user_id=$1', [userId]),
+  ])
+
   const sums = { equity: 0, debt: 0, gold: 0, liquid: 0 }
   let total = 0
-  for (const a of assets.rows) {
-    const qty = parseFloat(a.quantity)||0
-    const price = parseFloat(a.price)||0
+
+  for (const a of assetsRes.rows) {
+    const qty = parseFloat(a.quantity) || 0
+    const price = parseFloat(a.price) || 0
     const val = qty * price
-    const bucket = mapTypeToBucket(a.type)
+    const bucket = mapTypeToBucket(a.type, 'assets')
     sums[bucket] += val
     total += val
   }
+
+  for (const s of savingsRes.rows) {
+    const amt = parseFloat(s.amount) || 0
+    const bucket = mapTypeToBucket(s.account_type || s.description, 'savings')
+    sums[bucket] += amt
+    total += amt
+  }
+
   const pct = total > 0 ? {
-    equity: Math.round((sums.equity/total)*10000)/100,
-    debt: Math.round((sums.debt/total)*10000)/100,
-    gold: Math.round((sums.gold/total)*10000)/100,
-    liquid: Math.round((sums.liquid/total)*10000)/100,
+    equity: Math.round((sums.equity / total) * 10000) / 100,
+    debt: Math.round((sums.debt / total) * 10000) / 100,
+    gold: Math.round((sums.gold / total) * 10000) / 100,
+    liquid: Math.round((sums.liquid / total) * 10000) / 100,
   } : { equity: 0, debt: 0, gold: 0, liquid: 0 }
-  return { totals: { ...sums, total: Math.round(total*100)/100 }, weights: pct }
+
+  return { totals: { ...sums, total: Math.round(total * 100) / 100 }, weights: pct }
 }
 
 async function getTargetAllocation(userId, pool) {
@@ -99,14 +113,48 @@ function computeRebalance(current, target, totalValue, band=5) {
   return { drift, suggestions }
 }
 
-// New: return current holdings with totals
+// return comprehensive holdings (assets + savings)
 router.get('/holdings', async (req, res) => {
   try {
     const userId = req.user.id
-    const r = await pool.query('SELECT * FROM assets WHERE user_id=$1 ORDER BY created_at DESC', [userId])
-    const items = r.rows.map(x => ({ ...x, quantity: parseFloat(x.quantity), price: parseFloat(x.price), value: Math.round(parseFloat(x.quantity)*parseFloat(x.price)*100)/100 }))
-    const total = items.reduce((s,x)=> s + (x.value||0), 0)
-    res.json({ holdings: items, total })
+    const [assetsRes, savingsRes] = await Promise.all([
+      pool.query('SELECT * FROM assets WHERE user_id=$1 ORDER BY created_at DESC', [userId]),
+      pool.query('SELECT * FROM savings WHERE user_id=$1 ORDER BY created_at DESC', [userId]),
+    ])
+
+    const assetItems = assetsRes.rows.map(x => {
+      const qty = parseFloat(x.quantity) || 0
+      const price = parseFloat(x.price) || 0
+      const val = Math.round(qty * price * 100) / 100
+      return {
+        ...x,
+        name: x.symbol ? `${x.type} (${x.symbol.toUpperCase()})` : x.type,
+        quantity: qty,
+        price: price,
+        value: val,
+        assetClass: mapTypeToBucket(x.type, 'assets')
+      }
+    })
+
+    const savingItems = savingsRes.rows.map(s => {
+      const amt = parseFloat(s.amount) || 0
+      return {
+        id: s.id,
+        type: s.account_type || 'Savings Account',
+        name: s.account_type || 'Savings Account',
+        symbol: null,
+        quantity: 1,
+        price: amt,
+        value: amt,
+        assetClass: mapTypeToBucket(s.account_type || s.description, 'savings'),
+        description: s.description,
+        created_at: s.created_at
+      }
+    })
+
+    const items = [...assetItems, ...savingItems]
+    const total = items.reduce((s, x) => s + (x.value || 0), 0)
+    res.json({ holdings: items, total: Math.round(total * 100) / 100 })
   } catch (e) {
     console.error('Get holdings error:', e)
     res.status(500).json({ message: 'Failed to fetch holdings' })

@@ -92,17 +92,21 @@ async function getEmergencyFund(userId) {
   return { months: round2(months), cash: round2(cash), avgMonthly: round2(avgMonthly) }
 }
 
-function mapTypeToBucket(type) {
+function mapTypeToBucket(type, category = 'assets') {
   const text = (type || '').toLowerCase()
-  if (['stock', 'stocks', 'equity', 'mutualfund', 'mutual fund', 'mf', 'crypto', 'cryptocurrency', 'etf'].some((item) => text.includes(item))) return 'equity'
-  if (['debt', 'bond', 'bonds', 'fixed income', 'fd'].some((item) => text.includes(item))) return 'debt'
-  if (['gold'].some((item) => text.includes(item))) return 'gold'
-  if (['cash', 'liquid', 'savings', 'bank'].some((item) => text.includes(item))) return 'liquid'
-  return 'equity'
+  if (['stock', 'stocks', 'equity', 'mutualfund', 'mutual fund', 'mf', 'crypto', 'cryptocurrency', 'etf', 'share'].some((item) => text.includes(item))) return 'equity'
+  if (['debt', 'bond', 'bonds', 'fixed income', 'fd', 'fixed deposit', 'ppf', 'provident', 'nsc', 'rd'].some((item) => text.includes(item))) return 'debt'
+  if (['gold', 'silver', 'bullion', 'sgb', 'commodity', 'commodities'].some((item) => text.includes(item))) return 'gold'
+  if (['cash', 'liquid', 'savings', 'saving', 'emergency', 'bank', 'wallet', 'current', 'checking', 'deposit', 'high-yield'].some((item) => text.includes(item))) return 'liquid'
+  return category === 'savings' ? 'liquid' : 'equity'
 }
 
 async function currentAllocation(userId) {
-  const assets = await pool.query('SELECT type, quantity, price FROM assets WHERE user_id=$1', [userId])
+  const [assets, savings] = await Promise.all([
+    pool.query('SELECT type, quantity, price FROM assets WHERE user_id=$1', [userId]),
+    pool.query('SELECT amount, account_type, description FROM savings WHERE user_id=$1', [userId]),
+  ])
+
   const sums = { equity: 0, debt: 0, gold: 0, liquid: 0 }
   let total = 0
 
@@ -110,8 +114,14 @@ async function currentAllocation(userId) {
     const quantity = parseFloat(asset.quantity) || 0
     const price = parseFloat(asset.price) || 0
     const value = quantity * price
-    sums[mapTypeToBucket(asset.type)] += value
+    sums[mapTypeToBucket(asset.type, 'assets')] += value
     total += value
+  }
+
+  for (const s of savings.rows) {
+    const amt = parseFloat(s.amount) || 0
+    sums[mapTypeToBucket(s.account_type || s.description, 'savings')] += amt
+    total += amt
   }
 
   const weights = total > 0
