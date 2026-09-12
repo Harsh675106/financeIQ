@@ -176,7 +176,7 @@ export default function TransactionsPage() {
 
   return (
     <DashboardLayout>
-      <PageBackground variant="particles" />
+      <PageBackground variant="flow" />
       <ConfettiEffect trigger={confettiTrigger} onComplete={() => setConfettiTrigger(false)} />
 
       <div className="relative z-10 max-w-7xl mx-auto space-y-8 pb-16 px-2 sm:px-4 md:px-6">
