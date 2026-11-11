@@ -84,7 +84,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   ]
 
   const renderNav = (closeOnClick?: boolean, collapsed = false) => (
-    <nav className="flex-1 space-y-1.5 px-3 py-4">
+    <nav className="min-h-0 flex-1 space-y-1.5 overflow-y-auto overscroll-contain px-3 py-4">
       {navItems.map((item) => {
         const Icon = item.icon
         const isActive =
@@ -144,8 +144,11 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     </nav>
   )
 
-  const renderUserSection = (collapsed = false) => (
-    <div className={`border-t border-slate-800/80 p-3 ${collapsed ? 'px-2' : 'px-4'}`}>
+  const renderUserSection = (collapsed = false, mobile = false) => (
+    <div
+      className={`shrink-0 border-t border-slate-800/80 p-3 ${collapsed ? 'px-2' : 'px-4'}`}
+      style={mobile ? { paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom))' } : undefined}
+    >
       {!collapsed ? (
         <div className="mb-2 px-1">
           <div className="flex items-center gap-2">
@@ -199,11 +202,11 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       {sidebarOpen && (
         <>
           <div
-            className="fixed inset-0 z-[100] h-screen w-screen bg-slate-900/60 backdrop-blur-sm lg:hidden transition-opacity"
+            className="fixed inset-0 z-[100] bg-slate-900/60 backdrop-blur-sm lg:hidden transition-opacity"
             onClick={() => setSidebarOpen(false)}
           />
-          <aside className="sidebar-ambient fixed inset-y-0 left-0 z-[110] flex h-screen w-64 max-w-[85vw] flex-col border-r border-slate-800/80 bg-slate-950/95 shadow-2xl backdrop-blur-2xl lg:hidden animate-slide-in-left">
-            <div className="flex items-center justify-between border-b border-slate-800/70 px-4 py-4">
+          <aside className="sidebar-ambient fixed inset-y-0 left-0 z-[110] flex h-[100dvh] max-h-[100dvh] min-h-0 w-64 max-w-[85vw] flex-col border-r border-slate-800/80 bg-slate-950/95 shadow-2xl backdrop-blur-2xl lg:hidden animate-slide-in-left">
+            <div className="flex shrink-0 items-center justify-between border-b border-slate-800/70 px-4 py-4">
               <div className="flex items-center gap-2.5">
                 <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary-500/10 border border-primary-500/20 text-primary-400">
                   <TrendingUp className="h-5 w-5" />
@@ -221,7 +224,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
               </button>
             </div>
             {renderNav(true)}
-            {renderUserSection()}
+            {renderUserSection(false, true)}
           </aside>
         </>
       )}
