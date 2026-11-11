@@ -61,7 +61,7 @@ export default function LoginForm({ onLogin }: LoginFormProps) {
       size: "large",
       text: "continue_with",
       shape: "pill",
-      width: 320,
+      width: Math.min(320, Math.floor(buttonHost.clientWidth || 320)),
       click_listener: handleGoogleButtonClick,
     });
   }, [handleGoogleButtonClick]);
@@ -104,6 +104,13 @@ export default function LoginForm({ onLogin }: LoginFormProps) {
     script.defer = true;
     document.body.appendChild(script);
 
+    let resizeTimeout: number | undefined;
+    const handleResize = () => {
+      window.clearTimeout(resizeTimeout);
+      resizeTimeout = window.setTimeout(renderGoogleButton, 100);
+    };
+    window.addEventListener("resize", handleResize);
+
     const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
     if (!clientId) {
       setError("Google Sign-In is not configured");
@@ -124,6 +131,8 @@ export default function LoginForm({ onLogin }: LoginFormProps) {
     };
 
     return () => {
+      window.removeEventListener("resize", handleResize);
+      window.clearTimeout(resizeTimeout);
       if (document.body.contains(script)) {
         document.body.removeChild(script);
       }
@@ -292,7 +301,7 @@ export default function LoginForm({ onLogin }: LoginFormProps) {
         <div
           id="google-button"
           onClick={handleGoogleButtonClick}
-          className="flex justify-center rounded-xl border border-slate-700 bg-slate-950/70 p-3 transition hover:border-slate-600"
+          className="flex min-w-0 justify-center rounded-xl border border-slate-700 bg-slate-950/70 p-3 transition hover:border-slate-600"
         />
 
         <div className="relative">

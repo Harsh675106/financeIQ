@@ -78,9 +78,9 @@ export default function LandingPage() {
         </div>
       </header>
 
-      <main className="container-app pb-12 pt-4 sm:pt-6 lg:pt-10">
-        <div className="grid items-center gap-10 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
-          <div className="space-y-8">
+      <main className="container-app pb-8 pt-2 sm:pb-12 sm:pt-6 lg:pt-10">
+        <div className="grid items-center gap-6 lg:gap-10 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
+          <div className="order-last space-y-8 lg:order-first">
             <div className="space-y-4">
               <p className="inline-flex items-center rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-medium text-emerald-300 ring-1 ring-emerald-500/30">
                 AI-powered wealth insights
@@ -99,7 +99,7 @@ export default function LandingPage() {
               </p>
             </div>
 
-            <div className="grid gap-4 sm:grid-cols-2">
+            <div className="hidden gap-4 sm:grid sm:grid-cols-2">
               <div className="card card-pad card-hover animate-float-soft">
                 <Shield className="landing-feature-icon landing-feature-icon-emerald mb-3 h-6 w-6" />
                 <h3 className="mb-1 text-sm font-semibold text-slate-50">
@@ -153,12 +153,12 @@ export default function LandingPage() {
             </div>
           </div>
 
-          <div className="lg:justify-self-end">
-            <div className="card card-pad max-w-md border-primary-500/20 bg-slate-900/80">
+          <div className="order-first min-w-0 lg:order-last lg:justify-self-end">
+            <div className="card card-pad w-full min-w-0 max-w-md border-primary-500/20 bg-slate-900/80">
               <div className="mb-6 flex space-x-2 rounded-full bg-slate-900/70 p-1 text-xs ring-1 ring-slate-700">
                 <button
                   onClick={() => setIsLogin(true)}
-                  className={`flex-1 rounded-full py-2 text-center font-medium transition ${
+                  className={`min-h-[44px] flex-1 rounded-full py-2 text-center font-medium transition sm:min-h-0 ${
                     isLogin
                       ? 'bg-primary-500 text-slate-950'
                       : 'text-slate-400 hover:text-slate-100'
@@ -168,7 +168,7 @@ export default function LandingPage() {
                 </button>
                 <button
                   onClick={() => setIsLogin(false)}
-                  className={`flex-1 rounded-full py-2 text-center font-medium transition ${
+                  className={`min-h-[44px] flex-1 rounded-full py-2 text-center font-medium transition sm:min-h-0 ${
                     !isLogin
                       ? 'bg-primary-500 text-slate-950'
                       : 'text-slate-400 hover:text-slate-100'
