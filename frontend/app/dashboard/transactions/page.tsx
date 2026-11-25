@@ -184,8 +184,8 @@ export default function TransactionsPage() {
           meta={
             <span className="badge badge-success">
               <span className="relative flex h-2 w-2" aria-hidden="true">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-60" />
-                <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-500 opacity-50" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
               </span>
               Live Feed
             </span>
@@ -220,13 +220,13 @@ export default function TransactionsPage() {
             <button
               onClick={() => setShowAnalyticsStage(!showAnalyticsStage)}
               aria-expanded={showAnalyticsStage}
-              className="group surface-inset surface-inset-hover flex w-full items-center gap-3 px-3.5 py-3 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-400/70 sm:px-4"
+              className="group card card-hover flex w-full items-center gap-3 rounded-xl px-3.5 py-3 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/60 sm:px-4"
             >
-              <span className="icon-tile icon-tile-sm icon-tile-cyan">
+              <span className="icon-tile icon-tile-sm icon-tile-sky">
                 <BarChart3 className="h-4 w-4" />
               </span>
               <span className="min-w-0 flex-1">
-                <span className="block text-sm font-semibold text-slate-100 transition-colors group-hover:text-white">
+                <span className="block text-sm font-semibold text-ink-900 transition-colors group-hover:text-primary-700">
                   Spending Analytics & Outflow Velocity Studio
                 </span>
                 <span className="block text-xs font-normal text-slate-500">
@@ -250,13 +250,13 @@ export default function TransactionsPage() {
             <button
               onClick={() => setShowIntelligenceStage(!showIntelligenceStage)}
               aria-expanded={showIntelligenceStage}
-              className="group surface-inset surface-inset-hover flex w-full items-center gap-3 px-3.5 py-3 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-400/70 sm:px-4"
+              className="group card card-hover flex w-full items-center gap-3 rounded-xl px-3.5 py-3 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/60 sm:px-4"
             >
               <span className="icon-tile icon-tile-sm icon-tile-violet">
                 <BrainCircuit className="h-4 w-4" />
               </span>
               <span className="min-w-0 flex-1">
-                <span className="block text-sm font-semibold text-slate-100 transition-colors group-hover:text-white">
+                <span className="block text-sm font-semibold text-ink-900 transition-colors group-hover:text-primary-700">
                   Neural Transaction Intelligence & Anomaly Radar
                 </span>
                 <span className="block text-xs font-normal text-slate-500">
@@ -280,13 +280,13 @@ export default function TransactionsPage() {
             <button
               onClick={() => setShowBudgetsStage(!showBudgetsStage)}
               aria-expanded={showBudgetsStage}
-              className="group surface-inset surface-inset-hover flex w-full items-center gap-3 px-3.5 py-3 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-400/70 sm:px-4"
+              className="group card card-hover flex w-full items-center gap-3 rounded-xl px-3.5 py-3 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/60 sm:px-4"
             >
               <span className="icon-tile icon-tile-sm">
                 <Layers className="h-4 w-4" />
               </span>
               <span className="min-w-0 flex-1">
-                <span className="block text-sm font-semibold text-slate-100 transition-colors group-hover:text-white">
+                <span className="block text-sm font-semibold text-ink-900 transition-colors group-hover:text-primary-700">
                   Monthly Budget Guardrails & Thresholds
                 </span>
                 <span className="block text-xs font-normal text-slate-500">
@@ -310,7 +310,7 @@ export default function TransactionsPage() {
         <section className="card card-pad relative overflow-hidden">
           <div
             aria-hidden="true"
-            className="pointer-events-none absolute -right-24 -top-24 h-64 w-64 rounded-full bg-primary-500/10 blur-3xl"
+            className="pointer-events-none absolute -right-24 -top-24 h-64 w-64 rounded-full bg-gradient-to-br from-primary-100/60 to-ice-100/60 blur-3xl"
           />
 
           {/* Workspace Top Controls Header */}
@@ -384,7 +384,7 @@ export default function TransactionsPage() {
           <div className="relative mt-5 flex flex-col gap-2.5 sm:flex-row sm:items-center">
             {/* Search Input */}
             <div className="relative min-w-0 flex-1">
-              <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
+              <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
               <input
                 type="text"
                 placeholder="Search by description or category..."
@@ -424,7 +424,7 @@ export default function TransactionsPage() {
                 <p className="pt-2 text-center text-xs text-slate-500">Syncing financial stream...</p>
               </div>
             ) : filteredTransactions.length === 0 ? (
-              <div className="rounded-2xl border border-dashed border-white/10 px-4 sm:px-6">
+              <div className="rounded-2xl border border-dashed border-line-strong bg-canvas/60 px-4 sm:px-6">
                 <EmptyState
                   icon={Wallet}
                   tone="slate"
@@ -457,7 +457,7 @@ export default function TransactionsPage() {
               </div>
             ) : (
               /* Dual View 2: Compact High-Tech Table */
-              <div className="surface-inset scroll-thin overflow-x-auto">
+              <div className="scroll-thin overflow-x-auto rounded-xl border border-line bg-white">
                 <table className="data-table">
                   <thead>
                     <tr>
@@ -472,7 +472,7 @@ export default function TransactionsPage() {
                   <tbody>
                     {filteredTransactions.map((t) => (
                       <tr key={t.id}>
-                        <td className="num whitespace-nowrap !text-slate-300">
+                        <td className="num whitespace-nowrap !text-slate-500">
                           {new Date(t.date).toLocaleDateString('en-IN')}
                         </td>
                         <td>
@@ -484,13 +484,13 @@ export default function TransactionsPage() {
                             {t.type}
                           </span>
                         </td>
-                        <td className="whitespace-nowrap font-medium !text-slate-100">{t.category || 'General'}</td>
-                        <td className="!text-slate-300">
+                        <td className="whitespace-nowrap font-medium !text-ink-900">{t.category || 'General'}</td>
+                        <td className="!text-slate-600">
                           <span className="block min-w-[8rem] max-w-[18rem] truncate">{t.description || '-'}</span>
                         </td>
                         <td
                           className={`num whitespace-nowrap text-right font-display font-semibold ${
-                            t.type === 'income' ? '!text-emerald-400' : '!text-slate-100'
+                            t.type === 'income' ? '!text-emerald-700' : '!text-rose-600'
                           }`}
                         >
                           {t.type === 'income' ? '+' : '-'}₹{Number(t.amount).toLocaleString('en-IN')}
@@ -499,13 +499,13 @@ export default function TransactionsPage() {
                           <div className="flex items-center justify-end gap-1">
                             <button
                               onClick={() => handleEdit(t)}
-                              className="btn-ghost btn-sm hover:!text-primary-200"
+                              className="btn-ghost btn-sm hover:!bg-primary-50 hover:!text-primary-700"
                             >
                               Edit
                             </button>
                             <button
                               onClick={() => handleDelete(t.id)}
-                              className="btn-ghost btn-sm hover:!bg-rose-500/10 hover:!text-rose-300"
+                              className="btn-ghost btn-sm hover:!bg-rose-50 hover:!text-rose-700"
                             >
                               Delete
                             </button>

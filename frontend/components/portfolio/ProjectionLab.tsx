@@ -74,7 +74,7 @@ export default function ProjectionLab({ form, onChange, onRun, onResetToMyData, 
       {/* ---------- Header ---------- */}
       <div className="flex items-start justify-between gap-3">
         <div className="flex min-w-0 items-center gap-3">
-          <span className="pf-orbit icon-tile icon-tile-cyan icon-morph-container">
+          <span className="pf-orbit icon-tile icon-tile-sky icon-morph-container">
             <Wand2 className="h-[18px] w-[18px]" />
           </span>
           <div className="min-w-0">
@@ -85,7 +85,7 @@ export default function ProjectionLab({ form, onChange, onRun, onResetToMyData, 
 
         <button
           onClick={onResetToMyData}
-          className="pf-chip inline-flex shrink-0 items-center gap-1.5 px-3 py-2 text-[11px] font-semibold text-slate-300"
+          className="pf-chip inline-flex shrink-0 items-center gap-1.5 px-3 py-2 text-[11px] font-semibold text-ink-700"
         >
           <RotateCcw className="h-3.5 w-3.5" />
           Use my data
@@ -96,13 +96,13 @@ export default function ProjectionLab({ form, onChange, onRun, onResetToMyData, 
         {/* ---------- Starting capital ---------- */}
         <div>
           <div className="mb-1.5 flex items-baseline justify-between gap-2">
-            <label className="shrink-0 text-[13px] font-medium text-slate-300">Starting Capital</label>
+            <label className="shrink-0 text-[13px] font-medium text-ink-700">Starting Capital</label>
             <span className="num min-w-0 truncate text-[11px] text-slate-500">
               Your portfolio: {compactINR(derived.portfolioValue)}
             </span>
           </div>
           <div className="relative">
-            <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-sm font-semibold text-primary-300/80">
+            <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-sm font-semibold text-primary-600">
               ₹
             </span>
             <input
@@ -118,7 +118,7 @@ export default function ProjectionLab({ form, onChange, onRun, onResetToMyData, 
         {/* ---------- Monthly contribution ---------- */}
         <div>
           <div className="mb-1.5 flex items-baseline justify-between gap-2">
-            <label className="shrink-0 text-[13px] font-medium text-slate-300">Monthly Contribution</label>
+            <label className="shrink-0 text-[13px] font-medium text-ink-700">Monthly Contribution</label>
             <span className="num min-w-0 truncate text-[11px] text-slate-500">
               {derived.hasCashflow
                 ? `Your surplus: ${compactINR(Math.max(0, derived.monthlySurplus))}/mo`
@@ -126,7 +126,7 @@ export default function ProjectionLab({ form, onChange, onRun, onResetToMyData, 
             </span>
           </div>
           <div className="relative">
-            <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-sm font-semibold text-primary-300/80">
+            <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-sm font-semibold text-primary-600">
               ₹
             </span>
             <input
@@ -152,8 +152,8 @@ export default function ProjectionLab({ form, onChange, onRun, onResetToMyData, 
         {/* ---------- Horizon ---------- */}
         <div>
           <div className="mb-1.5 flex items-baseline justify-between gap-2">
-            <label className="shrink-0 text-[13px] font-medium text-slate-300">Time Horizon</label>
-            <span className="num font-display text-sm font-semibold text-primary-200">
+            <label className="shrink-0 text-[13px] font-medium text-ink-700">Time Horizon</label>
+            <span className="num font-display text-sm font-semibold text-primary-700">
               {years} year{years === 1 ? '' : 's'}
             </span>
           </div>
@@ -174,7 +174,7 @@ export default function ProjectionLab({ form, onChange, onRun, onResetToMyData, 
                 onClick={() => onChange({ years: String(y) })}
                 aria-pressed={years === y}
                 className={`pf-chip num min-w-[2.75rem] px-2.5 py-1.5 text-[11px] font-semibold ${
-                  years === y ? 'pf-chip-active' : 'text-slate-400'
+                  years === y ? 'pf-chip-active' : 'text-slate-500'
                 }`}
               >
                 {y}y
@@ -185,14 +185,14 @@ export default function ProjectionLab({ form, onChange, onRun, onResetToMyData, 
 
         {/* ---------- Return / volatility presets ---------- */}
         <div>
-          <label className="mb-2 block text-[13px] font-medium text-slate-300">Return Assumptions</label>
+          <label className="mb-2 block text-[13px] font-medium text-ink-700">Return Assumptions</label>
 
           <div className="flex flex-wrap gap-1.5">
             <button
               onClick={applyMyMix}
               aria-pressed={myMixActive}
               className={`pf-chip inline-flex items-center gap-1.5 px-2.5 py-1.5 text-[11px] font-semibold ${
-                myMixActive ? 'pf-chip-active' : 'text-slate-400'
+                myMixActive ? 'pf-chip-active' : 'text-slate-500'
               }`}
             >
               <Sparkles className="h-3 w-3" />
@@ -204,7 +204,7 @@ export default function ProjectionLab({ form, onChange, onRun, onResetToMyData, 
                 onClick={() => applyPreset(name)}
                 aria-pressed={presetActive(name)}
                 className={`pf-chip px-2.5 py-1.5 text-[11px] font-semibold ${
-                  presetActive(name) ? 'pf-chip-active' : 'text-slate-400'
+                  presetActive(name) ? 'pf-chip-active' : 'text-slate-500'
                 }`}
               >
                 {name}
@@ -214,7 +214,7 @@ export default function ProjectionLab({ form, onChange, onRun, onResetToMyData, 
 
           <div className="mt-3 grid grid-cols-2 gap-3">
             <div>
-              <label className="mb-1.5 block text-[11px] font-medium text-slate-400">Expected Return (%)</label>
+              <label className="mb-1.5 block text-[11px] font-medium text-slate-500">Expected Return (%)</label>
               <input
                 type="number"
                 step="0.1"
@@ -224,7 +224,7 @@ export default function ProjectionLab({ form, onChange, onRun, onResetToMyData, 
               />
             </div>
             <div>
-              <label className="mb-1.5 block text-[11px] font-medium text-slate-400">Volatility (%)</label>
+              <label className="mb-1.5 block text-[11px] font-medium text-slate-500">Volatility (%)</label>
               <input
                 type="number"
                 step="0.1"
@@ -236,7 +236,7 @@ export default function ProjectionLab({ form, onChange, onRun, onResetToMyData, 
           </div>
 
           <p className="mt-3 flex items-start gap-1.5 text-[11px] leading-relaxed text-slate-500">
-            <Info className="mt-0.5 h-3 w-3 shrink-0 text-cyan-300/80" />
+            <Info className="mt-0.5 h-3 w-3 shrink-0 text-sky-600" />
             Your mix blends to {(derived.profile.expectedReturn * 100).toFixed(1)}% return at{' '}
             {(derived.profile.volatility * 100).toFixed(1)}% volatility, using per-asset-class assumptions and their
             correlations.

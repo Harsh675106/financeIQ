@@ -2,13 +2,16 @@
 const defaultTheme = require('tailwindcss/defaultTheme')
 
 /*
- * FinanceIQ — "Obsidian Aurora" design tokens
+ * FinanceIQ — "Mint & Ice" light design tokens
  *
- * - `slate` is re-tuned into a cool, ink-tinted neutral scale so every
- *   surface, border and muted text in the app shares one premium tone.
- *   Luminance steps mirror Tailwind's slate, so contrast ratios are kept.
- * - `primary` is the brand "iris" (indigo → violet). Emerald stays the
- *   semantic colour for gains / positive values, rose for losses.
+ * - `ink`      deep teal-ink scale for primary text and headings (#172B2A @ 900).
+ * - `slate`    Tailwind default; slate-500 (#64748B) is the secondary text colour.
+ * - `primary`  brand emerald (fresh mint → deep emerald).
+ * - `ice`      ice / sky blue secondary accent (same values as Tailwind `sky`).
+ * - `canvas`   page backgrounds, `line` hairline borders.
+ * Semantics: emerald = gains / positive, rose = losses, amber/orange = caution,
+ * sky/ice = information & secondary series, indigo = AI features.
+ * Keyframes and `animate-*` utilities live in app/globals.css (motion-gated).
  */
 module.exports = {
   content: [
@@ -26,31 +29,52 @@ module.exports = {
         mono: ['var(--font-mono)', ...defaultTheme.fontFamily.mono],
       },
       colors: {
-        slate: {
-          50: '#f7f8fc',
-          100: '#eef0f8',
-          200: '#dde1ef',
-          300: '#bcc3db',
-          400: '#9099b8',
-          500: '#666f91',
-          600: '#4a5170',
-          700: '#323853',
-          800: '#1f2339',
-          900: '#121528',
-          950: '#090b17',
+        ink: {
+          50: '#f4f8f7',
+          100: '#e6eeec',
+          200: '#cbd8d5',
+          300: '#a3b4b1',
+          400: '#7c8c8a',
+          500: '#5e6e6c',
+          600: '#4a5a58',
+          700: '#364644',
+          800: '#243533',
+          900: '#172b2a',
+          950: '#0d1b1a',
         },
         primary: {
-          50: '#f0f1ff',
-          100: '#e3e5ff',
-          200: '#cacdff',
-          300: '#a9acff',
-          400: '#8a88fb',
-          500: '#7068f4',
-          600: '#5f50e6',
-          700: '#5041cb',
-          800: '#4237a4',
-          900: '#383381',
-          950: '#221e4b',
+          50: '#ecfdf5',
+          100: '#d1fae5',
+          200: '#a7f3d0',
+          300: '#6ee7b7',
+          400: '#34d399',
+          500: '#10b981',
+          600: '#059669',
+          700: '#047857',
+          800: '#065f46',
+          900: '#064e3b',
+          950: '#022c22',
+        },
+        ice: {
+          50: '#f0f9ff',
+          100: '#e0f2fe',
+          200: '#bae6fd',
+          300: '#7dd3fc',
+          400: '#38bdf8',
+          500: '#0ea5e9',
+          600: '#0284c7',
+          700: '#0369a1',
+          800: '#075985',
+          900: '#0c4a6e',
+        },
+        canvas: {
+          DEFAULT: '#f7fbfa',
+          subtle: '#eff8f6',
+          muted: '#e8f3f0',
+        },
+        line: {
+          DEFAULT: '#e2eeea',
+          strong: '#d3e4df',
         },
         success: {
           50: '#ecfdf5',
@@ -76,27 +100,22 @@ module.exports = {
           800: '#9f1239',
           900: '#881337',
         },
-        surface: {
-          950: '#06070f',
-          900: '#090b17',
-          800: '#0e1121',
-        },
       },
       borderRadius: {
         '4xl': '2rem',
       },
       boxShadow: {
-        'glow-primary': '0 0 0 1px rgba(112, 104, 244, 0.35), 0 10px 40px -10px rgba(112, 104, 244, 0.55)',
-        'glow-emerald': '0 0 0 1px rgba(52, 211, 153, 0.3), 0 10px 36px -12px rgba(16, 185, 129, 0.5)',
-        glass: 'inset 0 1px 0 0 rgba(255, 255, 255, 0.06), 0 1px 2px 0 rgba(0, 0, 0, 0.4), 0 24px 48px -28px rgba(0, 0, 0, 0.8)',
-        elevated: 'inset 0 1px 0 0 rgba(255, 255, 255, 0.08), 0 2px 4px 0 rgba(0, 0, 0, 0.35), 0 32px 64px -24px rgba(0, 0, 0, 0.85)',
+        xs: '0 1px 2px 0 rgba(16, 40, 38, 0.05)',
+        card: '0 1px 2px 0 rgba(16, 40, 38, 0.04), 0 4px 16px -6px rgba(16, 40, 38, 0.08)',
+        'card-hover': '0 2px 4px 0 rgba(16, 40, 38, 0.05), 0 16px 32px -12px rgba(16, 40, 38, 0.14)',
+        float: '0 12px 40px -12px rgba(16, 40, 38, 0.22), 0 2px 6px -2px rgba(16, 40, 38, 0.08)',
+        'glow-primary': '0 8px 24px -10px rgba(5, 150, 105, 0.55)',
+        'glow-ice': '0 8px 24px -10px rgba(14, 165, 233, 0.5)',
       },
       transitionTimingFunction: {
         'out-expo': 'cubic-bezier(0.16, 1, 0.3, 1)',
         spring: 'cubic-bezier(0.34, 1.56, 0.64, 1)',
       },
-      // Keyframes and `animate-*` utilities live in app/globals.css so every
-      // decorative animation can be gated behind prefers-reduced-motion.
     },
   },
   plugins: [],

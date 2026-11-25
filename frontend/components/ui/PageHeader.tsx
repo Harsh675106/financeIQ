@@ -34,7 +34,7 @@ export default function PageHeader({
     >
       <div className="min-w-0">
         {(eyebrow || meta) && (
-          <div className="mb-3 flex flex-wrap items-center gap-2">
+          <div className="mb-2.5 flex flex-wrap items-center gap-2">
             {eyebrow && (
               <span className={`badge ${badgeToneClass[eyebrowTone]}`}>
                 {EyebrowIcon && <EyebrowIcon className="h-3.5 w-3.5" />}
@@ -44,11 +44,11 @@ export default function PageHeader({
             {meta}
           </div>
         )}
-        <h1 className="text-balance font-display text-[1.75rem] font-semibold leading-[1.15] tracking-tight text-white sm:text-4xl">
+        <h1 className="text-balance font-display text-2xl font-semibold leading-tight tracking-tight text-ink-900 sm:text-[1.875rem]">
           {title}
         </h1>
         {description && (
-          <p className="text-pretty mt-2 max-w-2xl text-sm leading-relaxed text-slate-400 sm:text-[15px]">
+          <p className="text-pretty mt-1.5 max-w-2xl text-sm leading-relaxed text-slate-500 sm:text-[15px]">
             {description}
           </p>
         )}

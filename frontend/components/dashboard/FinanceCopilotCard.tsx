@@ -73,19 +73,19 @@ function renderInlineFormatting(text: string) {
     const token = match[0]
     if (token.startsWith('**') && token.endsWith('**')) {
       parts.push(
-        <strong key={match.index} className="font-semibold text-white">
+        <strong key={match.index} className="font-semibold text-ink-900">
           {token.slice(2, -2)}
         </strong>
       )
     } else if (token.startsWith('`') && token.endsWith('`')) {
       parts.push(
-        <code key={match.index} className="rounded-md border border-white/[0.08] bg-white/[0.06] px-1.5 py-0.5 font-mono text-xs text-violet-200">
+        <code key={match.index} className="rounded-md border border-slate-200 bg-slate-100 px-1.5 py-0.5 font-mono text-xs text-ink-800">
           {token.slice(1, -1)}
         </code>
       )
     } else if (token.startsWith('₹')) {
       parts.push(
-        <span key={match.index} className="font-semibold tabular-nums text-cyan-200">
+        <span key={match.index} className="font-semibold tabular-nums text-teal-700">
           {token}
         </span>
       )
@@ -107,7 +107,7 @@ function AuraMarkdownRenderer({ content }: { content: string }) {
   const lines = content.split('\n')
 
   return (
-    <div className="space-y-2 text-sm leading-relaxed text-slate-100">
+    <div className="space-y-2 text-sm leading-relaxed text-ink-700">
       {lines.map((line, idx) => {
         const trimmed = line.trim()
         if (!trimmed) {
@@ -116,8 +116,8 @@ function AuraMarkdownRenderer({ content }: { content: string }) {
 
         if (trimmed.startsWith('### ')) {
           return (
-            <h4 key={idx} className="mt-3.5 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.12em] text-violet-200 sm:text-[13px]">
-              <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-violet-400 shadow-[0_0_8px_#a78bfa]" />
+            <h4 key={idx} className="mt-3.5 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.12em] text-ink-900 sm:text-[13px]">
+              <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-ice-500" />
               {renderInlineFormatting(trimmed.slice(4))}
             </h4>
           )
@@ -125,8 +125,8 @@ function AuraMarkdownRenderer({ content }: { content: string }) {
 
         if (trimmed.startsWith('## ')) {
           return (
-            <h3 key={idx} className="mt-4 flex items-center gap-2 border-b border-white/[0.08] pb-1.5 font-display text-sm font-semibold text-white sm:text-base">
-              <span className="h-2 w-2 shrink-0 rounded-full bg-cyan-400 shadow-[0_0_10px_#22d3ee]" />
+            <h3 key={idx} className="mt-4 flex items-center gap-2 border-b border-line pb-1.5 font-display text-sm font-semibold text-ink-900 sm:text-base">
+              <span className="h-2 w-2 shrink-0 rounded-full bg-primary-500 ring-2 ring-primary-100" />
               {renderInlineFormatting(trimmed.slice(3))}
             </h3>
           )
@@ -134,21 +134,21 @@ function AuraMarkdownRenderer({ content }: { content: string }) {
 
         if (trimmed.startsWith('# ')) {
           return (
-            <h2 key={idx} className="mt-4 font-display text-base font-semibold tracking-tight text-white sm:text-lg">
+            <h2 key={idx} className="mt-4 font-display text-base font-semibold tracking-tight text-ink-900 sm:text-lg">
               {renderInlineFormatting(trimmed.slice(2))}
             </h2>
           )
         }
 
         if (trimmed.startsWith('---') || trimmed === '***') {
-          return <hr key={idx} className="my-3 border-white/[0.08]" />
+          return <hr key={idx} className="my-3 border-line" />
         }
 
         if (trimmed.startsWith('- ') || trimmed.startsWith('• ') || trimmed.startsWith('* ')) {
           return (
             <div key={idx} className="flex items-start gap-2.5 pl-1.5">
-              <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-primary-400 shadow-[0_0_6px_#8a88fb]" />
-              <div className="min-w-0 flex-1 text-slate-200">
+              <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-primary-500" />
+              <div className="min-w-0 flex-1 text-ink-700">
                 {renderInlineFormatting(trimmed.slice(2))}
               </div>
             </div>
@@ -159,10 +159,10 @@ function AuraMarkdownRenderer({ content }: { content: string }) {
         if (orderedMatch) {
           return (
             <div key={idx} className="flex items-start gap-2.5 pl-1.5">
-              <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-md bg-primary-500/15 text-[11px] font-semibold tabular-nums text-primary-200 ring-1 ring-primary-400/30">
+              <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-md bg-ice-50 text-[11px] font-semibold tabular-nums text-ice-700 ring-1 ring-ice-200">
                 {orderedMatch[1]}
               </span>
-              <div className="min-w-0 flex-1 text-slate-200">
+              <div className="min-w-0 flex-1 text-ink-700">
                 {renderInlineFormatting(orderedMatch[2])}
               </div>
             </div>
@@ -170,7 +170,7 @@ function AuraMarkdownRenderer({ content }: { content: string }) {
         }
 
         return (
-          <p key={idx} className="text-slate-200">
+          <p key={idx} className="text-ink-700">
             {renderInlineFormatting(trimmed)}
           </p>
         )
@@ -535,15 +535,15 @@ export default function FinanceCopilotCard({ fullPage = false }: FinanceCopilotC
       {speechError && (
         <div
           role="alert"
-          className="animate-pop-in flex items-center justify-between gap-3 rounded-2xl border border-amber-400/25 bg-amber-500/[0.08] px-4 py-2.5 text-xs text-amber-100"
+          className="animate-pop-in flex items-center justify-between gap-3 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-2.5 text-xs text-amber-800"
         >
           <div className="flex min-w-0 items-center gap-2.5">
-            <AlertCircle className="h-4 w-4 shrink-0 text-amber-300" />
+            <AlertCircle className="h-4 w-4 shrink-0 text-amber-600" />
             <span className="min-w-0">{speechError}</span>
           </div>
           <button
             onClick={() => setSpeechError(null)}
-            className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-amber-300 transition-colors hover:bg-amber-500/15 hover:text-amber-100"
+            className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-amber-600 transition-colors hover:bg-amber-100 hover:text-amber-800"
             aria-label="Dismiss voice error"
           >
             <X className="h-4 w-4" />
@@ -554,19 +554,19 @@ export default function FinanceCopilotCard({ fullPage = false }: FinanceCopilotC
       {/* 2. Main Holographic Interaction Panel */}
       <div className="cyber-glass-panel finance-chat-panel finance-chat-shell relative flex flex-1 flex-col overflow-hidden rounded-[1.25rem]">
         <div
-          className="pointer-events-none absolute inset-x-10 top-0 h-px bg-gradient-to-r from-transparent via-violet-300/50 to-transparent"
+          className="pointer-events-none absolute inset-x-10 top-0 h-px bg-gradient-to-r from-transparent via-primary-400/40 to-transparent"
           aria-hidden="true"
         />
 
         {/* Terminal Header Bar */}
-        <div className="relative flex items-center justify-between gap-3 border-b border-white/[0.06] bg-white/[0.015] px-4 py-3 sm:px-5">
+        <div className="relative flex items-center justify-between gap-3 border-b border-line bg-canvas/80 px-4 py-3 sm:px-5">
           <div className="flex min-w-0 items-center gap-3">
             <div className="hidden shrink-0 items-center gap-1.5 sm:flex" aria-hidden="true">
-              <span className="h-2.5 w-2.5 rounded-full bg-rose-400/70" />
-              <span className="h-2.5 w-2.5 rounded-full bg-amber-300/70" />
-              <span className="h-2.5 w-2.5 rounded-full bg-emerald-400/70" />
+              <span className="h-2.5 w-2.5 rounded-full bg-rose-400/80 ring-1 ring-inset ring-rose-500/20" />
+              <span className="h-2.5 w-2.5 rounded-full bg-amber-400/80 ring-1 ring-inset ring-amber-500/20" />
+              <span className="h-2.5 w-2.5 rounded-full bg-emerald-400/80 ring-1 ring-inset ring-emerald-500/20" />
             </div>
-            <span className="truncate font-mono text-[11px] font-semibold tracking-wider text-slate-400">
+            <span className="truncate font-mono text-[11px] font-semibold tracking-wider text-slate-500">
               FINANCEIQ-NEURAL-V2 // VOICE + TEXT ENGINE
             </span>
           </div>
@@ -576,7 +576,7 @@ export default function FinanceCopilotCard({ fullPage = false }: FinanceCopilotC
               <button
                 type="button"
                 onClick={stopSpeaking}
-                className="btn btn-sm animate-pop-in border border-cyan-400/30 bg-cyan-500/10 text-cyan-200 hover:border-cyan-300/50 hover:bg-cyan-500/20"
+                className="btn btn-sm animate-pop-in border border-ice-200 bg-ice-50 text-ice-700 hover:border-ice-300 hover:bg-ice-100"
               >
                 <Square className="h-3 w-3" />
                 Stop Voice
@@ -587,7 +587,7 @@ export default function FinanceCopilotCard({ fullPage = false }: FinanceCopilotC
               type="button"
               onClick={clearHistory}
               disabled={loading || loadingHistory || messages.length === 0}
-              className="btn-secondary btn-sm disabled:opacity-40 enabled:hover:!border-rose-400/30 enabled:hover:!bg-rose-500/10 enabled:hover:!text-rose-200"
+              className="btn-secondary btn-sm disabled:opacity-50 enabled:hover:!border-rose-200 enabled:hover:!bg-rose-50 enabled:hover:!text-rose-700"
             >
               <RotateCcw className="h-3.5 w-3.5" />
               Reset Memory
@@ -615,16 +615,16 @@ export default function FinanceCopilotCard({ fullPage = false }: FinanceCopilotC
             /* Futuristic Welcome Hero & Categorized Prompts */
             <div className="flex min-h-full flex-col items-center justify-center py-6 text-center animate-fade-up">
               <div className="relative mb-5">
-                <div className="absolute -inset-4 rounded-full bg-primary-500/25 blur-2xl" aria-hidden="true" />
-                <div className="relative flex h-20 w-20 items-center justify-center rounded-3xl border border-primary-300/30 bg-gradient-to-br from-primary-500/30 via-violet-500/20 to-cyan-400/15 shadow-[inset_0_1px_0_rgba(255,255,255,0.15),0_20px_50px_-20px_rgba(112,104,244,0.8)]">
-                  <BrainCircuit className="h-10 w-10 text-primary-100" />
+                <div className="absolute -inset-4 rounded-full bg-gradient-to-br from-primary-200/60 to-ice-200/60 blur-2xl" aria-hidden="true" />
+                <div className="relative flex h-20 w-20 items-center justify-center rounded-3xl border border-primary-100 bg-gradient-to-br from-primary-50 via-white to-ice-50 shadow-[0_18px_40px_-18px_rgba(5,150,105,0.45)]">
+                  <BrainCircuit className="h-10 w-10 text-primary-600" />
                 </div>
               </div>
 
-              <h2 className="font-display text-xl font-semibold tracking-tight text-white sm:text-2xl">
+              <h2 className="font-display text-xl font-semibold tracking-tight text-ink-900 sm:text-2xl">
                 Quantum AI Financial <span className="text-gradient">Co-Pilot</span>
               </h2>
-              <p className="text-pretty mt-2 max-w-xl text-xs leading-relaxed text-slate-400 sm:text-sm">
+              <p className="text-pretty mt-2 max-w-xl text-xs leading-relaxed text-slate-500 sm:text-sm">
                 Equipped with live microphone voice recognition and natural speech synthesis. Speak or type to analyze finances, simulate payoff models, and optimize asset allocations.
               </p>
 
@@ -635,14 +635,14 @@ export default function FinanceCopilotCard({ fullPage = false }: FinanceCopilotC
                   return (
                     <div
                       key={idx}
-                      className="surface-inset p-4 transition-colors animate-chat-suggestion-pop hover:border-primary-400/25"
+                      className="surface-inset p-4 transition-colors animate-chat-suggestion-pop hover:border-primary-200"
                       style={{ animationDelay: `${120 + idx * 80}ms` }}
                     >
                       <div className="mb-3 flex items-center gap-2.5">
                         <span className={`icon-tile icon-tile-sm ${group.color}`}>
                           <Icon className="h-4 w-4" />
                         </span>
-                        <h3 className="text-[13px] font-semibold text-slate-100">{group.category}</h3>
+                        <h3 className="text-[13px] font-semibold text-ink-900">{group.category}</h3>
                       </div>
                       <div className="space-y-2">
                         {group.prompts.map((p, pIdx) => (
@@ -650,10 +650,10 @@ export default function FinanceCopilotCard({ fullPage = false }: FinanceCopilotC
                             key={pIdx}
                             type="button"
                             onClick={() => askQuestion(p)}
-                            className="group/btn flex w-full items-center justify-between gap-2 rounded-xl border border-white/[0.06] bg-white/[0.02] px-3 py-2.5 text-left text-xs font-medium text-slate-300 transition-colors hover:border-primary-400/30 hover:bg-primary-500/10 hover:text-white"
+                            className="group/btn flex w-full items-center justify-between gap-2 rounded-xl border border-line bg-white px-3 py-2.5 text-left text-xs font-medium text-ink-700 shadow-xs transition-colors hover:border-primary-200 hover:bg-primary-50 hover:text-primary-800"
                           >
                             <span className="line-clamp-2 leading-snug">{p}</span>
-                            <ArrowRight className="h-3.5 w-3.5 shrink-0 text-primary-300 opacity-0 transition-[opacity,transform] duration-200 group-hover/btn:opacity-100 group-focus-visible/btn:opacity-100 motion-safe:group-hover/btn:translate-x-0.5" />
+                            <ArrowRight className="h-3.5 w-3.5 shrink-0 text-primary-600 opacity-0 transition-[opacity,transform] duration-200 group-hover/btn:opacity-100 group-focus-visible/btn:opacity-100 motion-safe:group-hover/btn:translate-x-0.5" />
                           </button>
                         ))}
                       </div>
@@ -679,13 +679,13 @@ export default function FinanceCopilotCard({ fullPage = false }: FinanceCopilotC
                       {/* Message Meta Header */}
                       <div
                         className={`mb-1.5 flex flex-wrap items-center gap-2 px-1 font-mono text-[10px] uppercase tracking-[0.14em] sm:text-[11px] ${
-                          isAssistant ? 'text-violet-300' : 'justify-end text-slate-500'
+                          isAssistant ? 'text-primary-700' : 'justify-end text-slate-500'
                         }`}
                       >
                         {isAssistant ? (
                           <>
-                            <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-md bg-violet-500/15 ring-1 ring-violet-400/30">
-                              <BrainCircuit className="h-3 w-3 text-violet-300" />
+                            <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-md bg-primary-50 ring-1 ring-primary-200">
+                              <BrainCircuit className="h-3 w-3 text-primary-600" />
                             </span>
                             <span>AURA 2.0 NEURAL STREAM</span>
                             {isCurrentlySpeaking && (
@@ -710,9 +710,9 @@ export default function FinanceCopilotCard({ fullPage = false }: FinanceCopilotC
                         className={`break-words rounded-2xl p-4 text-sm leading-relaxed transition-[box-shadow,border-color] duration-300 sm:p-5 ${
                           isAssistant
                             ? isCurrentlySpeaking
-                              ? 'cyber-assistant-bubble rounded-tl-md text-slate-100 !border-cyan-400/45 !shadow-[0_0_0_1px_rgba(34,211,238,0.3),0_0_36px_-8px_rgba(34,211,238,0.45)]'
-                              : 'cyber-assistant-bubble rounded-tl-md text-slate-100'
-                            : 'cyber-user-bubble rounded-tr-md text-white'
+                              ? 'cyber-assistant-bubble rounded-tl-md text-ink-800 !border-ice-300 !shadow-[0_0_0_3px_rgba(56,189,248,0.15),0_12px_28px_-16px_rgba(56,189,248,0.6)]'
+                              : 'cyber-assistant-bubble rounded-tl-md text-ink-800'
+                            : 'cyber-user-bubble rounded-tr-md text-ink-900'
                         }`}
                       >
                         {isAssistant ? (
@@ -725,8 +725,8 @@ export default function FinanceCopilotCard({ fullPage = false }: FinanceCopilotC
 
                         {/* Assistant Action Bar */}
                         {isAssistant && (
-                          <div className="mt-4 flex items-center justify-between gap-3 border-t border-white/[0.06] pt-3 text-xs text-slate-400">
-                            <span className="min-w-0 truncate font-mono text-[10px] uppercase tracking-wider text-slate-500">
+                          <div className="mt-4 flex items-center justify-between gap-3 border-t border-line pt-3 text-xs text-slate-500">
+                            <span className="min-w-0 truncate font-mono text-[10px] uppercase tracking-wider text-slate-400">
                               Financial Intelligence Protocol
                             </span>
                             <div className="flex shrink-0 items-center gap-1.5">
@@ -736,20 +736,20 @@ export default function FinanceCopilotCard({ fullPage = false }: FinanceCopilotC
                                 onClick={() => speakText(message.content, index)}
                                 className={`flex h-8 items-center gap-1.5 rounded-lg border px-2.5 text-xs font-semibold transition-colors ${
                                   isCurrentlySpeaking
-                                    ? 'border-cyan-400/40 bg-cyan-500/15 text-cyan-200'
-                                    : 'border-white/[0.07] bg-white/[0.03] text-slate-300 hover:border-white/15 hover:bg-white/[0.07] hover:text-white'
+                                    ? 'border-ice-200 bg-ice-50 text-ice-700'
+                                    : 'border-line bg-white text-slate-600 hover:border-line-strong hover:bg-slate-50 hover:text-ink-900'
                                 }`}
                                 title={isCurrentlySpeaking ? 'Stop speech playback' : 'Read response aloud'}
                                 aria-pressed={isCurrentlySpeaking}
                               >
                                 {isCurrentlySpeaking ? (
                                   <>
-                                    <Square className="h-3 w-3 text-cyan-300" />
+                                    <Square className="h-3 w-3 text-ice-600" />
                                     <span className="text-[11px]">Stop</span>
                                   </>
                                 ) : (
                                   <>
-                                    <Volume2 className="h-3 w-3 text-violet-300" />
+                                    <Volume2 className="h-3 w-3 text-ice-600" />
                                     <span className="text-[11px]">Listen</span>
                                   </>
                                 )}
@@ -759,12 +759,12 @@ export default function FinanceCopilotCard({ fullPage = false }: FinanceCopilotC
                               <button
                                 type="button"
                                 onClick={() => handleCopy(message.content, index)}
-                                className="flex h-8 items-center gap-1.5 rounded-lg border border-white/[0.07] bg-white/[0.03] px-2.5 text-xs font-semibold text-slate-300 transition-colors hover:border-white/15 hover:bg-white/[0.07] hover:text-white"
+                                className="flex h-8 items-center gap-1.5 rounded-lg border border-line bg-white px-2.5 text-xs font-semibold text-slate-600 transition-colors hover:border-line-strong hover:bg-slate-50 hover:text-ink-900"
                               >
                                 {copiedIndex === index ? (
                                   <>
-                                    <Check className="h-3 w-3 text-emerald-400" />
-                                    <span className="text-[11px] text-emerald-300">Copied</span>
+                                    <Check className="h-3 w-3 text-emerald-600" />
+                                    <span className="text-[11px] text-emerald-700">Copied</span>
                                   </>
                                 ) : (
                                   <>
@@ -786,14 +786,14 @@ export default function FinanceCopilotCard({ fullPage = false }: FinanceCopilotC
               {loading && (
                 <div className="flex justify-start animate-fade-up" role="status" aria-live="polite">
                   <div className="cyber-assistant-bubble mr-auto max-w-[85%] rounded-2xl rounded-tl-md p-4 sm:p-5">
-                    <div className="mb-2.5 flex items-center gap-2 font-mono text-[11px] text-violet-200 sm:text-xs">
-                      <Sparkles className="h-4 w-4 shrink-0 animate-spin text-violet-300 [animation-duration:2.4s]" />
+                    <div className="mb-2.5 flex items-center gap-2 font-mono text-[11px] text-slate-600 sm:text-xs">
+                      <Sparkles className="h-4 w-4 shrink-0 animate-spin text-primary-600 [animation-duration:2.4s]" />
                       <span>Synthesizing Financial Ledger & Computing Scenarios...</span>
                     </div>
                     <div className="flex items-center gap-1.5 pt-1" aria-hidden="true">
-                      <span className="h-2 w-2 rounded-full bg-primary-400 animate-bounce [animation-delay:-0.3s]" />
-                      <span className="h-2 w-2 rounded-full bg-violet-400 animate-bounce [animation-delay:-0.15s]" />
-                      <span className="h-2 w-2 rounded-full bg-cyan-300 animate-bounce" />
+                      <span className="h-2 w-2 rounded-full bg-primary-500 animate-bounce [animation-delay:-0.3s]" />
+                      <span className="h-2 w-2 rounded-full bg-teal-400 animate-bounce [animation-delay:-0.15s]" />
+                      <span className="h-2 w-2 rounded-full bg-ice-400 animate-bounce" />
                     </div>
                   </div>
                 </div>
@@ -805,7 +805,7 @@ export default function FinanceCopilotCard({ fullPage = false }: FinanceCopilotC
         </div>
 
         {/* 3. Futuristic Cyber Input Console */}
-        <div className="relative border-t border-white/[0.06] bg-[#070815]/70 p-3 backdrop-blur-xl sm:p-4">
+        <div className="relative border-t border-line bg-canvas/80 p-3 backdrop-blur-xl sm:p-4">
           {/* Quick Follow-up Suggestions */}
           {response?.followUps && response.followUps.length > 0 && (
             <div className="-mx-1 mb-2 flex gap-2 overflow-x-auto px-1 py-1 animate-fade-up sm:mb-3 sm:flex-wrap sm:overflow-visible">
@@ -816,7 +816,7 @@ export default function FinanceCopilotCard({ fullPage = false }: FinanceCopilotC
                   onClick={() => askQuestion(fUp)}
                   className="chat-suggestion-chip flex shrink-0 items-center gap-1.5 whitespace-nowrap text-left sm:shrink sm:whitespace-normal"
                 >
-                  <Sparkles className="h-3 w-3 shrink-0 text-violet-300" />
+                  <Sparkles className="h-3 w-3 shrink-0 text-primary-600" />
                   {fUp}
                 </button>
               ))}
@@ -825,26 +825,26 @@ export default function FinanceCopilotCard({ fullPage = false }: FinanceCopilotC
 
           {/* Active Voice Listening Live Banner */}
           {isListening && (
-            <div className="mb-3 flex animate-pop-in flex-col gap-2.5 rounded-xl border border-rose-400/30 bg-rose-500/10 p-3 text-xs text-rose-100 shadow-[0_0_30px_-10px_rgba(244,63,94,0.55)] sm:flex-row sm:items-center sm:justify-between">
+            <div className="mb-3 flex animate-pop-in flex-col gap-2.5 rounded-xl border border-rose-200 bg-rose-50 p-3 text-xs text-rose-700 shadow-[0_8px_24px_-14px_rgba(225,29,72,0.45)] sm:flex-row sm:items-center sm:justify-between">
               <div className="flex min-w-0 flex-wrap items-center gap-x-2.5 gap-y-1">
                 <span className="relative flex h-3 w-3">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-3 w-3 bg-rose-500"></span>
                 </span>
-                <span className="font-semibold text-white">Live Voice Listening...</span>
-                <span className="italic text-rose-100/70">Speak your financial question clearly</span>
+                <span className="font-semibold text-rose-800">Live Voice Listening...</span>
+                <span className="italic text-rose-700">Speak your financial question clearly</span>
               </div>
               <button
                 type="button"
                 onClick={stopListening}
-                className="btn btn-sm shrink-0 self-start bg-rose-500 text-white hover:bg-rose-400 sm:self-auto"
+                className="btn btn-sm shrink-0 self-start bg-rose-600 text-white hover:bg-rose-700 sm:self-auto"
               >
                 Done Speaking
               </button>
             </div>
           )}
 
-          <div className="relative rounded-2xl border border-white/10 bg-[#090b17]/80 p-2 shadow-[inset_0_1px_2px_rgba(0,0,0,0.3)] transition-[border-color,box-shadow] duration-200 focus-within:border-primary-400/60 focus-within:shadow-[0_0_0_4px_rgba(112,104,244,0.16),0_10px_40px_-12px_rgba(112,104,244,0.5)]">
+          <div className="relative rounded-2xl border border-line-strong bg-white p-2 shadow-xs transition-[border-color,box-shadow] duration-200 focus-within:border-primary-400 focus-within:shadow-[0_0_0_4px_rgba(16,185,129,0.14),0_10px_30px_-14px_rgba(5,150,105,0.35)]">
             <div className="flex items-center gap-2">
               {/* Interactive High-Accuracy Microphone Trigger */}
               <button
@@ -852,8 +852,8 @@ export default function FinanceCopilotCard({ fullPage = false }: FinanceCopilotC
                 onClick={toggleListening}
                 className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl transition-colors ${
                   isListening
-                    ? 'bg-rose-500 text-white animate-pulse shadow-[0_0_20px_rgba(244,63,94,0.7)]'
-                    : 'border border-white/[0.08] bg-white/[0.04] text-slate-300 hover:border-violet-400/30 hover:bg-violet-500/10 hover:text-violet-200'
+                    ? 'bg-rose-600 text-white animate-pulse shadow-[0_6px_16px_-6px_rgba(225,29,72,0.6)]'
+                    : 'border border-line bg-canvas-subtle text-slate-500 hover:border-ice-200 hover:bg-ice-50 hover:text-ice-700'
                 }`}
                 title={isListening ? 'Click to stop listening' : 'Click to speak question'}
                 aria-label={isListening ? 'Stop voice input' : 'Start voice input'}
@@ -871,7 +871,7 @@ export default function FinanceCopilotCard({ fullPage = false }: FinanceCopilotC
                     : `Ask ${personaConfigName(persona)} about savings, debts, cashflow, portfolio, or future goals...`
                 }
                 rows={1}
-                className="finance-chat-textarea min-h-[44px] min-w-0 flex-1 resize-none border-0 bg-transparent px-2 py-2.5 text-sm leading-relaxed text-slate-100 outline-none placeholder:text-slate-500"
+                className="finance-chat-textarea min-h-[44px] min-w-0 flex-1 resize-none border-0 bg-transparent px-2 py-2.5 text-sm leading-relaxed text-ink-900 outline-none placeholder:text-slate-400"
                 disabled={loading}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' && !e.shiftKey) {
@@ -886,7 +886,7 @@ export default function FinanceCopilotCard({ fullPage = false }: FinanceCopilotC
                 type="button"
                 onClick={() => askQuestion()}
                 disabled={loading || !question.trim()}
-                className="btn-primary h-10 w-12 shrink-0 rounded-xl px-0 py-0 disabled:opacity-40"
+                className="btn-primary h-10 w-12 shrink-0 rounded-xl px-0 py-0 disabled:opacity-50"
                 aria-label="Send message"
               >
                 <SendHorizonal className="h-4 w-4" />
@@ -896,9 +896,9 @@ export default function FinanceCopilotCard({ fullPage = false }: FinanceCopilotC
 
           <div className="mt-2.5 flex flex-wrap items-center justify-between gap-x-3 gap-y-1 px-1 text-[11px] text-slate-500">
             <span>
-              Press <kbd className="rounded border border-white/10 bg-white/[0.04] px-1 font-mono text-[10px] text-slate-300">Enter</kbd> to send, or click <kbd className="rounded border border-white/10 bg-white/[0.04] px-1 font-mono text-[10px] text-slate-300">Mic</kbd> to speak
+              Press <kbd className="rounded border border-line-strong bg-white px-1 font-mono text-[10px] text-ink-700 shadow-xs">Enter</kbd> to send, or click <kbd className="rounded border border-line-strong bg-white px-1 font-mono text-[10px] text-ink-700 shadow-xs">Mic</kbd> to speak
             </span>
-            <span className="flex items-center gap-1 font-semibold text-violet-300/90">
+            <span className="flex items-center gap-1 font-semibold text-ice-700">
               <Zap className="h-3 w-3" />
               Neural Speech Synthesis & Recognition Active
             </span>

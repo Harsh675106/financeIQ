@@ -30,10 +30,10 @@ const defaultAllocation: AllocationState = {
 
 /** Literal accent classes per asset class (dots + allocation strip). */
 const allocationAccent: Record<AllocationKey, string> = {
-  equity: 'bg-primary-400',
-  debt: 'bg-cyan-400',
-  gold: 'bg-amber-400',
-  liquid: 'bg-violet-400',
+  equity: 'bg-primary-500',
+  debt: 'bg-ice-400',
+  gold: 'bg-amber-500',
+  liquid: 'bg-indigo-500',
 }
 
 function normalizeAllocation(targetAllocation: Profile['target_allocation']): AllocationState {
@@ -143,8 +143,8 @@ export default function ProfileForm() {
       <form onSubmit={update} className="mt-6 space-y-5">
         <section className="surface-inset p-4 sm:p-5">
           <div className="mb-3 flex items-center gap-2">
-            <User className="h-4 w-4 text-primary-300" aria-hidden="true" />
-            <label htmlFor="settings-age" className="text-sm font-medium text-slate-200">Age</label>
+            <User className="h-4 w-4 text-primary-600" aria-hidden="true" />
+            <label htmlFor="settings-age" className="text-sm font-semibold text-ink-900">Age</label>
           </div>
           <input
             id="settings-age"
@@ -160,15 +160,15 @@ export default function ProfileForm() {
         <section className="surface-inset p-4 sm:p-5">
           <div className="mb-4 flex items-center justify-between gap-3">
             <div className="flex items-center gap-2">
-              <PieChart className="h-4 w-4 text-primary-300" aria-hidden="true" />
-              <label className="text-sm font-medium text-slate-200">Target Allocation</label>
+              <PieChart className="h-4 w-4 text-ice-600" aria-hidden="true" />
+              <label className="text-sm font-semibold text-ink-900">Target Allocation</label>
             </div>
             <span className={`badge num ${allocationTotal === 100 ? 'badge-success' : 'badge-danger'}`}>
               {allocationTotal}%
             </span>
           </div>
 
-          <div className="mb-5 flex h-2 w-full overflow-hidden rounded-full bg-white/[0.06]" aria-hidden="true">
+          <div className="mb-5 flex h-2 w-full overflow-hidden rounded-full bg-[#E6EFEC]" aria-hidden="true">
             {(Object.keys(allocationLabels) as AllocationKey[]).map((key) => (
               <div
                 key={key}
@@ -204,13 +204,13 @@ export default function ProfileForm() {
           </div>
         </section>
 
-        <div className="flex flex-col gap-3 border-t border-white/[0.06] pt-5 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-3 border-t border-line pt-5 sm:flex-row sm:items-center sm:justify-between">
           <button type="submit" disabled={saving} className="btn-primary h-11 w-full px-5 sm:w-auto">
             {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
             {saving ? 'Saving...' : 'Save Settings'}
           </button>
           {message && (
-            <p className="text-sm text-slate-300" role="status" aria-live="polite">
+            <p className="text-sm font-medium text-slate-600" role="status" aria-live="polite">
               {message}
             </p>
           )}

@@ -142,11 +142,11 @@ export default function LifeEventPlannerCard() {
 
       {result ? (
         <div className="mt-6 space-y-4">
-          <div className="rounded-2xl border border-primary-400/20 bg-gradient-to-br from-primary-500/[0.08] via-transparent to-cyan-500/[0.05] p-4 sm:p-5">
+          <div className="surface-highlight p-4 sm:p-5">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
               <div className="min-w-0">
                 <p className="eyebrow">{result.eventLabel}</p>
-                <h4 className="mt-1.5 text-base font-semibold leading-snug text-slate-50">{result.summary}</h4>
+                <h4 className="mt-1.5 text-base font-semibold leading-snug text-ink-900">{result.summary}</h4>
               </div>
               <span className="badge badge-brand num shrink-0 self-start px-3 py-1">
                 <Target className="h-3.5 w-3.5" />
@@ -154,21 +154,21 @@ export default function LifeEventPlannerCard() {
               </span>
             </div>
             <div className="mt-4 grid gap-3 sm:grid-cols-3">
-              <div className="surface-inset p-3 sm:p-4">
+              <div className="surface-inset bg-white/80 p-3 sm:p-4">
                 <p className="eyebrow">Required monthly</p>
                 <p className="kpi-value mt-2 text-lg sm:text-xl">
                   {Math.round(result.requiredMonthly).toLocaleString('en-IN')}
                 </p>
               </div>
-              <div className="surface-inset p-3 sm:p-4">
+              <div className="surface-inset bg-white/80 p-3 sm:p-4">
                 <p className="eyebrow">Comfortable monthly</p>
-                <p className="kpi-value mt-2 text-lg text-emerald-300 sm:text-xl">
+                <p className="kpi-value mt-2 text-lg text-emerald-700 sm:text-xl">
                   {Math.round(result.comfortableMonthly).toLocaleString('en-IN')}
                 </p>
               </div>
-              <div className="surface-inset p-3 sm:p-4">
+              <div className="surface-inset bg-white/80 p-3 sm:p-4">
                 <p className="eyebrow">Monthly gap</p>
-                <p className={`kpi-value mt-2 text-lg sm:text-xl ${result.monthlyGap > 0 ? 'text-rose-300' : 'text-slate-100'}`}>
+                <p className={`kpi-value mt-2 text-lg sm:text-xl ${result.monthlyGap > 0 ? 'text-rose-600' : 'text-ink-900'}`}>
                   {Math.round(result.monthlyGap).toLocaleString('en-IN')}
                 </p>
               </div>
@@ -180,8 +180,8 @@ export default function LifeEventPlannerCard() {
               <p className="eyebrow mb-3">Recommendations</p>
               <div className="space-y-2">
                 {result.recommendations.map((item) => (
-                  <p key={item} className="flex gap-2.5 text-sm leading-relaxed text-slate-200">
-                    <span aria-hidden="true" className="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full bg-primary-400" />
+                  <p key={item} className="flex gap-2.5 text-sm leading-relaxed text-ink-800">
+                    <span aria-hidden="true" className="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full bg-primary-500" />
                     <span className="min-w-0">{item}</span>
                   </p>
                 ))}
@@ -191,11 +191,11 @@ export default function LifeEventPlannerCard() {
               <p className="eyebrow mb-3">Tradeoffs</p>
               <div className="space-y-2">
                 {result.tradeoffs.length === 0 ? (
-                  <p className="text-sm text-slate-400">No major tradeoffs detected right now.</p>
+                  <p className="text-sm text-slate-500">No major tradeoffs detected right now.</p>
                 ) : (
                   result.tradeoffs.map((item) => (
-                    <p key={item} className="flex gap-2.5 text-sm leading-relaxed text-slate-200">
-                      <span aria-hidden="true" className="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full bg-amber-400" />
+                    <p key={item} className="flex gap-2.5 text-sm leading-relaxed text-ink-800">
+                      <span aria-hidden="true" className="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full bg-amber-500" />
                       <span className="min-w-0">{item}</span>
                     </p>
                   ))
@@ -207,9 +207,9 @@ export default function LifeEventPlannerCard() {
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {result.milestones.map((item) => (
               <div key={item.label} className="surface-inset relative overflow-hidden p-4">
-                <span aria-hidden="true" className="absolute inset-y-3 left-0 w-0.5 rounded-full bg-gradient-to-b from-primary-400 to-cyan-400" />
+                <span aria-hidden="true" className="absolute inset-y-3 left-0 w-0.5 rounded-full bg-gradient-to-b from-primary-500 to-ice-400" />
                 <p className="eyebrow">{item.label}</p>
-                <p className="mt-2 text-sm leading-relaxed text-slate-200">{item.detail}</p>
+                <p className="mt-2 text-sm leading-relaxed text-ink-800">{item.detail}</p>
               </div>
             ))}
           </div>
@@ -219,21 +219,21 @@ export default function LifeEventPlannerCard() {
               <p className="eyebrow">Assumptions</p>
               <div className="mt-2 space-y-2">
                 {result.assumptions.map((item) => (
-                  <p key={item} className="text-sm leading-relaxed text-slate-300">{item}</p>
+                  <p key={item} className="text-sm leading-relaxed text-slate-600">{item}</p>
                 ))}
               </div>
             </div>
             <div className="surface-inset p-4">
               <p className="eyebrow">If assumptions change</p>
-              <p className="mt-2 text-sm leading-relaxed text-slate-300">{result.whatChangesIfWrong}</p>
+              <p className="mt-2 text-sm leading-relaxed text-slate-600">{result.whatChangesIfWrong}</p>
               <p className="mt-3 text-xs text-slate-500">
                 <span className="badge badge-ai num">Confidence: {Math.round(result.confidence)}%</span>
               </p>
             </div>
           </div>
 
-          <div className="flex flex-col gap-3 border-t border-white/[0.06] pt-4 sm:flex-row sm:items-center sm:justify-between">
-            <p className={`flex items-center gap-2 text-sm ${saveMessage.includes('successfully') ? 'text-emerald-300' : 'text-slate-400'}`}>
+          <div className="flex flex-col gap-3 border-t border-line pt-4 sm:flex-row sm:items-center sm:justify-between">
+            <p className={`flex items-center gap-2 text-sm ${saveMessage.includes('successfully') ? 'text-emerald-700' : 'text-slate-500'}`}>
               {saveMessage.includes('successfully') && <CheckCircle2 className="h-4 w-4 shrink-0" />}
               {saveMessage || 'Turn this plan into a tracked goal with the recommended monthly contribution.'}
             </p>
@@ -243,7 +243,7 @@ export default function LifeEventPlannerCard() {
           </div>
         </div>
       ) : (
-        <div className="surface-inset mt-5 flex items-center gap-3 border-dashed p-4 text-sm text-slate-400">
+        <div className="surface-inset mt-5 flex items-center gap-3 border-dashed border-line-strong p-4 text-sm text-slate-500">
           <span className="icon-tile icon-tile-sm icon-tile-slate">
             <CalendarHeart className="h-4 w-4" />
           </span>

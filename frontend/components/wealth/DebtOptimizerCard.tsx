@@ -95,7 +95,7 @@ export default function DebtOptimizerCard({ refreshKey = 0 }: DebtOptimizerCardP
       {/* Background glow */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute -right-16 -top-16 h-56 w-56 rounded-full bg-violet-500/[0.12] blur-3xl"
+        className="pointer-events-none absolute -right-16 -top-16 h-56 w-56 rounded-full bg-indigo-50 blur-3xl"
       />
 
       {/* Header */}
@@ -103,7 +103,7 @@ export default function DebtOptimizerCard({ refreshKey = 0 }: DebtOptimizerCardP
         as="h3"
         icon={BrainCircuit}
         tone="violet"
-        className="relative mb-6 border-b border-white/[0.06] pb-5"
+        className="relative mb-6 border-b border-line pb-5"
         title={
           <span className="flex flex-wrap items-center gap-2 whitespace-normal">
             AI Debt Payoff Engine & Accelerator
@@ -151,13 +151,13 @@ export default function DebtOptimizerCard({ refreshKey = 0 }: DebtOptimizerCardP
           <span className="sr-only">Loading debt optimizer</span>
         </div>
       ) : !data?.hasDebts ? (
-        <div className="relative flex items-center gap-4 rounded-2xl border border-emerald-400/20 bg-gradient-to-r from-emerald-500/[0.1] via-emerald-500/[0.03] to-transparent p-4 sm:p-5">
+        <div className="relative flex items-center gap-4 rounded-2xl border border-emerald-200 bg-gradient-to-r from-emerald-50 via-emerald-50/40 to-transparent p-4 sm:p-5">
           <span className="icon-tile icon-tile-lg icon-tile-emerald">
             <ShieldCheck className="h-6 w-6" />
           </span>
           <div className="min-w-0">
-            <p className="font-display text-sm font-semibold text-slate-50">Zero Debt Burden Detected 🎉</p>
-            <p className="mt-0.5 text-xs leading-relaxed text-slate-400">
+            <p className="font-display text-sm font-semibold text-ink-900">Zero Debt Burden Detected 🎉</p>
+            <p className="mt-0.5 text-xs leading-relaxed text-slate-500">
               You are currently debt-free! 100% of your surplus cash flow is available to accelerate savings and investments.
             </p>
           </div>
@@ -165,14 +165,14 @@ export default function DebtOptimizerCard({ refreshKey = 0 }: DebtOptimizerCardP
       ) : (
         <div className="relative space-y-5">
           {/* Strategy Summary Banner */}
-          <div className="rounded-2xl border border-primary-400/20 bg-gradient-to-r from-primary-500/[0.12] via-violet-500/[0.05] to-transparent p-4">
+          <div className="surface-highlight p-4">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <div className="flex min-w-0 flex-wrap items-center gap-2">
                 <span className="relative flex h-2.5 w-2.5 shrink-0" aria-hidden="true">
-                  <span className="absolute inline-flex h-full w-full rounded-full bg-primary-400 opacity-60 motion-safe:animate-ping" />
-                  <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-primary-400" />
+                  <span className="absolute inline-flex h-full w-full rounded-full bg-primary-500 opacity-60 motion-safe:animate-ping" />
+                  <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-primary-500" />
                 </span>
-                <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-primary-200">
+                <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-primary-700">
                   {selectedStrategy === 'avalanche' ? 'Avalanche Strategy (Highest APR first)' : 'Snowball Strategy (Smallest balance first)'}
                 </span>
                 {data.recommendedStrategy?.strategy === selectedStrategy && (
@@ -181,11 +181,11 @@ export default function DebtOptimizerCard({ refreshKey = 0 }: DebtOptimizerCardP
                   </span>
                 )}
               </div>
-              <span className="text-xs text-slate-400">
-                Monthly Budget: <strong className="num font-semibold text-primary-200">₹{formatINR(data.monthlyPaymentBudget)}</strong>
+              <span className="text-xs text-slate-500">
+                Monthly Budget: <strong className="num font-semibold text-primary-700">₹{formatINR(data.monthlyPaymentBudget)}</strong>
               </span>
             </div>
-            <p className="mt-2 text-xs leading-relaxed text-slate-300">{data.summary}</p>
+            <p className="mt-2 text-xs leading-relaxed text-slate-600">{data.summary}</p>
           </div>
 
           {/* Strategy Compare Cards */}
@@ -198,8 +198,8 @@ export default function DebtOptimizerCard({ refreshKey = 0 }: DebtOptimizerCardP
                   onClick={() => setSelectedStrategy(strategy.strategy)}
                   className={`cursor-pointer rounded-2xl border p-4 transition-[border-color,background-color,box-shadow] duration-300 ${
                     isSelected
-                      ? 'border-primary-400/40 bg-primary-500/[0.08] shadow-[0_14px_34px_-20px_rgba(112,104,244,0.8)] ring-1 ring-primary-400/20'
-                      : 'border-white/[0.06] bg-white/[0.025] hover:border-white/[0.12] hover:bg-white/[0.045]'
+                      ? 'border-primary-300 bg-primary-50/60 shadow-card ring-1 ring-primary-200'
+                      : 'border-line bg-white hover:border-line-strong hover:bg-slate-50'
                   }`}
                 >
                   <div className="flex items-center justify-between gap-2">
@@ -211,12 +211,12 @@ export default function DebtOptimizerCard({ refreshKey = 0 }: DebtOptimizerCardP
                           <Flame className="h-4 w-4" />
                         )}
                       </span>
-                      <h4 className="truncate font-display text-sm font-semibold capitalize text-slate-100">
+                      <h4 className="truncate font-display text-sm font-semibold capitalize text-ink-900">
                         {strategy.strategy} Method
                       </h4>
                     </div>
                     {isSelected && (
-                      <span className="flex shrink-0 items-center gap-1 text-[11px] font-semibold text-primary-200">
+                      <span className="flex shrink-0 items-center gap-1 text-[11px] font-semibold text-primary-700">
                         <CheckCircle2 className="h-3.5 w-3.5" />
                         Selected
                       </span>
@@ -224,15 +224,15 @@ export default function DebtOptimizerCard({ refreshKey = 0 }: DebtOptimizerCardP
                   </div>
 
                   <div className="mt-3 grid grid-cols-2 gap-2 text-xs">
-                    <div className="rounded-xl border border-white/[0.05] bg-black/20 p-2.5">
-                      <span className="text-slate-400">Debt-Free Horizon</span>
-                      <p className="num mt-0.5 text-sm font-semibold text-slate-100">
+                    <div className="rounded-xl border border-line bg-white p-2.5">
+                      <span className="text-slate-500">Debt-Free Horizon</span>
+                      <p className="num mt-0.5 text-sm font-semibold text-ink-900">
                         {strategy.monthsToDebtFree === null ? 'Long horizon' : `${strategy.monthsToDebtFree} Months`}
                       </p>
                     </div>
-                    <div className="rounded-xl border border-white/[0.05] bg-black/20 p-2.5">
-                      <span className="text-slate-400">Total Interest</span>
-                      <p className="num mt-0.5 break-words text-sm font-semibold text-amber-300">
+                    <div className="rounded-xl border border-line bg-white p-2.5">
+                      <span className="text-slate-500">Total Interest</span>
+                      <p className="num mt-0.5 break-words text-sm font-semibold text-amber-700">
                         ₹{formatINR(strategy.totalInterest)}
                       </p>
                     </div>
@@ -249,11 +249,11 @@ export default function DebtOptimizerCard({ refreshKey = 0 }: DebtOptimizerCardP
                 <span className="icon-tile icon-tile-sm icon-tile-brand">
                   <Coins className="h-4 w-4" />
                 </span>
-                <span className="text-xs font-semibold text-slate-200">
+                <span className="text-xs font-semibold text-ink-800">
                   Boost Extra Monthly Paydown:
                 </span>
               </div>
-              <span className="num font-display text-sm font-semibold text-primary-100">
+              <span className="num font-display text-sm font-semibold text-primary-700">
                 +₹{formatINR(extraPayment)}/mo
               </span>
             </div>
@@ -271,23 +271,23 @@ export default function DebtOptimizerCard({ refreshKey = 0 }: DebtOptimizerCardP
 
             {acceleratedMetrics && (
               <div className="grid grid-cols-2 gap-3 pt-1 sm:grid-cols-3">
-                <div className="rounded-xl border border-white/[0.05] bg-black/20 p-3">
-                  <span className="text-[11px] text-slate-400">Accelerated Timeline</span>
-                  <p className="num mt-0.5 text-sm font-semibold text-emerald-300">
+                <div className="rounded-xl border border-line bg-white p-3">
+                  <span className="text-[11px] text-slate-500">Accelerated Timeline</span>
+                  <p className="num mt-0.5 text-sm font-semibold text-emerald-700">
                     {acceleratedMetrics.newMonths} Months
                   </p>
                 </div>
 
-                <div className="rounded-xl border border-white/[0.05] bg-black/20 p-3">
-                  <span className="text-[11px] text-slate-400">Time Saved</span>
-                  <p className="num mt-0.5 text-sm font-semibold text-cyan-300">
+                <div className="rounded-xl border border-line bg-white p-3">
+                  <span className="text-[11px] text-slate-500">Time Saved</span>
+                  <p className="num mt-0.5 text-sm font-semibold text-sky-700">
                     -{acceleratedMetrics.monthsSaved} Months Faster
                   </p>
                 </div>
 
-                <div className="col-span-2 rounded-xl border border-emerald-400/25 bg-gradient-to-br from-emerald-500/[0.14] to-emerald-500/[0.03] p-3 sm:col-span-1">
-                  <span className="text-[11px] text-emerald-300/90">Interest Saved</span>
-                  <p className="num mt-0.5 break-words font-display text-sm font-semibold text-emerald-200">
+                <div className="col-span-2 rounded-xl border border-emerald-200 bg-gradient-to-br from-emerald-50 to-ice-50 p-3 sm:col-span-1">
+                  <span className="text-[11px] font-medium text-emerald-700">Interest Saved</span>
+                  <p className="num mt-0.5 break-words font-display text-sm font-semibold text-emerald-700">
                     ₹{formatINR(acceleratedMetrics.interestSaved)}
                   </p>
                 </div>
@@ -300,8 +300,8 @@ export default function DebtOptimizerCard({ refreshKey = 0 }: DebtOptimizerCardP
             <div className="surface-inset space-y-3 p-4">
               <div className="flex items-center justify-between gap-2">
                 <div className="flex items-center gap-2">
-                  <TrendingDown className="h-4 w-4 text-primary-300" />
-                  <p className="text-xs font-semibold text-slate-200">Recommended Payoff Sequence</p>
+                  <TrendingDown className="h-4 w-4 text-primary-600" />
+                  <p className="text-xs font-semibold text-ink-800">Recommended Payoff Sequence</p>
                 </div>
                 <span className="eyebrow text-[10px]">Priority order</span>
               </div>
@@ -310,20 +310,20 @@ export default function DebtOptimizerCard({ refreshKey = 0 }: DebtOptimizerCardP
                 {activeStrat.payoffOrder.slice(0, 4).map((item, idx) => (
                   <div
                     key={`${item.id}-${item.month}`}
-                    className="flex min-w-0 flex-col justify-between gap-2 rounded-xl border border-white/[0.05] bg-black/20 p-3 transition-colors hover:border-primary-400/25"
+                    className="flex min-w-0 flex-col justify-between gap-2 rounded-xl border border-line bg-white p-3 transition-colors hover:border-primary-200"
                   >
                     <div className="flex items-center justify-between text-xs">
-                      <span className="num flex h-6 w-6 items-center justify-center rounded-full bg-primary-500/15 text-[10px] font-semibold text-primary-200 ring-1 ring-primary-400/30">
+                      <span className="num flex h-6 w-6 items-center justify-center rounded-full bg-primary-50 text-[10px] font-semibold text-primary-700 ring-1 ring-primary-200">
                         #{idx + 1}
                       </span>
-                      <span className="num flex items-center gap-1 text-[11px] text-slate-400">
-                        <Clock className="h-3 w-3 text-slate-500" />
+                      <span className="num flex items-center gap-1 text-[11px] text-slate-500">
+                        <Clock className="h-3 w-3 text-slate-400" />
                         Month {item.month}
                       </span>
                     </div>
                     <div className="min-w-0">
-                      <p className="truncate text-xs font-semibold text-slate-100">{item.debtType}</p>
-                      <p className="mt-0.5 truncate text-[11px] text-slate-400">
+                      <p className="truncate text-xs font-semibold text-ink-900">{item.debtType}</p>
+                      <p className="mt-0.5 truncate text-[11px] text-slate-500">
                         {item.description || 'Target Payoff'}
                       </p>
                     </div>

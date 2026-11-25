@@ -318,12 +318,12 @@ export default function WealthPage() {
           <div
             onClick={() => handleTabChange('savings')}
             className={`card card-spotlight stage-card-lift group relative cursor-pointer overflow-hidden p-5 sm:p-6 ${
-              activeTab === 'savings' ? 'border-emerald-400/35 ring-1 ring-emerald-400/20' : ''
+              activeTab === 'savings' ? 'border-emerald-300 ring-1 ring-emerald-200' : ''
             }`}
           >
             <div
               aria-hidden="true"
-              className={`pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-emerald-400/80 to-transparent transition-opacity duration-300 ${
+              className={`pointer-events-none absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-transparent via-emerald-500 to-transparent transition-opacity duration-300 ${
                 activeTab === 'savings' ? 'opacity-100' : 'opacity-0'
               }`}
             />
@@ -334,12 +334,12 @@ export default function WealthPage() {
                   <PiggyBank className="h-4 w-4" />
                 </span>
               </div>
-              <p className="kpi-value break-words text-2xl text-emerald-300 2xl:text-[1.75rem]">
+              <p className="kpi-value break-words text-2xl text-emerald-600 2xl:text-[1.75rem]">
                 ₹{formatINR(totalSavings)}
               </p>
-              <div className="mt-4 flex items-center justify-between gap-2 border-t border-white/[0.06] pt-3 text-xs text-slate-400">
+              <div className="mt-4 flex items-center justify-between gap-2 border-t border-line pt-3 text-xs text-slate-500">
                 <span className="num min-w-0 truncate">{savings.length} Active Accounts</span>
-                <span className="flex shrink-0 items-center gap-1 font-semibold text-emerald-300">
+                <span className="flex shrink-0 items-center gap-1 font-semibold text-emerald-700">
                   <ShieldCheck className="h-3.5 w-3.5" /> Emergency Shield
                 </span>
               </div>
@@ -350,12 +350,12 @@ export default function WealthPage() {
           <div
             onClick={() => handleTabChange('debts')}
             className={`card card-spotlight stage-card-lift group relative cursor-pointer overflow-hidden p-5 sm:p-6 ${
-              activeTab === 'debts' ? 'border-rose-400/35 ring-1 ring-rose-400/20' : ''
+              activeTab === 'debts' ? 'border-rose-300 ring-1 ring-rose-200' : ''
             }`}
           >
             <div
               aria-hidden="true"
-              className={`pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-rose-400/80 to-transparent transition-opacity duration-300 ${
+              className={`pointer-events-none absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-transparent via-rose-500 to-transparent transition-opacity duration-300 ${
                 activeTab === 'debts' ? 'opacity-100' : 'opacity-0'
               }`}
             />
@@ -366,12 +366,12 @@ export default function WealthPage() {
                   <AlertCircle className="h-4 w-4" />
                 </span>
               </div>
-              <p className="kpi-value break-words text-2xl text-rose-300 2xl:text-[1.75rem]">
+              <p className="kpi-value break-words text-2xl text-rose-600 2xl:text-[1.75rem]">
                 ₹{formatINR(totalDebts)}
               </p>
-              <div className="mt-4 flex items-center justify-between gap-2 border-t border-white/[0.06] pt-3 text-xs text-slate-400">
+              <div className="mt-4 flex items-center justify-between gap-2 border-t border-line pt-3 text-xs text-slate-500">
                 <span className="num min-w-0 truncate">{debts.length} Active Debts</span>
-                <span className="num shrink-0 font-semibold text-rose-300">Avg {averageDebtApr}% APR</span>
+                <span className="num shrink-0 font-semibold text-rose-600">Avg {averageDebtApr}% APR</span>
               </div>
             </div>
           </div>
@@ -380,28 +380,28 @@ export default function WealthPage() {
           <div
             onClick={() => handleTabChange('assets')}
             className={`card card-spotlight stage-card-lift group relative cursor-pointer overflow-hidden p-5 sm:p-6 ${
-              activeTab === 'assets' ? 'border-cyan-400/35 ring-1 ring-cyan-400/20' : ''
+              activeTab === 'assets' ? 'border-sky-300 ring-1 ring-sky-200' : ''
             }`}
           >
             <div
               aria-hidden="true"
-              className={`pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-cyan-400/80 to-transparent transition-opacity duration-300 ${
+              className={`pointer-events-none absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-transparent via-sky-400 to-transparent transition-opacity duration-300 ${
                 activeTab === 'assets' ? 'opacity-100' : 'opacity-0'
               }`}
             />
             <div className="relative z-10">
               <div className="mb-4 flex items-center justify-between gap-3">
                 <span className="eyebrow truncate">Invested Assets</span>
-                <span className="icon-tile icon-tile-sm icon-tile-cyan">
+                <span className="icon-tile icon-tile-sm icon-tile-sky">
                   <TrendingUp className="h-4 w-4" />
                 </span>
               </div>
-              <p className="kpi-value break-words text-2xl text-cyan-200 2xl:text-[1.75rem]">
+              <p className="kpi-value break-words text-2xl text-sky-600 2xl:text-[1.75rem]">
                 ₹{formatINR(totalAssets)}
               </p>
-              <div className="mt-4 flex items-center justify-between gap-2 border-t border-white/[0.06] pt-3 text-xs text-slate-400">
+              <div className="mt-4 flex items-center justify-between gap-2 border-t border-line pt-3 text-xs text-slate-500">
                 <span className="num min-w-0 truncate">{assets.length} Holdings</span>
-                <span className="shrink-0 font-semibold text-cyan-300">Growth Engine</span>
+                <span className="shrink-0 font-semibold text-sky-700">Growth Engine</span>
               </div>
             </div>
           </div>
@@ -410,12 +410,12 @@ export default function WealthPage() {
           <div
             onClick={() => handleTabChange('liabilities')}
             className={`card card-spotlight stage-card-lift group relative cursor-pointer overflow-hidden p-5 sm:p-6 ${
-              activeTab === 'liabilities' ? 'border-primary-400/40 ring-1 ring-primary-400/25' : ''
+              activeTab === 'liabilities' ? 'border-primary-300 ring-1 ring-primary-200' : ''
             }`}
           >
             <div
               aria-hidden="true"
-              className={`pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary-300/80 to-transparent transition-opacity duration-300 ${
+              className={`pointer-events-none absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-transparent via-primary-500 to-transparent transition-opacity duration-300 ${
                 activeTab === 'liabilities' ? 'opacity-100' : 'opacity-0'
               }`}
             />
@@ -428,16 +428,16 @@ export default function WealthPage() {
               </div>
               <p
                 className={`kpi-value break-words text-2xl 2xl:text-[1.75rem] ${
-                  netWorth >= 0 ? 'text-gradient' : 'text-rose-300'
+                  netWorth >= 0 ? 'text-gradient' : 'text-rose-600'
                 }`}
               >
                 ₹{formatINR(netWorth)}
               </p>
-              <div className="mt-4 flex items-center justify-between gap-2 border-t border-white/[0.06] pt-3 text-xs text-slate-400">
+              <div className="mt-4 flex items-center justify-between gap-2 border-t border-line pt-3 text-xs text-slate-500">
                 <span className="num min-w-0 truncate">Liabilities: ₹{formatINR(totalLiabilities)}</span>
                 <span
                   className={`shrink-0 font-semibold uppercase tracking-wide ${
-                    netWorth >= 0 ? 'text-emerald-300' : 'text-rose-300'
+                    netWorth >= 0 ? 'text-emerald-700' : 'text-rose-600'
                   }`}
                 >
                   {netWorth >= 0 ? 'Surplus' : 'Deficit'}
@@ -459,17 +459,17 @@ export default function WealthPage() {
                 {isHealthStageExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
               </span>
               <span className="min-w-0">
-                <span className="block font-display text-[15px] font-semibold tracking-tight text-slate-100 transition-colors group-hover:text-white sm:text-base">
+                <span className="block font-display text-[15px] font-semibold tracking-tight text-ink-900 transition-colors group-hover:text-primary-700 sm:text-base">
                   Financial Health & Solvency Diagnostic
                 </span>
-                <span className="block text-xs text-slate-500 transition-colors group-hover:text-slate-400">
+                <span className="block text-xs text-slate-500 transition-colors group-hover:text-slate-600">
                   {isHealthStageExpanded ? 'Click to collapse' : 'Click to expand'}
                 </span>
               </span>
             </button>
             <div
               aria-hidden="true"
-              className="hidden h-px flex-1 bg-gradient-to-r from-white/10 via-white/[0.04] to-transparent sm:block"
+              className="hidden h-px flex-1 bg-gradient-to-r from-line-strong via-line to-transparent sm:block"
             />
           </div>
 
@@ -497,10 +497,10 @@ export default function WealthPage() {
                 {isSimulatorStageExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
               </span>
               <span className="min-w-0">
-                <span className="block font-display text-[15px] font-semibold tracking-tight text-slate-100 transition-colors group-hover:text-white sm:text-base">
+                <span className="block font-display text-[15px] font-semibold tracking-tight text-ink-900 transition-colors group-hover:text-primary-700 sm:text-base">
                   Interactive Simulators & Payoff Engines
                 </span>
-                <span className="block text-xs text-slate-500 transition-colors group-hover:text-slate-400">
+                <span className="block text-xs text-slate-500 transition-colors group-hover:text-slate-600">
                   {isSimulatorStageExpanded ? 'Click to collapse' : 'Click to expand'}
                 </span>
               </span>
@@ -552,17 +552,17 @@ export default function WealthPage() {
             {/* Subtle Ambient Glow */}
             <div
               aria-hidden="true"
-              className="pointer-events-none absolute -right-24 -top-24 h-64 w-64 rounded-full bg-primary-500/10 blur-3xl"
+              className="pointer-events-none absolute -right-24 -top-24 h-64 w-64 rounded-full bg-primary-100/50 blur-3xl"
             />
 
             {/* Top Segmented Tabs Bar */}
-            <div className="relative flex flex-col justify-between gap-5 border-b border-white/[0.06] pb-6 lg:flex-row lg:items-center">
+            <div className="relative flex flex-col justify-between gap-5 border-b border-line pb-6 lg:flex-row lg:items-center">
               <div className="grid grid-cols-2 gap-2.5 sm:flex sm:flex-wrap sm:items-center">
                 {[
-                  { id: 'savings' as WealthCategory, label: 'Savings Accounts', icon: PiggyBank, count: savings.length, total: totalSavings, color: 'text-emerald-300', activeStyle: 'border-primary-400/40 bg-primary-500/[0.14] text-white shadow-[0_10px_28px_-14px_rgba(112,104,244,0.8)]' },
-                  { id: 'debts' as WealthCategory, label: 'Debts & Loans', icon: AlertCircle, count: debts.length, total: totalDebts, color: 'text-rose-300', activeStyle: 'border-primary-400/40 bg-primary-500/[0.14] text-white shadow-[0_10px_28px_-14px_rgba(112,104,244,0.8)]' },
-                  { id: 'assets' as WealthCategory, label: 'Investments & Assets', icon: TrendingUp, count: assets.length, total: totalAssets, color: 'text-cyan-300', activeStyle: 'border-primary-400/40 bg-primary-500/[0.14] text-white shadow-[0_10px_28px_-14px_rgba(112,104,244,0.8)]' },
-                  { id: 'liabilities' as WealthCategory, label: 'Other Liabilities', icon: Zap, count: liabilities.length, total: totalLiabilities, color: 'text-amber-300', activeStyle: 'border-primary-400/40 bg-primary-500/[0.14] text-white shadow-[0_10px_28px_-14px_rgba(112,104,244,0.8)]' },
+                  { id: 'savings' as WealthCategory, label: 'Savings Accounts', icon: PiggyBank, count: savings.length, total: totalSavings, color: 'text-emerald-600', activeStyle: 'border-primary-200 bg-primary-50 text-primary-800 shadow-xs' },
+                  { id: 'debts' as WealthCategory, label: 'Debts & Loans', icon: AlertCircle, count: debts.length, total: totalDebts, color: 'text-rose-600', activeStyle: 'border-primary-200 bg-primary-50 text-primary-800 shadow-xs' },
+                  { id: 'assets' as WealthCategory, label: 'Investments & Assets', icon: TrendingUp, count: assets.length, total: totalAssets, color: 'text-sky-600', activeStyle: 'border-primary-200 bg-primary-50 text-primary-800 shadow-xs' },
+                  { id: 'liabilities' as WealthCategory, label: 'Other Liabilities', icon: Zap, count: liabilities.length, total: totalLiabilities, color: 'text-amber-600', activeStyle: 'border-primary-200 bg-primary-50 text-primary-800 shadow-xs' },
                 ].map((tab) => {
                   const Icon = tab.icon
                   const isActive = activeTab === tab.id
@@ -574,20 +574,20 @@ export default function WealthPage() {
                       className={`bookmark-tab group flex min-h-[40px] min-w-0 items-center justify-between gap-2.5 rounded-xl border px-3.5 py-2.5 text-xs font-semibold sm:justify-start ${
                         isActive
                           ? `active-bookmark ${tab.activeStyle}`
-                          : 'border-white/[0.06] bg-white/[0.025] text-slate-400 hover:border-white/[0.12] hover:bg-white/[0.05] hover:text-slate-200'
+                          : 'border-line bg-white text-slate-600 hover:border-line-strong hover:bg-canvas-subtle hover:text-ink-900'
                       }`}
                     >
                       <div className="flex min-w-0 items-center gap-2">
                         <Icon
                           className={`h-4 w-4 shrink-0 transition-colors ${
-                            isActive ? tab.color : 'text-slate-500 group-hover:text-slate-300'
+                            isActive ? tab.color : 'text-slate-400 group-hover:text-slate-600'
                           }`}
                         />
                         <span className="truncate">{tab.label}</span>
                       </div>
                       <span
                         className={`num shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold ${
-                          isActive ? 'bg-white/10 text-white' : 'bg-white/[0.05] text-slate-400'
+                          isActive ? 'bg-white text-primary-700 ring-1 ring-primary-200' : 'bg-slate-100 text-slate-500'
                         }`}
                       >
                         {tab.count}
@@ -610,7 +610,7 @@ export default function WealthPage() {
             <div className="surface-inset relative mt-6 flex flex-wrap items-center justify-between gap-3 p-3 sm:p-3.5">
               {/* Search Input */}
               <div className="relative min-w-[200px] flex-1">
-                <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
+                <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
                 <input
                   type="text"
                   placeholder={`Search ${activeTab} by name or notes...`}
@@ -640,8 +640,8 @@ export default function WealthPage() {
                   aria-pressed={filterHighValue}
                   className={`num inline-flex h-10 items-center rounded-xl border px-3.5 text-xs font-semibold transition-colors ${
                     filterHighValue
-                      ? 'border-primary-400/45 bg-primary-500/15 text-primary-100 shadow-[0_6px_18px_-10px_rgba(112,104,244,0.8)]'
-                      : 'border-white/[0.08] bg-white/[0.03] text-slate-400 hover:border-white/[0.14] hover:text-slate-200'
+                      ? 'border-primary-200 bg-primary-50 text-primary-700 shadow-xs'
+                      : 'border-line-strong bg-white text-slate-600 hover:border-slate-300 hover:text-ink-900'
                   }`}
                 >
                   ≥ ₹50,000
@@ -653,8 +653,8 @@ export default function WealthPage() {
                     aria-pressed={filterHighAprOnly}
                     className={`num inline-flex h-10 items-center rounded-xl border px-3.5 text-xs font-semibold transition-colors ${
                       filterHighAprOnly
-                        ? 'border-rose-400/45 bg-rose-500/15 text-rose-200 shadow-[0_6px_18px_-10px_rgba(244,63,94,0.8)]'
-                        : 'border-white/[0.08] bg-white/[0.03] text-slate-400 hover:border-white/[0.14] hover:text-slate-200'
+                        ? 'border-rose-200 bg-rose-50 text-rose-700 shadow-xs'
+                        : 'border-line-strong bg-white text-slate-600 hover:border-slate-300 hover:text-ink-900'
                     }`}
                   >
                     High APR (≥12%)
@@ -672,13 +672,13 @@ export default function WealthPage() {
                       <div key={slot} className="skeleton h-40 rounded-[1.25rem]" />
                     ))}
                   </div>
-                  <p className="text-center text-xs text-slate-400">Syncing balance matrix...</p>
+                  <p className="text-center text-xs text-slate-500">Syncing balance matrix...</p>
                 </div>
               ) : activeItems.length === 0 ? (
                 /* High-Fidelity Empty State with 1-Click Starters */
-                <div className="rounded-2xl border border-dashed border-white/10 bg-white/[0.015] px-5 py-10 text-center sm:px-8 sm:py-12">
+                <div className="rounded-2xl border border-dashed border-line-strong bg-canvas-subtle/50 px-5 py-10 text-center sm:px-8 sm:py-12">
                   <div className="relative mx-auto mb-5 w-fit">
-                    <div aria-hidden="true" className="absolute inset-0 rounded-2xl bg-primary-500/20 blur-xl" />
+                    <div aria-hidden="true" className="absolute inset-0 rounded-2xl bg-primary-100/70 blur-xl" />
                     <span
                       className={`icon-tile icon-tile-lg relative ${
                         activeTab === 'savings'
@@ -686,7 +686,7 @@ export default function WealthPage() {
                           : activeTab === 'debts'
                           ? 'icon-tile-rose'
                           : activeTab === 'assets'
-                          ? 'icon-tile-cyan'
+                          ? 'icon-tile-sky'
                           : 'icon-tile-amber'
                       }`}
                     >
@@ -702,12 +702,12 @@ export default function WealthPage() {
                     </span>
                   </div>
 
-                  <h4 className="text-balance break-words font-display text-lg font-semibold text-slate-50">
+                  <h4 className="text-balance break-words font-display text-lg font-semibold text-ink-900">
                     {searchQuery
                       ? `No ${activeTab} matching "${searchQuery}"`
                       : `No ${activeTab === 'savings' ? 'Savings Accounts' : activeTab === 'debts' ? 'Debts or Loans' : activeTab === 'assets' ? 'Investments' : 'Liabilities'} Added Yet`}
                   </h4>
-                  <p className="mx-auto mt-1.5 max-w-md text-sm leading-relaxed text-slate-400">
+                  <p className="mx-auto mt-1.5 max-w-md text-sm leading-relaxed text-slate-500">
                     {searchQuery
                       ? 'Try adjusting your search query or removing active filters.'
                       : 'Get started in 1-click by picking a popular preset below or create a custom entry:'}
@@ -731,7 +731,7 @@ export default function WealthPage() {
                             <span className="icon-tile icon-tile-sm">
                               <Icon className="h-4 w-4" />
                             </span>
-                            <span className="text-xs font-semibold text-slate-300 transition-colors group-hover:text-white">
+                            <span className="text-xs font-semibold text-ink-700 transition-colors group-hover:text-ink-900">
                               + {starter.label}
                             </span>
                           </button>

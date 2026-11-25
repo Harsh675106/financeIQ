@@ -27,14 +27,14 @@ export default function EmptyState({
     <div className={`flex flex-col items-center justify-center text-center ${compact ? 'py-8' : 'py-12'} ${className}`}>
       {Icon && (
         <div className="relative mb-4">
-          <div className="absolute inset-0 rounded-2xl bg-primary-500/20 blur-xl" />
+          <div className="absolute inset-0 rounded-2xl bg-primary-200/50 blur-xl" />
           <span className={`icon-tile icon-tile-lg ${iconToneClass[tone]} relative`}>
             <Icon className="h-6 w-6" />
           </span>
         </div>
       )}
-      <h3 className="font-display text-base font-semibold text-slate-50">{title}</h3>
-      {description && <p className="mt-1.5 max-w-sm text-sm text-slate-400">{description}</p>}
+      <h3 className="font-display text-base font-semibold text-ink-900">{title}</h3>
+      {description && <p className="mt-1.5 max-w-sm text-sm text-slate-500">{description}</p>}
       {action && <div className="mt-5">{action}</div>}
     </div>
   )

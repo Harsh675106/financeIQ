@@ -127,43 +127,43 @@ export default function WealthItemCard({
   const getTheme = () => {
     if (category === 'savings') {
       return {
-        amountColor: 'text-emerald-300',
-        glowBg: 'hover:border-emerald-400/30',
+        amountColor: 'text-emerald-600',
+        glowBg: 'hover:border-emerald-200',
         iconBg: 'icon-tile-emerald',
         badgeClass: 'badge-success',
         cardBorder: '',
-        accentGlow: 'from-emerald-500/[0.07] to-transparent',
+        accentGlow: 'from-emerald-50/80 to-transparent',
       }
     }
     if (category === 'debts') {
       return {
-        amountColor: isHighApr ? 'text-rose-300' : 'text-rose-200',
+        amountColor: isHighApr ? 'text-rose-700' : 'text-rose-600',
         glowBg: isHighApr
-          ? 'shadow-[0_18px_44px_-28px_rgba(244,63,94,0.7)] hover:border-rose-400/50'
-          : 'hover:border-rose-400/30',
+          ? 'shadow-[0_16px_36px_-24px_rgba(225,29,72,0.35)] hover:border-rose-300'
+          : 'hover:border-rose-200',
         iconBg: 'icon-tile-rose',
-        badgeClass: isHighApr ? 'badge-danger ring-1 ring-rose-400/40' : 'badge-danger',
-        cardBorder: isHighApr ? 'border-rose-400/35' : '',
-        accentGlow: 'from-rose-500/[0.07] to-transparent',
+        badgeClass: isHighApr ? 'badge-danger ring-1 ring-rose-300' : 'badge-danger',
+        cardBorder: isHighApr ? 'border-rose-200' : '',
+        accentGlow: 'from-rose-50/80 to-transparent',
       }
     }
     if (category === 'assets') {
       return {
-        amountColor: 'text-cyan-200',
-        glowBg: 'hover:border-cyan-400/30',
-        iconBg: 'icon-tile-cyan',
+        amountColor: 'text-sky-600',
+        glowBg: 'hover:border-sky-200',
+        iconBg: 'icon-tile-sky',
         badgeClass: 'badge-info',
         cardBorder: '',
-        accentGlow: 'from-cyan-500/[0.07] to-transparent',
+        accentGlow: 'from-sky-50/80 to-transparent',
       }
     }
     return {
-      amountColor: 'text-amber-200',
-      glowBg: 'hover:border-amber-400/30',
+      amountColor: 'text-amber-700',
+      glowBg: 'hover:border-amber-200',
       iconBg: 'icon-tile-amber',
       badgeClass: 'badge-warning',
       cardBorder: '',
-      accentGlow: 'from-amber-500/[0.07] to-transparent',
+      accentGlow: 'from-amber-50/80 to-transparent',
     }
   }
 
@@ -189,7 +189,7 @@ export default function WealthItemCard({
         {isHighApr && (
           <div
             aria-hidden="true"
-            className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-rose-500 via-amber-400 to-rose-500 shadow-[0_0_14px_rgba(244,63,94,0.6)]"
+            className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-rose-500 via-amber-400 to-rose-500"
           />
         )}
 
@@ -203,7 +203,7 @@ export default function WealthItemCard({
 
             <div className="min-w-0 flex-1 space-y-1.5">
               <div className="flex flex-wrap items-center gap-2">
-                <h4 className="min-w-0 break-words font-display text-[15px] font-semibold tracking-tight text-slate-100 transition-colors group-hover:text-white sm:text-base">
+                <h4 className="min-w-0 break-words font-display text-[15px] font-semibold tracking-tight text-ink-900 transition-colors group-hover:text-ink-950 sm:text-base">
                   {title}
                 </h4>
                 {badgeText && (
@@ -214,7 +214,7 @@ export default function WealthItemCard({
                 )}
               </div>
 
-              <p className="line-clamp-2 text-xs leading-relaxed text-slate-400">
+              <p className="line-clamp-2 text-xs leading-relaxed text-slate-500">
                 {subtitle}
               </p>
             </div>
@@ -232,7 +232,7 @@ export default function WealthItemCard({
         </div>
 
         {/* Action Footer Bar with Generous Padding */}
-        <div className="relative z-10 mt-5 flex items-center justify-between gap-2 border-t border-white/[0.06] pt-4">
+        <div className="relative z-10 mt-5 flex items-center justify-between gap-2 border-t border-line pt-4">
           <div className="flex items-center gap-2">
             {onQuickAdjust && (category === 'savings' || category === 'debts') && (
               <button
@@ -241,12 +241,12 @@ export default function WealthItemCard({
               >
                 {category === 'savings' ? (
                   <>
-                    <PlusCircle className="h-3.5 w-3.5 text-emerald-300" />
+                    <PlusCircle className="h-3.5 w-3.5 text-emerald-600" />
                     <span>Deposit Funds</span>
                   </>
                 ) : (
                   <>
-                    <MinusCircle className="h-3.5 w-3.5 text-rose-300" />
+                    <MinusCircle className="h-3.5 w-3.5 text-rose-600" />
                     <span>Record Payment</span>
                   </>
                 )}
@@ -257,7 +257,7 @@ export default function WealthItemCard({
           <div className="flex items-center gap-1">
             <button
               onClick={() => onEdit(item, category)}
-              className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-transparent px-2.5 text-slate-400 transition-colors hover:border-white/[0.08] hover:bg-white/[0.05] hover:text-primary-200"
+              className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-transparent px-2.5 text-slate-500 transition-colors hover:border-primary-100 hover:bg-primary-50 hover:text-primary-700"
               title="Edit Entry"
               aria-label="Edit Entry"
             >
@@ -266,7 +266,7 @@ export default function WealthItemCard({
             </button>
             <button
               onClick={() => onDelete(item.id, category)}
-              className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-transparent px-2.5 text-slate-400 transition-colors hover:border-rose-400/20 hover:bg-rose-500/10 hover:text-rose-300"
+              className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-transparent px-2.5 text-slate-500 transition-colors hover:border-rose-100 hover:bg-rose-50 hover:text-rose-600"
               title="Delete Entry"
               aria-label="Delete Entry"
             >

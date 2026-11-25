@@ -52,18 +52,18 @@ function MetricTile({ label, value, sub, icon, accent, tone, delay, trend }: Til
         <span
           className="icon-morph-container flex h-9 w-9 shrink-0 items-center justify-center rounded-xl"
           style={{
-            color: accent,
-            background: `radial-gradient(120% 120% at 30% 0%, rgba(255,255,255,0.1), transparent 60%), linear-gradient(145deg, ${accent}40, ${accent}10)`,
-            boxShadow: `inset 0 0 0 1px ${accent}4d, inset 0 1px 0 0 rgba(255,255,255,0.1), 0 8px 20px -10px ${accent}99`,
+            color: `color-mix(in srgb, ${accent} 78%, ${chartColors.text})`,
+            background: `linear-gradient(145deg, ${accent}1f, ${accent}0a)`,
+            boxShadow: `inset 0 0 0 1px ${accent}33, 0 6px 14px -10px ${accent}80`,
           }}
         >
           {icon}
         </span>
       </div>
 
-      <p className="mt-3 flex items-center gap-1 text-xs leading-relaxed text-slate-400">
-        {trend === 'up' && <ArrowUpRight className="h-3.5 w-3.5 shrink-0 text-emerald-400" />}
-        {trend === 'down' && <ArrowDownRight className="h-3.5 w-3.5 shrink-0 text-rose-400" />}
+      <p className="mt-3 flex items-center gap-1 text-xs leading-relaxed text-slate-500">
+        {trend === 'up' && <ArrowUpRight className="h-3.5 w-3.5 shrink-0 text-emerald-600" />}
+        {trend === 'down' && <ArrowDownRight className="h-3.5 w-3.5 shrink-0 text-rose-600" />}
         <span className="truncate">{sub}</span>
       </p>
 
@@ -105,7 +105,7 @@ export default function PortfolioHero({
         eyebrow={
           <>
             <span className="live-beacon">
-              <span className="relative h-1.5 w-1.5 rounded-full bg-emerald-400" />
+              <span className="relative h-1.5 w-1.5 rounded-full bg-emerald-500" />
             </span>
             Live Portfolio Intelligence
           </>
@@ -114,7 +114,7 @@ export default function PortfolioHero({
         description="Allocation, risk and Monte Carlo projections computed from your own holdings, savings and cash flow."
         actions={
           <button onClick={onRefresh} disabled={refreshing} className="btn-secondary">
-            <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin text-primary-300' : ''}`} />
+            <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin text-primary-600' : ''}`} />
             {refreshing ? 'Syncing' : 'Refresh'}
           </button>
         }
@@ -157,7 +157,7 @@ export default function PortfolioHero({
           sub={`${investedShare}% of portfolio in equity, debt and gold`}
           icon={<Sparkles className="h-4 w-4" />}
           accent={chartColors.brand}
-          tone="text-primary-200"
+          tone="text-primary-700"
           delay={60}
         />
         <MetricTile
@@ -165,8 +165,8 @@ export default function PortfolioHero({
           value={compactINR(liquidValue)}
           sub={`${liquidShare}% held as cash, deposits and savings`}
           icon={<Wallet className="h-4 w-4" />}
-          accent={chartColors.cyan}
-          tone="text-cyan-300"
+          accent={chartColors.ice}
+          tone="text-ice-700"
           delay={120}
         />
         <MetricTile
@@ -175,7 +175,7 @@ export default function PortfolioHero({
           sub={`Blended from your mix · ${profile.diversification}% diversified`}
           icon={<ArrowUpRight className="h-4 w-4" />}
           accent={chartColors.violet}
-          tone="text-violet-300"
+          tone="text-indigo-600"
           delay={180}
         />
         <MetricTile
@@ -188,7 +188,7 @@ export default function PortfolioHero({
           }
           icon={<Activity className="h-4 w-4" />}
           accent={monthlySurplus >= 0 ? chartColors.positive : chartColors.negative}
-          tone={monthlySurplus >= 0 ? 'text-emerald-300' : 'text-rose-300'}
+          tone={monthlySurplus >= 0 ? 'text-emerald-700' : 'text-rose-600'}
           delay={240}
           trend={cashflowMonths > 0 ? (monthlySurplus >= 0 ? 'up' : 'down') : null}
         />

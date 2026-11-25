@@ -221,10 +221,10 @@ function formatIndicatorValue(indicator: Indicator) {
 }
 
 function getChangeTone(value: number | null) {
-  if (value === null || value === undefined) return 'text-slate-400 bg-white/[0.03] ring-1 ring-inset ring-white/[0.06]'
-  if (value > 0) return 'text-emerald-300 bg-emerald-500/10 ring-1 ring-inset ring-emerald-400/20'
-  if (value < 0) return 'text-rose-300 bg-rose-500/10 ring-1 ring-inset ring-rose-400/20'
-  return 'text-slate-200 bg-white/[0.04] ring-1 ring-inset ring-white/[0.08]'
+  if (value === null || value === undefined) return 'text-slate-500 bg-slate-50 ring-1 ring-inset ring-slate-200'
+  if (value > 0) return 'text-emerald-700 bg-emerald-50 ring-1 ring-inset ring-emerald-200'
+  if (value < 0) return 'text-rose-700 bg-rose-50 ring-1 ring-inset ring-rose-200'
+  return 'text-ink-700 bg-slate-100 ring-1 ring-inset ring-slate-200'
 }
 
 /** Presentational accents for the movers buckets (literal classes for Tailwind). */
@@ -383,11 +383,11 @@ export default function MarketsPage() {
         >
           <div className="flex flex-col items-center gap-4">
             <div className="relative h-12 w-12">
-              <div className="absolute inset-0 rounded-full bg-primary-500/20 blur-xl" />
-              <div className="absolute inset-0 rounded-full border border-white/10" />
-              <div className="absolute inset-0 animate-spin rounded-full border-2 border-transparent border-r-cyan-400/70 border-t-primary-400" />
+              <div className="absolute inset-0 rounded-full bg-primary-200/50 blur-xl" />
+              <div className="absolute inset-0 rounded-full border-2 border-line" />
+              <div className="absolute inset-0 animate-spin rounded-full border-2 border-transparent border-r-ice-400 border-t-primary-500" />
             </div>
-            <p className="text-sm text-slate-400">Loading market insights…</p>
+            <p className="text-sm text-slate-500">Loading market insights…</p>
           </div>
         </div>
       </DashboardLayout>
@@ -441,20 +441,18 @@ export default function MarketsPage() {
               }}
               className="btn-secondary h-10"
             >
-              <RefreshCcw className={`h-4 w-4 text-primary-300 ${refreshing ? 'animate-spin' : ''}`} />
+              <RefreshCcw className={`h-4 w-4 text-primary-600 ${refreshing ? 'animate-spin' : ''}`} />
               <span>Refresh intelligence</span>
             </button>
           }
         />
 
         <section
-          className="card card-spotlight relative overflow-hidden p-5 animate-fade-up sm:p-6"
+          className="surface-highlight card-spotlight relative overflow-hidden p-5 shadow-card animate-fade-up sm:p-6"
           style={{ animationDelay: '60ms' }}
         >
           <div className="pointer-events-none absolute inset-0" aria-hidden="true">
-            <div className="absolute -left-16 -top-24 h-64 w-64 rounded-full bg-primary-500/20 blur-3xl" />
-            <div className="absolute -bottom-28 right-0 h-64 w-64 rounded-full bg-cyan-400/10 blur-3xl" />
-            <div className="absolute inset-0 bg-[linear-gradient(rgba(169,172,255,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(169,172,255,0.05)_1px,transparent_1px)] bg-[length:32px_32px] [mask-image:radial-gradient(ellipse_at_top_left,#000_15%,transparent_70%)]" />
+            <div className="absolute inset-0 bg-[linear-gradient(rgba(5,150,105,0.06)_1px,transparent_1px),linear-gradient(90deg,rgba(5,150,105,0.06)_1px,transparent_1px)] bg-[length:32px_32px] [mask-image:radial-gradient(ellipse_at_top_left,#000_15%,transparent_70%)]" />
           </div>
 
           <div className="relative grid gap-5 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)] lg:gap-6">
@@ -465,14 +463,14 @@ export default function MarketsPage() {
                 </span>
                 <p className="eyebrow">What it means</p>
               </div>
-              <p className="text-pretty mt-4 font-display text-lg font-medium leading-relaxed text-slate-100 sm:text-xl">
+              <p className="text-pretty mt-4 font-display text-lg font-medium leading-relaxed text-ink-900 sm:text-xl">
                 {data?.insights.headline}
               </p>
             </div>
 
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
-              <div className="surface-inset p-4">
-                <div className="flex items-center gap-2 text-slate-400">
+              <div className="rounded-xl border border-line bg-white/80 p-4 shadow-xs">
+                <div className="flex items-center gap-2 text-slate-500">
                   <Clock className="h-3.5 w-3.5" />
                   <p className="eyebrow">Data refresh</p>
                 </div>
@@ -488,8 +486,8 @@ export default function MarketsPage() {
                   Cached market data refreshes from free APIs with fallback handling.
                 </p>
               </div>
-              <div className="surface-inset p-4">
-                <div className="flex items-center gap-2 text-slate-400">
+              <div className="rounded-xl border border-line bg-white/80 p-4 shadow-xs">
+                <div className="flex items-center gap-2 text-slate-500">
                   <IndianRupee className="h-3.5 w-3.5" />
                   <p className="eyebrow">USD/INR</p>
                 </div>
@@ -504,7 +502,7 @@ export default function MarketsPage() {
         </section>
 
         {missingKeys.length > 0 ? (
-          <div className="flex items-start gap-3 rounded-2xl border border-amber-400/20 bg-amber-500/[0.07] p-4 text-sm leading-6 text-amber-100/90">
+          <div className="flex items-start gap-3 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm leading-6 text-amber-800">
             <span className="icon-tile icon-tile-sm icon-tile-amber">
               <AlertTriangle className="h-4 w-4" />
             </span>
@@ -525,7 +523,7 @@ export default function MarketsPage() {
             />
             <div className="flex w-full gap-2 lg:max-w-xl">
               <div className="relative min-w-0 flex-1">
-                <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
+                <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
                 <input
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
@@ -548,14 +546,14 @@ export default function MarketsPage() {
 
           {searchResult ? (
             <div className="surface-inset relative mt-5 overflow-hidden p-5 animate-pop-in">
-              <div className="pointer-events-none absolute -right-12 -top-12 h-36 w-36 rounded-full bg-primary-500/15 blur-2xl" aria-hidden="true" />
+              <div className="pointer-events-none absolute -right-12 -top-12 h-36 w-36 rounded-full bg-primary-100/80 blur-2xl" aria-hidden="true" />
               <div className="relative flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                 <div className="min-w-0">
                   <p className="eyebrow">
                     {searchResult.instrumentType || searchResult.category}
                   </p>
-                  <h3 className="mt-2 break-words font-display text-2xl font-semibold tracking-tight text-white">{searchResult.label}</h3>
-                  <p className="mt-1 break-words font-mono text-[13px] text-slate-400">
+                  <h3 className="mt-2 break-words font-display text-2xl font-semibold tracking-tight text-ink-900">{searchResult.label}</h3>
+                  <p className="mt-1 break-words font-mono text-[13px] text-slate-500">
                     {searchResult.symbol}
                     {searchResult.country ? ` | ${searchResult.country}` : ''}
                     {searchResult.exchange ? ` | ${searchResult.exchange}` : ''}
@@ -563,7 +561,7 @@ export default function MarketsPage() {
                 </div>
                 <div className="text-left lg:text-right">
                   <p className="kpi-value text-3xl">{formatAssetPrice(searchResult)}</p>
-                  <p className="num mt-1 text-xs text-slate-400">Original: {formatOriginalPrice(searchResult)}</p>
+                  <p className="num mt-1 text-xs text-slate-500">Original: {formatOriginalPrice(searchResult)}</p>
                   <p className="mt-1 text-xs text-slate-500">Currency: {searchResult.rawCurrency || searchResult.currency}</p>
                 </div>
               </div>
@@ -581,8 +579,8 @@ export default function MarketsPage() {
               </div>
             </div>
           ) : searchReason ? (
-            <div className="surface-inset mt-5 flex items-start gap-3 p-4 text-sm text-slate-300">
-              <Info className="mt-0.5 h-4 w-4 shrink-0 text-sky-300" />
+            <div className="surface-inset mt-5 flex items-start gap-3 p-4 text-sm text-ink-700">
+              <Info className="mt-0.5 h-4 w-4 shrink-0 text-sky-600" />
               <p className="min-w-0">
                 {searchReason === 'missing_twelve_data_key'
                   ? 'Search is unavailable because the Twelve Data API key is missing.'
@@ -608,8 +606,8 @@ export default function MarketsPage() {
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
                       <p className="eyebrow text-[10px] text-slate-500">{asset.category}</p>
-                      <h3 className="mt-1.5 break-words font-display text-base font-semibold tracking-tight text-white">{asset.label}</h3>
-                      <p className="mt-0.5 text-xs leading-5 text-slate-400">{asset.concept}</p>
+                      <h3 className="mt-1.5 break-words font-display text-base font-semibold tracking-tight text-ink-900">{asset.label}</h3>
+                      <p className="mt-0.5 text-xs leading-5 text-slate-500">{asset.concept}</p>
                     </div>
                     {asset.isProxy ? (
                       <span className="badge badge-neutral shrink-0 text-[10px] uppercase tracking-wide">
@@ -620,7 +618,7 @@ export default function MarketsPage() {
 
                   <div className="mt-4 flex-1">
                     <p className="kpi-value break-words text-2xl">{formatAssetPrice(asset)}</p>
-                    <p className="num mt-1 text-xs text-slate-400">Original: {formatOriginalPrice(asset)}</p>
+                    <p className="num mt-1 text-xs text-slate-500">Original: {formatOriginalPrice(asset)}</p>
                     <p className="mt-2 text-xs leading-5 text-slate-500">{asset.importance}</p>
                   </div>
 
@@ -646,12 +644,12 @@ export default function MarketsPage() {
               <SectionHeader icon={Landmark} tone="sky" title="Market Status" />
               <div className="mt-5 space-y-2.5">
                 {statuses.length === 0 ? (
-                  <p className="text-sm text-slate-400">No market status data available.</p>
+                  <p className="text-sm text-slate-500">No market status data available.</p>
                 ) : (
                   statuses.map((item) => (
                     <div key={`${item.region}-${item.marketType}`} className="surface-inset flex items-center justify-between gap-3 px-4 py-3">
                       <div className="min-w-0">
-                        <p className="truncate text-sm font-semibold text-slate-100">{item.region}</p>
+                        <p className="truncate text-sm font-semibold text-ink-900">{item.region}</p>
                         <p className="truncate text-xs text-slate-500">{item.primaryExchanges || item.marketType}</p>
                       </div>
                       <span className={`badge shrink-0 uppercase tracking-wide ${
@@ -662,8 +660,8 @@ export default function MarketsPage() {
                         <span
                           className={`h-1.5 w-1.5 rounded-full ${
                             item.status.toLowerCase().includes('open')
-                              ? 'bg-emerald-400 shadow-[0_0_6px_#34d399]'
-                              : 'bg-slate-500'
+                              ? 'bg-emerald-500'
+                              : 'bg-slate-400'
                           }`}
                           aria-hidden="true"
                         />
@@ -679,8 +677,8 @@ export default function MarketsPage() {
               <SectionHeader icon={BrainCircuit} tone="violet" title="Personal Relevance" />
               <div className="mt-5 space-y-2.5">
                 {personalRelevance.map((item) => (
-                  <div key={item} className="surface-inset flex gap-3 p-4 text-sm leading-6 text-slate-200">
-                    <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-violet-400 shadow-[0_0_8px_#a78bfa]" aria-hidden="true" />
+                  <div key={item} className="surface-inset flex gap-3 p-4 text-sm leading-6 text-ink-700">
+                    <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-indigo-500" aria-hidden="true" />
                     <p className="min-w-0">{item}</p>
                   </div>
                 ))}
@@ -696,13 +694,13 @@ export default function MarketsPage() {
               tone="cyan"
               title="Trend Dashboard"
               actions={
-                <div className="flex items-center gap-3 text-[11px] font-semibold text-slate-400" aria-hidden="true">
+                <div className="flex items-center gap-3 text-[11px] font-semibold text-slate-600" aria-hidden="true">
                   <span className="inline-flex items-center gap-1.5">
                     <span className="h-2 w-2 rounded-full" style={{ backgroundColor: chartColors.brand }} />
                     1D
                   </span>
                   <span className="inline-flex items-center gap-1.5">
-                    <span className="h-2 w-2 rounded-full" style={{ backgroundColor: chartColors.cyan }} />
+                    <span className="h-2 w-2 rounded-full" style={{ backgroundColor: chartColors.ice }} />
                     1W
                   </span>
                   <span className="inline-flex items-center gap-1.5">
@@ -724,7 +722,7 @@ export default function MarketsPage() {
                       formatter={(value: number) => `${value.toFixed(2)}%`}
                     />
                     <Bar dataKey="oneDay" name="1D" fill={chartColors.brand} radius={[6, 6, 0, 0]} maxBarSize={18} isAnimationActive={!reduceMotion} />
-                    <Bar dataKey="oneWeek" name="1W" fill={chartColors.cyan} radius={[6, 6, 0, 0]} maxBarSize={18} isAnimationActive={!reduceMotion} />
+                    <Bar dataKey="oneWeek" name="1W" fill={chartColors.ice} radius={[6, 6, 0, 0]} maxBarSize={18} isAnimationActive={!reduceMotion} />
                     <Bar dataKey="oneMonth" name="1M" fill={chartColors.warning} radius={[6, 6, 0, 0]} maxBarSize={18} isAnimationActive={!reduceMotion} />
                   </BarChart>
                 </ResponsiveContainer>
@@ -732,7 +730,7 @@ export default function MarketsPage() {
             </div>
             <div className="surface-inset mt-5 p-4">
               <p className="eyebrow">Narrative</p>
-              <p className="mt-2 text-sm leading-7 text-slate-300">{data?.insights.trendNarrative}</p>
+              <p className="mt-2 text-sm leading-7 text-ink-700">{data?.insights.trendNarrative}</p>
             </div>
           </section>
 
@@ -744,7 +742,7 @@ export default function MarketsPage() {
                 <div key={indicator.key} className="surface-inset min-w-0 p-4">
                   <p className="eyebrow text-[10px] text-slate-500">{indicator.label}</p>
                   <p className="kpi-value mt-2 break-words text-xl sm:text-2xl">{formatIndicatorValue(indicator)}</p>
-                  <p className="mt-1.5 text-[13px] leading-6 text-slate-400">{indicator.importance}</p>
+                  <p className="mt-1.5 text-[13px] leading-6 text-slate-500">{indicator.importance}</p>
                 </div>
               ))}
             </div>
@@ -756,8 +754,8 @@ export default function MarketsPage() {
                     <AreaChart data={pulseData}>
                       <defs>
                         <linearGradient id="marketPulseFill" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor={chartColors.brand} stopOpacity={0.4} />
-                          <stop offset="95%" stopColor={chartColors.brand} stopOpacity={0.02} />
+                          <stop offset="5%" stopColor={chartColors.brand} stopOpacity={0.25} />
+                          <stop offset="95%" stopColor={chartColors.ice} stopOpacity={0.02} />
                         </linearGradient>
                       </defs>
                       <CartesianGrid {...gridProps} />
@@ -781,26 +779,26 @@ export default function MarketsPage() {
 
             <div className={`mt-4 rounded-2xl border p-4 ${
               data?.macro.recessionSignal.status === 'warning'
-                ? 'border-rose-400/25 bg-rose-500/[0.08]'
+                ? 'border-rose-200 bg-rose-50'
                 : data?.macro.recessionSignal.status === 'caution'
-                  ? 'border-amber-400/25 bg-amber-500/[0.08]'
-                  : 'border-emerald-400/25 bg-emerald-500/[0.08]'
+                  ? 'border-amber-200 bg-amber-50'
+                  : 'border-emerald-200 bg-emerald-50'
             }`}>
               <div className="flex items-center gap-2">
                 <span
                   className={`h-2 w-2 rounded-full ${
                     data?.macro.recessionSignal.status === 'warning'
-                      ? 'bg-rose-400 shadow-[0_0_8px_#fb7185]'
+                      ? 'bg-rose-500 ring-4 ring-rose-500/15'
                       : data?.macro.recessionSignal.status === 'caution'
-                        ? 'bg-amber-400 shadow-[0_0_8px_#fbbf24]'
-                        : 'bg-emerald-400 shadow-[0_0_8px_#34d399]'
+                        ? 'bg-amber-500 ring-4 ring-amber-500/15'
+                        : 'bg-emerald-500 ring-4 ring-emerald-500/15'
                   }`}
                   aria-hidden="true"
                 />
                 <p className="eyebrow">Recession signal</p>
               </div>
-              <p className="mt-2 font-display text-lg font-semibold text-white">{data?.macro.recessionSignal.label}</p>
-              <p className="mt-1.5 text-sm leading-6 text-slate-300">{data?.macro.recessionSignal.detail}</p>
+              <p className="mt-2 font-display text-lg font-semibold text-ink-900">{data?.macro.recessionSignal.label}</p>
+              <p className="mt-1.5 text-sm leading-6 text-ink-700">{data?.macro.recessionSignal.detail}</p>
             </div>
           </section>
         </div>
@@ -818,24 +816,24 @@ export default function MarketsPage() {
                       <span className={`icon-tile icon-tile-sm ${moverStyle.tile}`}>
                         <MoverIcon className="h-4 w-4" />
                       </span>
-                      <p className="text-sm font-semibold text-slate-50">{title}</p>
+                      <p className="text-sm font-semibold text-ink-900">{title}</p>
                     </div>
                     <div className="mt-3 space-y-2">
                       {items.length === 0 ? (
-                        <p className="text-[13px] leading-6 text-slate-400">Unavailable right now. {alphaUnavailableReason}</p>
+                        <p className="text-[13px] leading-6 text-slate-500">Unavailable right now. {alphaUnavailableReason}</p>
                       ) : (
                         items.map((item) => (
                           <div
                             key={`${title}-${item.symbol}`}
-                            className="rounded-xl border border-white/[0.05] bg-[#05060e]/40 px-3 py-2.5 transition-colors hover:border-white/10"
+                            className="rounded-xl border border-line bg-white px-3 py-2.5 shadow-xs transition-colors hover:border-line-strong"
                           >
                             <div className="flex items-center justify-between gap-3">
-                              <p className="min-w-0 truncate font-mono text-sm font-semibold text-slate-100">{item.symbol}</p>
+                              <p className="min-w-0 truncate font-mono text-sm font-semibold text-ink-900">{item.symbol}</p>
                               <span className={`num shrink-0 rounded-md px-2 py-0.5 text-[11px] font-semibold ${getChangeTone(item.changePercentage)}`}>
                                 {formatSignedPercent(item.changePercentage)}
                               </span>
                             </div>
-                            <p className="num mt-1.5 text-[11px] leading-5 text-slate-400">
+                            <p className="num mt-1.5 text-[11px] leading-5 text-slate-500">
                               Original {item.price !== null ? `$${item.price.toFixed(2)}` : 'N/A'} | INR {formatRupees(item.priceInInr)} | Vol {item.volume !== null ? formatCompactNumber(item.volume) : 'Unavailable'}
                             </p>
                           </div>
@@ -852,8 +850,8 @@ export default function MarketsPage() {
             <SectionHeader icon={Newspaper} tone="sky" title="News and Sentiment" />
             <div className="mt-5 space-y-3">
               {news.length === 0 ? (
-                <div className="surface-inset flex items-start gap-3 p-4 text-sm text-slate-300">
-                  <Info className="mt-0.5 h-4 w-4 shrink-0 text-sky-300" />
+                <div className="surface-inset flex items-start gap-3 p-4 text-sm text-ink-700">
+                  <Info className="mt-0.5 h-4 w-4 shrink-0 text-sky-600" />
                   <p className="min-w-0">Market news feed is currently unavailable. {alphaUnavailableReason}</p>
                 </div>
               ) : (
@@ -876,16 +874,16 @@ export default function MarketsPage() {
                               {item.sentiment}
                             </span>
                           </div>
-                          <h3 className="mt-3 break-words text-[15px] font-semibold leading-snug text-slate-50 transition-colors group-hover:text-white">{item.title}</h3>
+                          <h3 className="mt-3 break-words text-[15px] font-semibold leading-snug text-ink-900 transition-colors group-hover:text-primary-700">{item.title}</h3>
                         </div>
-                        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-white/[0.08] bg-white/[0.03] text-slate-400 transition-colors group-hover:border-primary-400/30 group-hover:text-primary-200">
+                        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-line bg-white text-slate-400 shadow-xs transition-colors group-hover:border-primary-200 group-hover:text-primary-600">
                           <ArrowUpRight className="h-4 w-4 transition-transform motion-safe:group-hover:-translate-y-0.5 motion-safe:group-hover:translate-x-0.5" />
                         </span>
                       </div>
-                      <p className="mt-2.5 text-sm leading-6 text-slate-300">{item.summary}</p>
+                      <p className="mt-2.5 text-sm leading-6 text-slate-600">{item.summary}</p>
                       <div className="mt-3 flex flex-wrap items-center gap-1.5">
                         {item.topics.map((topic) => (
-                          <span key={topic} className="rounded-full border border-white/[0.08] bg-white/[0.02] px-2 py-0.5 text-[11px] text-slate-400">
+                          <span key={topic} className="rounded-full border border-line bg-white px-2 py-0.5 text-[11px] text-slate-500">
                             {topic}
                           </span>
                         ))}
@@ -907,13 +905,13 @@ export default function MarketsPage() {
                               {item.sentiment}
                             </span>
                           </div>
-                          <h3 className="mt-3 break-words text-[15px] font-semibold leading-snug text-slate-50">{item.title}</h3>
+                          <h3 className="mt-3 break-words text-[15px] font-semibold leading-snug text-ink-900">{item.title}</h3>
                         </div>
                       </div>
-                      <p className="mt-2.5 text-sm leading-6 text-slate-300">{item.summary}</p>
+                      <p className="mt-2.5 text-sm leading-6 text-slate-600">{item.summary}</p>
                       <div className="mt-3 flex flex-wrap items-center gap-1.5">
                         {item.topics.map((topic) => (
-                          <span key={topic} className="rounded-full border border-white/[0.08] bg-white/[0.02] px-2 py-0.5 text-[11px] text-slate-400">
+                          <span key={topic} className="rounded-full border border-line bg-white px-2 py-0.5 text-[11px] text-slate-500">
                             {topic}
                           </span>
                         ))}
@@ -938,11 +936,11 @@ export default function MarketsPage() {
                   style={{ animationDelay: `${index * 50}ms` }}
                 >
                   <span
-                    className="absolute inset-y-4 left-0 w-[3px] rounded-r-full bg-gradient-to-b from-primary-400 to-cyan-400"
+                    className="absolute inset-y-4 left-0 w-[3px] rounded-r-full bg-gradient-to-b from-primary-500 to-ice-400"
                     aria-hidden="true"
                   />
-                  <p className="text-[15px] font-semibold text-slate-50">{card.title}</p>
-                  <p className="mt-1.5 text-sm leading-6 text-slate-300">{card.body}</p>
+                  <p className="text-[15px] font-semibold text-ink-900">{card.title}</p>
+                  <p className="mt-1.5 text-sm leading-6 text-slate-600">{card.body}</p>
                 </div>
               ))}
             </div>
@@ -953,35 +951,35 @@ export default function MarketsPage() {
             <div className="mt-5 grid gap-3 md:grid-cols-2">
               <div className="surface-inset p-4">
                 <div className="flex items-center gap-2">
-                  <span className="h-1.5 w-1.5 rounded-full bg-rose-400" aria-hidden="true" />
+                  <span className="h-1.5 w-1.5 rounded-full bg-rose-500" aria-hidden="true" />
                   <p className="eyebrow">Total debt</p>
                 </div>
                 <p className="kpi-value mt-2.5 text-2xl">
                   ₹{Math.round(data?.insights.userContext.totalDebt || 0).toLocaleString('en-IN')}
                 </p>
-                <p className="mt-1.5 text-[13px] leading-5 text-slate-400">Higher-rate environments make debt strategy more important.</p>
+                <p className="mt-1.5 text-[13px] leading-5 text-slate-500">Higher-rate environments make debt strategy more important.</p>
               </div>
               <div className="surface-inset p-4">
                 <div className="flex items-center gap-2">
-                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" aria-hidden="true" />
+                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" aria-hidden="true" />
                   <p className="eyebrow">Total savings</p>
                 </div>
                 <p className="kpi-value mt-2.5 text-2xl">
                   ₹{Math.round(data?.insights.userContext.totalSavings || 0).toLocaleString('en-IN')}
                 </p>
-                <p className="mt-1.5 text-[13px] leading-5 text-slate-400">Savings strength affects how well you can absorb macro volatility.</p>
+                <p className="mt-1.5 text-[13px] leading-5 text-slate-500">Savings strength affects how well you can absorb macro volatility.</p>
               </div>
             </div>
             <div className="surface-inset mt-3 p-4">
               <p className="eyebrow">Top expense categories</p>
               <div className="mt-3 space-y-2">
                 {(data?.insights.userContext.topExpenseCategories || []).length === 0 ? (
-                  <p className="text-sm text-slate-400">Add expense transactions to unlock more personal market relevance.</p>
+                  <p className="text-sm text-slate-500">Add expense transactions to unlock more personal market relevance.</p>
                 ) : (
                   (data?.insights.userContext.topExpenseCategories || []).map((item) => (
-                    <div key={item.category} className="flex items-center justify-between gap-3 rounded-xl border border-white/[0.05] bg-white/[0.02] px-3.5 py-2.5">
-                      <p className="min-w-0 truncate text-sm text-slate-200">{item.category}</p>
-                      <p className="num shrink-0 text-sm font-semibold text-slate-50">
+                    <div key={item.category} className="flex items-center justify-between gap-3 rounded-xl border border-line bg-white px-3.5 py-2.5 shadow-xs">
+                      <p className="min-w-0 truncate text-sm text-ink-800">{item.category}</p>
+                      <p className="num shrink-0 text-sm font-semibold text-ink-900">
                         ₹{Math.round(item.total).toLocaleString('en-IN')}
                       </p>
                     </div>

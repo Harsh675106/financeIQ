@@ -18,10 +18,10 @@ import { WealthCategory, WealthItem } from './WealthItemCard'
 
 // Literal class map so Tailwind keeps every tone (savings/assets read positive, debts as liabilities).
 const previewToneClass: Record<WealthCategory, string> = {
-  savings: 'text-emerald-300',
-  debts: 'text-rose-300',
-  assets: 'text-cyan-200',
-  liabilities: 'text-amber-200',
+  savings: 'text-emerald-700',
+  debts: 'text-rose-600',
+  assets: 'text-sky-700',
+  liabilities: 'text-amber-700',
 }
 
 interface WealthModalProps {
@@ -267,11 +267,11 @@ export default function WealthModal({
         {/* Glow backdrop */}
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute -right-20 -top-20 h-48 w-48 rounded-full bg-primary-500/15 blur-3xl"
+          className="pointer-events-none absolute -right-20 -top-20 h-48 w-48 rounded-full bg-primary-100/60 blur-3xl"
         />
 
         {/* Mobile sheet handle */}
-        <div aria-hidden="true" className="relative mx-auto -mt-1 mb-4 h-1 w-10 rounded-full bg-white/15 sm:hidden" />
+        <div aria-hidden="true" className="relative mx-auto -mt-1 mb-4 h-1 w-10 rounded-full bg-slate-200 sm:hidden" />
 
         {/* Close Button */}
         <button
@@ -288,10 +288,10 @@ export default function WealthModal({
             <Sparkles className="h-[18px] w-[18px]" />
           </span>
           <div className="min-w-0">
-            <h2 className="font-display text-lg font-semibold tracking-tight text-slate-50 sm:text-xl">
+            <h2 className="font-display text-lg font-semibold tracking-tight text-ink-900 sm:text-xl">
               {editingItem ? 'Edit Entry' : 'Add New Wealth Entry'}
             </h2>
-            <p className="mt-0.5 text-xs text-slate-400">
+            <p className="mt-0.5 text-xs text-slate-500">
               Maintain high balance sheet fidelity for accurate AI projections
             </p>
           </div>
@@ -319,7 +319,7 @@ export default function WealthModal({
         {/* Quick Presets */}
         <div className="relative mb-5 space-y-2">
           <span className="eyebrow flex items-center gap-1.5 text-[10px]">
-            <Sparkles className="h-3 w-3 text-primary-300" />
+            <Sparkles className="h-3 w-3 text-primary-600" />
             Quick Presets:
           </span>
           <div className="flex flex-wrap gap-1.5">
@@ -328,7 +328,7 @@ export default function WealthModal({
                 key={p.label}
                 type="button"
                 onClick={() => applyPreset(p)}
-                className="rounded-lg border border-white/[0.08] bg-white/[0.03] px-2.5 py-1.5 text-[11px] font-medium text-slate-300 transition-colors hover:border-primary-400/45 hover:bg-primary-500/10 hover:text-white"
+                className="rounded-lg border border-line-strong bg-white px-2.5 py-1.5 text-[11px] font-medium text-ink-700 transition-colors hover:border-primary-200 hover:bg-primary-50 hover:text-primary-700"
               >
                 + {p.label}
               </button>
@@ -338,9 +338,9 @@ export default function WealthModal({
 
         {/* Live Preview Card */}
         <div className="surface-inset relative mb-5 overflow-hidden p-4">
-          <div aria-hidden="true" className="absolute inset-y-0 left-0 w-[3px] bg-gradient-to-b from-primary-400 via-violet-400 to-cyan-400" />
+          <div aria-hidden="true" className="absolute inset-y-0 left-0 w-[3px] bg-gradient-to-b from-primary-500 via-teal-400 to-sky-400" />
           <div className="mb-1.5 flex items-center justify-between gap-3">
-            <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-primary-300">
+            <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-primary-700">
               Live Card Preview
             </span>
             <span className={`kpi-value break-words text-base ${previewToneClass[activeTab]}`}>
@@ -348,7 +348,7 @@ export default function WealthModal({
             </span>
           </div>
           <div className="min-w-0 text-xs">
-            <p className="truncate font-semibold text-slate-100">
+            <p className="truncate font-semibold text-ink-900">
               {activeTab === 'savings'
                 ? formData.account_type || 'Savings Account'
                 : activeTab === 'debts'
@@ -357,7 +357,7 @@ export default function WealthModal({
                 ? `${formData.type || 'Asset'}${formData.symbol ? ` (${formData.symbol.toUpperCase()})` : ''}`
                 : formData.type || 'Liability'}
             </p>
-            <p className="mt-0.5 truncate text-[11px] text-slate-400">
+            <p className="mt-0.5 truncate text-[11px] text-slate-500">
               {formData.description || 'No notes added'}
             </p>
           </div>
@@ -578,15 +578,15 @@ export default function WealthModal({
           {error && (
             <p
               role="alert"
-              className="flex items-start gap-2 rounded-xl border border-rose-400/25 bg-rose-500/10 px-3 py-2 text-xs font-medium text-rose-200"
+              className="flex items-start gap-2 rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-xs font-medium text-rose-700"
             >
-              <AlertCircle className="mt-px h-3.5 w-3.5 shrink-0 text-rose-300" />
+              <AlertCircle className="mt-px h-3.5 w-3.5 shrink-0 text-rose-500" />
               <span>{error}</span>
             </p>
           )}
 
           {/* Action buttons */}
-          <div className="flex gap-3 border-t border-white/[0.06] pt-4">
+          <div className="flex gap-3 border-t border-line pt-4">
             <button
               type="button"
               onClick={onClose}

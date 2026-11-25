@@ -4,6 +4,9 @@ import { useState } from 'react'
 import { useAuth } from '@/hooks/useAuth'
 import LoginForm from '@/components/auth/LoginForm'
 import RegisterForm from '@/components/auth/RegisterForm'
+import AmbientCanvas from '@/components/motion/AmbientCanvas'
+import FloatingShapes, { type ShapeSpec } from '@/components/motion/FloatingShapes'
+import TiltCard from '@/components/motion/TiltCard'
 import {
   TrendingUp,
   Shield,
@@ -53,7 +56,7 @@ const features = [
     Icon: Brain,
     title: 'AI Opportunity Engine',
     description: 'Machine learning projections on savings, goals and cashflow.',
-    tile: 'icon-tile-violet',
+    tile: 'icon-tile-sky',
   },
   {
     Icon: Target,
@@ -65,8 +68,15 @@ const features = [
     Icon: BarChart3,
     title: 'Live Portfolio Radar',
     description: 'Allocation heatmaps and Monte Carlo stress tests in one view.',
-    tile: 'icon-tile-cyan',
+    tile: 'icon-tile-violet',
   },
+]
+
+const heroShapes: ShapeSpec[] = [
+  { kind: 'cube', size: 56, style: { top: '2%', left: '46%' }, desktopOnly: true },
+  { kind: 'ring', size: 132, style: { top: '-4%', right: '-2%' }, delay: 1.5, desktopOnly: true },
+  { kind: 'orb', size: 66, style: { bottom: '4%', left: '-2%' }, delay: 3, desktopOnly: true },
+  { kind: 'tile', size: 70, style: { bottom: '-2%', right: '40%' }, delay: 4.5, desktopOnly: true },
 ]
 
 export default function LandingPage() {
@@ -74,12 +84,12 @@ export default function LandingPage() {
   const { login, register } = useAuth()
 
   return (
-    <div className="relative isolate min-h-screen overflow-x-clip text-slate-100">
+    <div className="relative isolate min-h-screen overflow-x-clip text-ink-900">
       {/* Ambient glow */}
       <div className="pointer-events-none absolute inset-0 -z-10" aria-hidden="true">
-        <div className="absolute -left-32 -top-24 h-[28rem] w-[28rem] rounded-full bg-primary-500/25 blur-3xl animate-blob-slow" />
-        <div className="absolute -right-24 top-16 h-[24rem] w-[24rem] rounded-full bg-violet-500/20 blur-3xl animate-blob-slow" />
-        <div className="absolute bottom-[-8rem] left-1/3 h-[26rem] w-[26rem] rounded-full bg-cyan-400/10 blur-3xl animate-blob-slow" />
+        <div className="absolute -left-32 -top-24 h-[28rem] w-[28rem] rounded-full bg-primary-200/50 blur-3xl animate-blob-slow" />
+        <div className="absolute -right-24 top-16 h-[24rem] w-[24rem] rounded-full bg-ice-200/60 blur-3xl animate-blob-slow" />
+        <div className="absolute bottom-[-8rem] left-1/3 h-[26rem] w-[26rem] rounded-full bg-teal-100/60 blur-3xl animate-blob-slow" />
       </div>
 
       {/* Drifting finance symbols */}
@@ -101,13 +111,19 @@ export default function LandingPage() {
         ))}
       </div>
 
+      {/* Aurora ribbon + interactive particle network */}
+      <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden" aria-hidden="true">
+        <div className="page-bg-aurora absolute" />
+        <AmbientCanvas density={1.1} />
+      </div>
+
       <header className="container-app py-5 sm:py-7">
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-2.5">
             <div className="landing-brand-icon flex h-10 w-10 items-center justify-center rounded-xl">
               <TrendingUp className="h-5 w-5 text-white" strokeWidth={2.4} />
             </div>
-            <span className="font-display text-lg font-semibold tracking-tight text-white sm:text-xl">
+            <span className="font-display text-lg font-semibold tracking-tight text-ink-900 sm:text-xl">
               Finance<span className="text-gradient">IQ</span>
             </span>
           </div>
@@ -119,7 +135,8 @@ export default function LandingPage() {
         </div>
       </header>
 
-      <main className="container-app pb-12 pt-2 sm:pb-16 sm:pt-6 lg:pt-12">
+      <main className="container-app relative pb-12 pt-2 sm:pb-16 sm:pt-6 lg:pt-12">
+        <FloatingShapes shapes={heroShapes} className="-z-10" />
         <div className="grid items-center gap-10 lg:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)] lg:gap-16">
           {/* Hero copy */}
           <section className="order-last min-w-0 space-y-9 lg:order-first">
@@ -128,12 +145,12 @@ export default function LandingPage() {
                 <Sparkles className="h-3.5 w-3.5" />
                 AI-powered wealth insights
               </span>
-              <h1 className="text-balance font-display text-[2.25rem] font-semibold leading-[1.08] tracking-tight text-white sm:text-5xl lg:text-[3.6rem]">
+              <h1 className="text-balance font-display text-[2.1rem] font-semibold leading-[1.1] tracking-tight text-ink-900 sm:text-[2.75rem] lg:text-[3.25rem]">
                 The Modern Solution
                 <br />
                 <span className="text-gradient">For Financial Opportunity</span>
               </h1>
-              <p className="text-pretty max-w-xl text-[15px] leading-relaxed text-slate-400 sm:text-base">
+              <p className="text-pretty max-w-xl text-[15px] leading-relaxed text-slate-500 sm:text-base">
                 Create and track your financial journey with intelligent
                 analytics, Monte Carlo simulations, and risk insights crafted
                 for Indian investors.
@@ -144,29 +161,33 @@ export default function LandingPage() {
               {features.map(({ Icon, title, description, tile }, index) => (
                 <div
                   key={title}
-                  className="card card-hover hover-lift p-4 animate-fade-up sm:p-5"
+                  className="animate-fade-up"
                   style={{ animationDelay: `${120 + index * 70}ms` }}
                 >
-                  <div className="flex items-start gap-3.5">
-                    <span className={`icon-tile ${tile}`}>
-                      <Icon className="h-[18px] w-[18px]" />
-                    </span>
-                    <div className="min-w-0">
-                      <h3 className="text-sm font-semibold text-slate-50">{title}</h3>
-                      <p className="mt-1 text-xs leading-relaxed text-slate-400">{description}</p>
+                  <TiltCard className="h-full" max={8}>
+                    <div className="card card-hover h-full p-4 sm:p-5">
+                      <div className="flex items-start gap-3.5">
+                        <span className={`icon-tile ${tile}`}>
+                          <Icon className="h-[18px] w-[18px]" />
+                        </span>
+                        <div className="min-w-0">
+                          <h3 className="text-sm font-semibold text-ink-900">{title}</h3>
+                          <p className="mt-1 text-xs leading-relaxed text-slate-500">{description}</p>
+                        </div>
+                      </div>
                     </div>
-                  </div>
+                  </TiltCard>
                 </div>
               ))}
             </div>
 
-            <div className="flex flex-wrap items-center gap-x-6 gap-y-3 text-xs text-slate-400 sm:text-sm">
+            <div className="flex flex-wrap items-center gap-x-6 gap-y-3 text-xs text-slate-500 sm:text-sm">
               <div className="flex items-center gap-2">
-                <Zap className="landing-inline-icon h-4 w-4 text-primary-300" />
+                <Zap className="landing-inline-icon h-4 w-4 text-primary-600" />
                 <span>Realtime analytics</span>
               </div>
               <div className="flex items-center gap-2">
-                <Shield className="landing-inline-icon h-4 w-4 text-cyan-300" />
+                <Shield className="landing-inline-icon h-4 w-4 text-ice-600" />
                 <span>Bank-grade security</span>
               </div>
             </div>
@@ -178,10 +199,10 @@ export default function LandingPage() {
               <div className="landing-hero-glow pointer-events-none absolute -inset-10 -z-10" aria-hidden="true" />
               <div className="glass-strong auth-card w-full min-w-0 rounded-[1.75rem] p-5 animate-scale-in sm:p-8">
                 <div className="mb-6">
-                  <h2 className="font-display text-xl font-semibold tracking-tight text-white sm:text-2xl">
+                  <h2 className="font-display text-xl font-semibold tracking-tight text-ink-900 sm:text-2xl">
                     {isLogin ? 'Welcome back' : 'Create your account'}
                   </h2>
-                  <p className="mt-1 text-sm text-slate-400">
+                  <p className="mt-1 text-sm text-slate-500">
                     {isLogin
                       ? 'Sign in to your financial command center.'
                       : 'Start building your financial intelligence in minutes.'}

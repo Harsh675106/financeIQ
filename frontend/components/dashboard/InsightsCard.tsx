@@ -29,13 +29,13 @@ interface DashboardResponse {
 function severityStyle(sev: string) {
   switch (sev) {
     case 'critical':
-      return 'border-rose-500/25 bg-rose-500/[0.07] text-rose-100 hover:border-rose-400/45'
+      return 'border-rose-200 bg-rose-50/90 text-rose-800 hover:border-rose-300 hover:bg-rose-50'
     case 'warning':
-      return 'border-amber-500/25 bg-amber-500/[0.07] text-amber-100 hover:border-amber-400/45'
+      return 'border-amber-200 bg-amber-50/90 text-amber-800 hover:border-amber-300 hover:bg-amber-50'
     case 'info':
-      return 'border-cyan-500/20 bg-cyan-500/[0.06] text-cyan-50 hover:border-cyan-400/40'
+      return 'border-sky-100 bg-white/90 text-ink-800 hover:border-sky-200 hover:bg-white'
     default:
-      return 'border-white/[0.06] bg-white/[0.025] text-slate-200 hover:border-white/[0.12]'
+      return 'border-line bg-white/90 text-ink-800 hover:border-line-strong hover:bg-white'
   }
 }
 
@@ -55,7 +55,7 @@ function severityIcon(sev: string) {
       )
     case 'info':
       return (
-        <span className="icon-tile icon-tile-sm icon-tile-cyan h-7 w-7">
+        <span className="icon-tile icon-tile-sm icon-tile-sky h-7 w-7">
           <Info className="h-3.5 w-3.5" />
         </span>
       )
@@ -104,7 +104,7 @@ export default function InsightsCard() {
   })
 
   return (
-    <div className="card card-pad card-spotlight group h-full animate-fade-up">
+    <div className="surface-highlight card-pad card-spotlight group h-full shadow-card animate-fade-up">
       {/* Header with Filter Pill Tabs */}
       <SectionHeader
         icon={Lightbulb}
@@ -152,7 +152,7 @@ export default function InsightsCard() {
           {filteredInsights.map((ins, idx) => (
             <div
               key={idx}
-              className={`group/item flex items-start justify-between gap-3 rounded-xl border p-3 transition-colors duration-200 ${severityStyle(
+              className={`group/item flex items-start justify-between gap-3 rounded-xl border p-3 shadow-xs transition-colors duration-200 ${severityStyle(
                 ins.severity
               )}`}
             >
@@ -167,7 +167,7 @@ export default function InsightsCard() {
               <div className="flex shrink-0 items-center gap-1 opacity-80 transition-opacity group-hover/item:opacity-100">
                 <button
                   onClick={() => handleResolve(idx)}
-                  className="btn-icon h-8 w-8 hover:!text-emerald-300"
+                  className="btn-icon h-8 w-8 hover:!border-emerald-200 hover:!bg-emerald-50 hover:!text-emerald-700"
                   title="Mark as reviewed"
                   aria-label="Mark as reviewed"
                 >

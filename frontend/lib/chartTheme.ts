@@ -1,44 +1,55 @@
 /**
- * Shared Recharts theme for FinanceIQ ("Obsidian Aurora").
+ * Shared Recharts theme for FinanceIQ ("Mint & Ice" light theme).
  *
  * Axis ticks, grid lines, cursors and default tooltips are also themed
  * globally in app/globals.css, so charts stay consistent even where a
  * prop is not set. Use these constants for series colours and gradients.
+ *
+ * Key names are stable across themes — components reference them by role
+ * (brand, positive, negative …), not by hue.
  */
 
 export const chartColors = {
-  brand: '#8a88fb',
-  brandStrong: '#7068f4',
-  brandSoft: '#a9acff',
-  violet: '#a78bfa',
-  cyan: '#22d3ee',
+  /** Primary series (brand emerald). */
+  brand: '#10b981',
+  brandStrong: '#059669',
+  brandSoft: '#6ee7b7',
+  /** Secondary series (ice blue). */
+  ice: '#38bdf8',
+  iceStrong: '#0ea5e9',
+  /** Kept for existing references: AI / tertiary series. */
+  violet: '#6366f1',
+  cyan: '#06b6d4',
   sky: '#38bdf8',
-  positive: '#34d399',
-  positiveStrong: '#10b981',
-  negative: '#fb7185',
-  negativeStrong: '#f43f5e',
-  warning: '#fbbf24',
-  pink: '#f472b6',
-  lime: '#a3e635',
-  axis: '#7d86a8',
-  grid: 'rgba(255, 255, 255, 0.06)',
-  muted: '#4a5170',
-  surface: '#090b17',
-  text: '#eef0f8',
+  teal: '#14b8a6',
+  positive: '#10b981',
+  positiveStrong: '#059669',
+  negative: '#f43f5e',
+  negativeStrong: '#e11d48',
+  warning: '#f59e0b',
+  orange: '#f97316',
+  pink: '#ec4899',
+  lime: '#84cc16',
+  axis: '#64748b',
+  grid: '#e6efec',
+  muted: '#cbd8d5',
+  /** Background behind marks (donut separators, active-dot rings). */
+  surface: '#ffffff',
+  text: '#172b2a',
 } as const
 
-/** Categorical palette — ordered for maximum adjacent contrast. */
+/** Categorical palette — ordered for maximum adjacent contrast on white. */
 export const chartPalette = [
-  '#8a88fb', // iris
-  '#22d3ee', // cyan
-  '#34d399', // mint
-  '#f472b6', // pink
-  '#fbbf24', // amber
-  '#a78bfa', // violet
-  '#38bdf8', // sky
-  '#fb7185', // rose
-  '#a3e635', // lime
-  '#2dd4bf', // teal
+  '#10b981', // emerald
+  '#38bdf8', // ice blue
+  '#6366f1', // indigo
+  '#f59e0b', // amber
+  '#14b8a6', // teal
+  '#ec4899', // pink
+  '#0ea5e9', // sky
+  '#8b5cf6', // violet
+  '#f97316', // orange
+  '#84cc16', // lime
 ] as const
 
 export const axisTick = { fontSize: 11, fill: chartColors.axis }
@@ -55,8 +66,8 @@ export const gridProps = {
   vertical: false,
 } as const
 
-export const tooltipCursor = { stroke: 'rgba(169, 172, 255, 0.35)', strokeWidth: 1, strokeDasharray: '4 4' }
-export const barCursor = { fill: 'rgba(169, 172, 255, 0.06)' }
+export const tooltipCursor = { stroke: 'rgba(5, 150, 105, 0.35)', strokeWidth: 1, strokeDasharray: '4 4' }
+export const barCursor = { fill: 'rgba(16, 185, 129, 0.07)' }
 
 export const activeDot = {
   r: 5,

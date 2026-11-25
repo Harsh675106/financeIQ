@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { X, Sparkles, PlusCircle, MinusCircle, CheckCircle2 } from 'lucide-react'
+import { X, Sparkles, PlusCircle, MinusCircle, CheckCircle2, AlertCircle } from 'lucide-react'
 import { api } from '@/lib/api'
 import { safeNumber, formatINR } from '@/lib/formatters'
 import { WealthItem, WealthCategory } from './WealthItemCard'
@@ -81,13 +81,13 @@ export default function QuickAdjustModal({
         {/* Ambient glow */}
         <div
           aria-hidden="true"
-          className={`pointer-events-none absolute -right-16 -top-16 h-40 w-40 rounded-full opacity-20 blur-3xl ${
-            isSaving ? 'bg-emerald-500' : 'bg-rose-500'
+          className={`pointer-events-none absolute -right-16 -top-16 h-40 w-40 rounded-full opacity-60 blur-3xl ${
+            isSaving ? 'bg-emerald-100' : 'bg-rose-100'
           }`}
         />
 
         {/* Mobile sheet handle */}
-        <div aria-hidden="true" className="relative mx-auto -mt-1 mb-4 h-1 w-10 rounded-full bg-white/15 sm:hidden" />
+        <div aria-hidden="true" className="relative mx-auto -mt-1 mb-4 h-1 w-10 rounded-full bg-slate-200 sm:hidden" />
 
         {/* Close Button */}
         <button
@@ -104,29 +104,29 @@ export default function QuickAdjustModal({
             {isSaving ? <PlusCircle className="h-5 w-5" /> : <MinusCircle className="h-5 w-5" />}
           </span>
           <div className="min-w-0">
-            <h3 className="font-display text-base font-semibold tracking-tight text-slate-50 sm:text-lg">
+            <h3 className="font-display text-base font-semibold tracking-tight text-ink-900 sm:text-lg">
               {isSaving ? 'Deposit to Savings' : 'Record Debt Paydown'}
             </h3>
-            <p className="truncate text-xs text-slate-400">{title}</p>
+            <p className="truncate text-xs text-slate-500">{title}</p>
           </div>
         </div>
 
         {/* Live Calculation Preview Card */}
         <div className="surface-inset relative mb-5 space-y-2.5 p-4">
-          <div className="flex items-center justify-between gap-3 text-xs text-slate-400">
+          <div className="flex items-center justify-between gap-3 text-xs text-slate-500">
             <span>Current Balance:</span>
-            <span className="num font-medium text-slate-200">₹{formatINR(currentAmount)}</span>
+            <span className="num font-medium text-ink-800">₹{formatINR(currentAmount)}</span>
           </div>
 
-          <div className="flex items-center justify-between gap-3 text-xs text-slate-400">
+          <div className="flex items-center justify-between gap-3 text-xs text-slate-500">
             <span>{isSaving ? 'Deposit Amount:' : 'Payment Applied:'}</span>
-            <span className={`num font-semibold ${isSaving ? 'text-emerald-300' : 'text-rose-300'}`}>
+            <span className={`num font-semibold ${isSaving ? 'text-emerald-700' : 'text-rose-600'}`}>
               {isSaving ? '+' : '-'}₹{formatINR(adjustValue)}
             </span>
           </div>
 
-          <div className="flex items-center justify-between gap-3 border-t border-white/[0.06] pt-2.5 text-xs font-semibold">
-            <span className="text-slate-300">Updated Balance:</span>
+          <div className="flex items-center justify-between gap-3 border-t border-line pt-2.5 text-xs font-semibold">
+            <span className="text-ink-700">Updated Balance:</span>
             <span className="kpi-value text-base">
               ₹{formatINR(previewNewAmount)}
             </span>
@@ -159,7 +159,7 @@ export default function QuickAdjustModal({
                 type="button"
                 key={preset}
                 onClick={() => setAmountInput(preset.toString())}
-                className="num rounded-lg border border-white/[0.08] bg-white/[0.03] px-2.5 py-1.5 text-xs font-medium text-slate-300 transition-colors hover:border-primary-400/45 hover:bg-primary-500/10 hover:text-white"
+                className="num rounded-lg border border-line-strong bg-white px-2.5 py-1.5 text-xs font-medium text-ink-700 transition-colors hover:border-primary-200 hover:bg-primary-50 hover:text-primary-700"
               >
                 +₹{preset.toLocaleString('en-IN')}
               </button>
@@ -169,13 +169,14 @@ export default function QuickAdjustModal({
           {error && (
             <p
               role="alert"
-              className="rounded-xl border border-rose-400/25 bg-rose-500/10 px-3 py-2 text-xs text-rose-200"
+              className="flex items-start gap-2 rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-xs font-medium text-rose-700"
             >
-              {error}
+              <AlertCircle className="mt-px h-3.5 w-3.5 shrink-0 text-rose-500" />
+              <span>{error}</span>
             </p>
           )}
 
-          <div className="flex gap-3 border-t border-white/[0.06] pt-4">
+          <div className="flex gap-3 border-t border-line pt-4">
             <button
               type="button"
               onClick={onClose}
@@ -188,8 +189,8 @@ export default function QuickAdjustModal({
               disabled={submitting}
               className={`btn h-11 flex-1 text-white ${
                 isSaving
-                  ? 'bg-gradient-to-r from-emerald-500 to-teal-500 shadow-[inset_0_1px_0_rgba(255,255,255,0.2),0_8px_24px_-10px_rgba(16,185,129,0.75)] hover:brightness-110'
-                  : 'bg-gradient-to-r from-rose-500 to-pink-500 shadow-[inset_0_1px_0_rgba(255,255,255,0.2),0_8px_24px_-10px_rgba(244,63,94,0.75)] hover:brightness-110'
+                  ? 'bg-gradient-to-r from-emerald-600 to-emerald-700 shadow-glow-primary hover:brightness-105'
+                  : 'bg-gradient-to-r from-rose-600 to-rose-700 shadow-[0_8px_24px_-10px_rgba(225,29,72,0.55)] hover:brightness-105'
               }`}
             >
               {submitting ? 'Applying...' : isSaving ? 'Confirm Deposit' : 'Confirm Paydown'}

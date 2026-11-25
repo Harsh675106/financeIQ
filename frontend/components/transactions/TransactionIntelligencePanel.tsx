@@ -38,7 +38,7 @@ export default function TransactionIntelligencePanel() {
     <div className="card card-pad relative overflow-hidden">
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-violet-500/10 blur-3xl"
+        className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-indigo-100/60 blur-3xl"
       />
 
       {/* Header */}
@@ -60,8 +60,8 @@ export default function TransactionIntelligencePanel() {
 
         <span className="badge badge-ai self-start sm:self-auto">
           <span className="relative flex h-2 w-2" aria-hidden="true">
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-violet-400 opacity-60" />
-            <span className="relative inline-flex h-2 w-2 rounded-full bg-violet-400" />
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-indigo-500 opacity-50" />
+            <span className="relative inline-flex h-2 w-2 rounded-full bg-indigo-500" />
           </span>
           Realtime Observer
         </span>
@@ -73,14 +73,14 @@ export default function TransactionIntelligencePanel() {
           <div className="skeleton hidden h-32 md:block" />
         </div>
       ) : !data ? (
-        <div className="relative py-4 text-sm text-slate-400">No AI intelligence data available yet.</div>
+        <div className="relative py-4 text-sm text-slate-500">No AI intelligence data available yet.</div>
       ) : (
         <div className="relative grid grid-cols-1 gap-6 md:grid-cols-2">
           {/* Smart Categorization */}
           <div className="min-w-0 space-y-3">
             <div className="flex items-center justify-between gap-3">
-              <h4 className="eyebrow flex items-center gap-1.5 text-slate-300">
-                <Sparkles className="h-3.5 w-3.5 text-violet-300" />
+              <h4 className="eyebrow flex items-center gap-1.5 text-ink-700">
+                <Sparkles className="h-3.5 w-3.5 text-indigo-600" />
                 Category Optimization
               </h4>
               <span className="shrink-0 text-[11px] text-slate-500">Confidence rating</span>
@@ -94,8 +94,8 @@ export default function TransactionIntelligencePanel() {
                     className="surface-inset flex items-center justify-between gap-3 p-3.5"
                   >
                     <div className="min-w-0">
-                      <p className="truncate text-sm font-semibold text-slate-100">{item.suggestedCategory}</p>
-                      <p className="mt-0.5 text-xs text-slate-400">{item.reason}</p>
+                      <p className="truncate text-sm font-semibold text-ink-900">{item.suggestedCategory}</p>
+                      <p className="mt-0.5 text-xs text-slate-500">{item.reason}</p>
                     </div>
                     <span className="badge badge-ai num shrink-0">
                       {item.confidence}% Match
@@ -104,7 +104,7 @@ export default function TransactionIntelligencePanel() {
                 ))}
               </div>
             ) : (
-              <div className="surface-inset p-4 text-center text-xs text-slate-400">
+              <div className="surface-inset p-4 text-center text-xs text-slate-500">
                 All transactions are cleanly categorized with high fidelity.
               </div>
             )}
@@ -113,8 +113,8 @@ export default function TransactionIntelligencePanel() {
           {/* Anomaly & Recurring Radar */}
           <div className="min-w-0 space-y-3">
             <div className="flex items-center justify-between gap-3">
-              <h4 className="eyebrow flex items-center gap-1.5 text-slate-300">
-                <Repeat className="h-3.5 w-3.5 text-cyan-300" />
+              <h4 className="eyebrow flex items-center gap-1.5 text-ink-700">
+                <Repeat className="h-3.5 w-3.5 text-sky-600" />
                 Anomalies & Recurring Radar
               </h4>
               <span className="shrink-0 text-[11px] text-slate-500">Pattern engine</span>
@@ -128,8 +128,8 @@ export default function TransactionIntelligencePanel() {
                     className="surface-inset flex items-center justify-between gap-3 p-3.5"
                   >
                     <div className="min-w-0">
-                      <p className="text-sm font-semibold text-slate-100">{item.reason || item.classification}</p>
-                      <p className="num mt-0.5 text-xs text-slate-400">
+                      <p className="text-sm font-semibold text-ink-900">{item.reason || item.classification}</p>
+                      <p className="num mt-0.5 text-xs text-slate-500">
                         {item.amount ? `Estimated ₹${Math.round(item.amount).toLocaleString('en-IN')}` : 'Identified recurring pattern'}
                       </p>
                     </div>
@@ -140,7 +140,7 @@ export default function TransactionIntelligencePanel() {
                 ))}
               </div>
             ) : (
-              <div className="surface-inset p-4 text-center text-xs text-slate-400">
+              <div className="surface-inset p-4 text-center text-xs text-slate-500">
                 No unusual spending anomalies or new recurring fees detected this cycle.
               </div>
             )}

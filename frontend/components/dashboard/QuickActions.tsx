@@ -33,7 +33,7 @@ export default function QuickActions() {
       label: 'Add Transaction',
       description: 'Quick log income or expense',
       color: 'icon-tile-brand',
-      glow: 'bg-primary-500/25',
+      glow: 'bg-primary-200/70',
       shortcut: 'T',
       onClick: () => setModalOpen(true),
     },
@@ -41,8 +41,8 @@ export default function QuickActions() {
       icon: Target,
       label: 'Create Goal',
       description: 'Define target & timeline',
-      color: 'icon-tile-cyan',
-      glow: 'bg-cyan-400/20',
+      color: 'icon-tile-sky',
+      glow: 'bg-ice-200/70',
       shortcut: 'G',
       onClick: () => router.push('/dashboard/goals'),
     },
@@ -51,7 +51,7 @@ export default function QuickActions() {
       label: 'AI Copilot Chat',
       description: 'Ask deep financial questions',
       color: 'icon-tile-violet',
-      glow: 'bg-violet-500/25',
+      glow: 'bg-indigo-200/70',
       shortcut: 'C',
       onClick: () => router.push('/dashboard/chat'),
     },
@@ -60,7 +60,7 @@ export default function QuickActions() {
       label: 'Risk Warnings',
       description: 'Review stress probabilities',
       color: 'icon-tile-rose',
-      glow: 'bg-rose-500/20',
+      glow: 'bg-rose-200/70',
       shortcut: 'A',
       onClick: () => router.push('/dashboard/alerts'),
     },
@@ -111,13 +111,13 @@ export default function QuickActions() {
               <button
                 key={index}
                 onClick={action.onClick}
-                className="quick-action-card group/action relative flex min-h-[7.5rem] flex-col justify-between overflow-hidden rounded-2xl border border-white/[0.07] bg-white/[0.025] p-3.5 text-left transition-colors hover:border-primary-300/25 hover:bg-white/[0.05] sm:p-4 animate-fade-up"
+                className="quick-action-card group/action relative flex min-h-[7.5rem] flex-col justify-between overflow-hidden rounded-2xl border border-line bg-canvas p-3.5 text-left transition-colors hover:border-primary-200 hover:bg-white hover:shadow-card-hover sm:p-4 animate-fade-up"
                 style={{ animationDelay: `${50 + index * 40}ms` }}
               >
                 {/* Hover accent glow */}
                 <div
                   aria-hidden="true"
-                  className={`pointer-events-none absolute -right-8 -top-8 h-24 w-24 rounded-full ${action.glow} opacity-40 blur-2xl transition-opacity duration-300 group-hover/action:opacity-100`}
+                  className={`pointer-events-none absolute -right-8 -top-8 h-24 w-24 rounded-full ${action.glow} opacity-0 blur-2xl transition-opacity duration-300 group-hover/action:opacity-100`}
                 />
 
                 {/* Top Row: Icon and Shortcut */}
@@ -126,19 +126,19 @@ export default function QuickActions() {
                     <Icon className="h-4 w-4" />
                   </span>
                   <div className="flex items-center gap-1.5">
-                    <kbd className="hidden rounded-md border border-white/10 bg-white/[0.04] px-1.5 py-0.5 font-mono text-[10px] text-slate-400 sm:inline-block">
+                    <kbd className="hidden rounded-md border border-line bg-white px-1.5 py-0.5 font-mono text-[10px] text-slate-500 shadow-xs sm:inline-block">
                       {action.shortcut}
                     </kbd>
-                    <ArrowRight className="action-arrow h-4 w-4 text-slate-300" aria-hidden="true" />
+                    <ArrowRight className="action-arrow h-4 w-4 text-primary-600" aria-hidden="true" />
                   </div>
                 </div>
 
                 {/* Text Content */}
                 <div className="relative">
-                  <p className="font-display text-xs font-semibold leading-tight tracking-tight text-slate-100 sm:text-sm">
+                  <p className="font-display text-xs font-semibold leading-tight tracking-tight text-ink-900 sm:text-sm">
                     {action.label}
                   </p>
-                  <p className="mt-1 line-clamp-1 text-[10px] text-slate-400 sm:text-[11px]">
+                  <p className="mt-1 line-clamp-1 text-[10px] text-slate-500 sm:text-[11px]">
                     {action.description}
                   </p>
                 </div>
@@ -153,7 +153,7 @@ export default function QuickActions() {
         <Portal>
         <div
           role="status"
-          className="glass-strong fixed bottom-6 right-4 z-[200] flex items-center gap-2.5 rounded-2xl px-4 py-3 text-xs font-medium text-slate-100 animate-pop-in sm:right-6"
+          className="glass-strong fixed bottom-6 right-4 z-[200] flex items-center gap-2.5 rounded-2xl px-4 py-3 text-xs font-medium text-ink-900 animate-pop-in sm:right-6"
         >
           <span className="icon-tile icon-tile-sm icon-tile-emerald h-6 w-6 rounded-md">
             <Check className="h-3.5 w-3.5" />
@@ -173,12 +173,12 @@ export default function QuickActions() {
             aria-labelledby="quick-log-title"
             className="modal-panel max-w-md overflow-y-auto p-5 animate-pop-in sm:p-6"
           >
-            <div className="mb-5 flex items-center justify-between gap-3 border-b border-white/[0.06] pb-4">
+            <div className="mb-5 flex items-center justify-between gap-3 border-b border-line pb-4">
               <div className="flex min-w-0 items-center gap-3">
                 <span className="icon-tile icon-tile-sm icon-tile-brand">
                   <TrendingUp className="h-4 w-4" />
                 </span>
-                <h3 id="quick-log-title" className="truncate font-display text-base font-semibold text-slate-50">
+                <h3 id="quick-log-title" className="truncate font-display text-base font-semibold text-ink-900">
                   Quick Log Transaction
                 </h3>
               </div>
@@ -200,7 +200,7 @@ export default function QuickActions() {
                   aria-pressed={txType === 'expense'}
                   className={`segmented-item py-2 ${
                     txType === 'expense'
-                      ? 'bg-rose-500/15 !text-rose-200 ring-1 ring-inset ring-rose-400/40'
+                      ? 'bg-white !text-rose-700 shadow-xs ring-1 ring-inset ring-rose-200'
                       : ''
                   }`}
                 >
@@ -212,7 +212,7 @@ export default function QuickActions() {
                   aria-pressed={txType === 'income'}
                   className={`segmented-item py-2 ${
                     txType === 'income'
-                      ? 'bg-emerald-500/15 !text-emerald-200 ring-1 ring-inset ring-emerald-400/40'
+                      ? 'bg-white !text-emerald-700 shadow-xs ring-1 ring-inset ring-emerald-200'
                       : ''
                   }`}
                 >

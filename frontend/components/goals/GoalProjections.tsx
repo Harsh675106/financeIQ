@@ -73,7 +73,7 @@ export default function GoalProjections({ refreshKey = 0 }: GoalProjectionsProps
     <div className="card card-pad relative overflow-hidden">
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute -right-24 -top-24 h-56 w-56 rounded-full bg-violet-500/10 blur-3xl"
+        className="pointer-events-none absolute -right-24 -top-24 h-56 w-56 rounded-full bg-indigo-100/60 blur-3xl"
       />
 
       <SectionHeader
@@ -81,7 +81,7 @@ export default function GoalProjections({ refreshKey = 0 }: GoalProjectionsProps
         tone="violet"
         as="h3"
         title="Goal Probability & Trajectory Matrix"
-        className="relative mb-5 border-b border-white/[0.06] pb-4"
+        className="relative mb-5 border-b border-line pb-4"
         actions={
           <span className="badge badge-ai">
             <Sparkles className="h-3 w-3" />
@@ -110,12 +110,12 @@ export default function GoalProjections({ refreshKey = 0 }: GoalProjectionsProps
                   key={item.goal.id}
                   className={`surface-inset relative overflow-hidden p-4 transition-colors sm:p-5 ${
                     isCompleted
-                      ? 'border-emerald-400/25 bg-emerald-500/[0.04]'
+                      ? 'border-emerald-200 bg-emerald-50/60'
                       : isOverdue
-                      ? 'border-rose-400/25 bg-rose-500/[0.05]'
+                      ? 'border-rose-200 bg-rose-50/60'
                       : isOnTrack
-                      ? 'border-emerald-400/20'
-                      : 'border-amber-400/20'
+                      ? 'border-emerald-100'
+                      : 'border-amber-200'
                   }`}
                 >
                   {/* Status accent rail */}
@@ -123,26 +123,26 @@ export default function GoalProjections({ refreshKey = 0 }: GoalProjectionsProps
                     aria-hidden="true"
                     className={`absolute inset-y-4 left-0 w-[3px] rounded-r-full ${
                       isCompleted
-                        ? 'bg-emerald-400/80'
+                        ? 'bg-emerald-500'
                         : isOverdue
-                        ? 'bg-rose-400/80'
+                        ? 'bg-rose-500'
                         : isOnTrack
-                        ? 'bg-emerald-400/60'
-                        : 'bg-amber-400/70'
+                        ? 'bg-emerald-400'
+                        : 'bg-amber-500'
                     }`}
                   />
 
                   {/* Header */}
                   <div className="mb-3 flex flex-col justify-between gap-2 sm:flex-row sm:items-center">
                     <div className="min-w-0">
-                      <div className="flex items-center gap-2 break-words font-display text-[15px] font-semibold tracking-tight text-white sm:text-base">
+                      <div className="flex items-center gap-2 break-words font-display text-[15px] font-semibold tracking-tight text-ink-900 sm:text-base">
                         {item.goal.name}
-                        {isCompleted && <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-400" />}
-                        {isOverdue && <AlertTriangle className="h-4 w-4 shrink-0 text-rose-400" />}
+                        {isCompleted && <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-600" />}
+                        {isOverdue && <AlertTriangle className="h-4 w-4 shrink-0 text-rose-600" />}
                       </div>
-                      <div className="num mt-0.5 text-xs text-slate-400">
+                      <div className="num mt-0.5 text-xs text-slate-500">
                         {item.projection.completionPercentage.toFixed(1)}% complete • Success probability{' '}
-                        <strong className={`font-semibold ${isOnTrack ? 'text-emerald-300' : 'text-amber-300'}`}>
+                        <strong className={`font-semibold ${isOnTrack ? 'text-emerald-700' : 'text-amber-700'}`}>
                           {item.projection.successProbability}%
                         </strong>
                       </div>
@@ -163,7 +163,7 @@ export default function GoalProjections({ refreshKey = 0 }: GoalProjectionsProps
 
                   {/* Progress Bar */}
                   <div className="mb-4">
-                    <div className="num mb-1.5 flex justify-between text-xs text-slate-400">
+                    <div className="num mb-1.5 flex justify-between text-xs text-slate-500">
                       <span>₹{item.goal.current_amount.toLocaleString('en-IN')}</span>
                       <span>₹{item.goal.target_amount.toLocaleString('en-IN')}</span>
                     </div>
@@ -171,10 +171,10 @@ export default function GoalProjections({ refreshKey = 0 }: GoalProjectionsProps
                       <div
                         className={`progress-fill neon-progress-bar ${
                           isCompleted
-                            ? 'bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-300 shadow-[0_0_12px_-2px_rgba(52,211,153,0.75)]'
+                            ? 'bg-gradient-to-r from-emerald-400 to-emerald-600'
                             : isOnTrack
-                            ? 'bg-gradient-to-r from-emerald-400 to-teal-300 shadow-[0_0_12px_-2px_rgba(52,211,153,0.6)]'
-                            : 'bg-gradient-to-r from-amber-400 to-orange-400 shadow-[0_0_12px_-2px_rgba(251,191,36,0.6)]'
+                            ? 'bg-gradient-to-r from-emerald-400 to-ice-400'
+                            : 'bg-gradient-to-r from-amber-400 to-orange-500'
                         }`}
                         style={{ width: `${Math.min(100, item.projection.completionPercentage)}%` }}
                       />
@@ -183,42 +183,42 @@ export default function GoalProjections({ refreshKey = 0 }: GoalProjectionsProps
 
                   {/* Metrics Grid */}
                   <div className="mb-3 grid grid-cols-2 gap-2 text-xs sm:grid-cols-4">
-                    <div className="min-w-0 rounded-xl border border-white/[0.06] bg-white/[0.03] p-2.5">
-                      <div className="text-[10px] text-slate-400">Projected Value</div>
-                      <div className="num mt-0.5 break-words text-sm font-semibold text-slate-100">
+                    <div className="min-w-0 rounded-xl border border-line bg-white p-2.5">
+                      <div className="text-[10px] text-slate-500">Projected Value</div>
+                      <div className="num mt-0.5 break-words text-sm font-semibold text-ink-900">
                         ₹{item.projection.projectedValueAtTargetDate.toLocaleString('en-IN')}
                       </div>
                     </div>
 
                     {item.projection.projectedShortfall > 0 ? (
-                      <div className="min-w-0 rounded-xl border border-rose-400/20 bg-rose-500/[0.08] p-2.5">
-                        <div className="text-[10px] text-rose-300">Projected Gap</div>
-                        <div className="num mt-0.5 break-words text-sm font-semibold text-rose-200">
+                      <div className="min-w-0 rounded-xl border border-rose-200 bg-rose-50 p-2.5">
+                        <div className="text-[10px] font-medium text-rose-600">Projected Gap</div>
+                        <div className="num mt-0.5 break-words text-sm font-semibold text-rose-700">
                           ₹{item.projection.projectedShortfall.toLocaleString('en-IN')}
                         </div>
                       </div>
                     ) : (
-                      <div className="min-w-0 rounded-xl border border-emerald-400/20 bg-emerald-500/[0.08] p-2.5">
-                        <div className="text-[10px] text-emerald-300">Surplus Outlook</div>
-                        <div className="mt-0.5 text-sm font-semibold text-emerald-200">
+                      <div className="min-w-0 rounded-xl border border-emerald-200 bg-emerald-50 p-2.5">
+                        <div className="text-[10px] font-medium text-emerald-700">Surplus Outlook</div>
+                        <div className="mt-0.5 text-sm font-semibold text-emerald-700">
                           On Schedule
                         </div>
                       </div>
                     )}
 
-                    <div className="min-w-0 rounded-xl border border-white/[0.06] bg-white/[0.03] p-2.5">
-                      <div className="flex items-center gap-1 text-[10px] text-slate-400">
+                    <div className="min-w-0 rounded-xl border border-line bg-white p-2.5">
+                      <div className="flex items-center gap-1 text-[10px] text-slate-500">
                         <Clock className="h-3 w-3 text-slate-400" />
                         Time to Target
                       </div>
-                      <div className="num mt-0.5 break-words text-sm font-semibold text-slate-100">
+                      <div className="num mt-0.5 break-words text-sm font-semibold text-ink-900">
                         {formatMonths(item.projection.monthsRemaining)}
                       </div>
                     </div>
 
-                    <div className="min-w-0 rounded-xl border border-white/[0.06] bg-white/[0.03] p-2.5">
-                      <div className="text-[10px] text-slate-400">Required Pace</div>
-                      <div className="num mt-0.5 break-words text-sm font-semibold text-slate-100">
+                    <div className="min-w-0 rounded-xl border border-line bg-white p-2.5">
+                      <div className="text-[10px] text-slate-500">Required Pace</div>
+                      <div className="num mt-0.5 break-words text-sm font-semibold text-ink-900">
                         {item.projection.requiredMonthly > 0
                           ? `₹${item.projection.requiredMonthly.toLocaleString('en-IN')}/mo`
                           : 'Target Met'}
@@ -228,8 +228,8 @@ export default function GoalProjections({ refreshKey = 0 }: GoalProjectionsProps
 
                   {/* Recommendation Narrative */}
                   {item.projection.recommendation && (
-                    <div className="flex items-start gap-2 rounded-xl border border-violet-400/15 bg-violet-500/[0.06] p-3 text-xs leading-relaxed text-slate-300">
-                      <Sparkles className="mt-0.5 h-3.5 w-3.5 shrink-0 text-violet-300" />
+                    <div className="flex items-start gap-2 rounded-xl border border-indigo-100 bg-indigo-50/70 p-3 text-xs leading-relaxed text-ink-700">
+                      <Sparkles className="mt-0.5 h-3.5 w-3.5 shrink-0 text-indigo-600" />
                       <span>{item.projection.recommendation}</span>
                     </div>
                   )}

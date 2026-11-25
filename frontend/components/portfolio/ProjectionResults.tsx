@@ -54,13 +54,13 @@ const LADDER_META: Record<number, { label: string; hint: string; color: string }
   5: { label: '5th percentile', hint: '95% of paths finish above this', color: chartColors.warning },
   25: { label: '25th percentile', hint: 'Lower quartile outcome', color: chartColors.lime },
   50: { label: 'Median', hint: 'Even odds above or below', color: chartColors.positive },
-  75: { label: '75th percentile', hint: 'Upper quartile outcome', color: chartColors.cyan },
-  95: { label: '95th percentile', hint: 'Only 5% of paths beat this', color: chartColors.brand },
+  75: { label: '75th percentile', hint: 'Upper quartile outcome', color: chartColors.ice },
+  95: { label: '95th percentile', hint: 'Only 5% of paths beat this', color: chartColors.iceStrong },
   100: { label: 'Maximum', hint: 'Best single path observed', color: chartColors.violet },
 }
 
 /** Series colours: what you put in (info) vs what compounding adds on top (gain). */
-const CONTRIBUTED_COLOR = chartColors.cyan
+const CONTRIBUTED_COLOR = chartColors.ice
 const GROWTH_COLOR = chartColors.positive
 
 function ChartTooltip({ active, payload, label }: any) {
@@ -79,7 +79,7 @@ function ChartTooltip({ active, payload, label }: any) {
       footer={
         <span className="flex items-center justify-between gap-4">
           <span>Total</span>
-          <span className="num text-sm font-semibold text-white">₹{formatINR(contributed + growth)}</span>
+          <span className="num text-sm font-semibold text-ink-900">₹{formatINR(contributed + growth)}</span>
         </span>
       }
     />
@@ -104,16 +104,16 @@ function Stat({ label, value, sub, icon, accent, tone, delay }: StatProps) {
         <span
           className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg"
           style={{
-            color: accent,
-            background: `radial-gradient(120% 120% at 30% 0%, rgba(255,255,255,0.1), transparent 60%), linear-gradient(145deg, ${accent}40, ${accent}10)`,
-            boxShadow: `inset 0 0 0 1px ${accent}4d, inset 0 1px 0 0 rgba(255,255,255,0.1), 0 8px 20px -10px ${accent}99`,
+            color: `color-mix(in srgb, ${accent} 78%, ${chartColors.text})`,
+            background: `linear-gradient(145deg, ${accent}1f, ${accent}0a)`,
+            boxShadow: `inset 0 0 0 1px ${accent}33, 0 6px 14px -10px ${accent}80`,
           }}
         >
           {icon}
         </span>
       </div>
       <p className={`kpi-value mt-2 truncate text-xl sm:text-2xl ${tone}`}>{value}</p>
-      <p className="mt-1.5 text-xs leading-relaxed text-slate-400">{sub}</p>
+      <p className="mt-1.5 text-xs leading-relaxed text-slate-500">{sub}</p>
       <span className="pf-tile-accent" style={{ backgroundColor: accent }} />
     </div>
   )
@@ -153,7 +153,7 @@ export default function ProjectionResults({ sim, params }: Props) {
           sub={`Middle outcome after ${years} year${years === 1 ? '' : 's'}`}
           icon={<Target className="h-4 w-4" />}
           accent={chartColors.brand}
-          tone="text-primary-200"
+          tone="text-primary-700"
           delay={0}
         />
         <Stat
@@ -162,7 +162,7 @@ export default function ProjectionResults({ sim, params }: Props) {
           sub={`₹${formatINR(initialAmount)} start + ₹${formatINR(monthlyContribution)}/mo × ${years * 12} months`}
           icon={<Banknote className="h-4 w-4" />}
           accent={CONTRIBUTED_COLOR}
-          tone="text-cyan-300"
+          tone="text-ice-700"
           delay={70}
         />
         <Stat
@@ -175,7 +175,7 @@ export default function ProjectionResults({ sim, params }: Props) {
           }
           icon={<Flame className="h-4 w-4" />}
           accent={gain >= 0 ? chartColors.positive : chartColors.negative}
-          tone={gain >= 0 ? 'text-emerald-300' : 'text-rose-300'}
+          tone={gain >= 0 ? 'text-emerald-700' : 'text-rose-600'}
           delay={140}
         />
         <Stat
@@ -184,7 +184,7 @@ export default function ProjectionResults({ sim, params }: Props) {
           sub="Money-weighted across every contribution"
           icon={<Percent className="h-4 w-4" />}
           accent={chartColors.violet}
-          tone="text-violet-300"
+          tone="text-indigo-600"
           delay={210}
         />
       </div>
@@ -203,18 +203,12 @@ export default function ProjectionResults({ sim, params }: Props) {
           </div>
 
           <div className="flex items-center gap-4 text-[11px] font-medium">
-            <span className="flex items-center gap-1.5 text-slate-300">
-              <span
-                className="h-2 w-2 rounded-full"
-                style={{ backgroundColor: CONTRIBUTED_COLOR, boxShadow: `0 0 8px ${CONTRIBUTED_COLOR}` }}
-              />{' '}
+            <span className="flex items-center gap-1.5 text-slate-600">
+              <span className="h-2 w-2 rounded-full" style={{ backgroundColor: CONTRIBUTED_COLOR }} />{' '}
               Contributed
             </span>
-            <span className="flex items-center gap-1.5 text-slate-300">
-              <span
-                className="h-2 w-2 rounded-full"
-                style={{ backgroundColor: GROWTH_COLOR, boxShadow: `0 0 8px ${GROWTH_COLOR}` }}
-              />{' '}
+            <span className="flex items-center gap-1.5 text-slate-600">
+              <span className="h-2 w-2 rounded-full" style={{ backgroundColor: GROWTH_COLOR }} />{' '}
               Growth
             </span>
           </div>
@@ -225,12 +219,12 @@ export default function ProjectionResults({ sim, params }: Props) {
             <AreaChart data={path} margin={{ top: 6, right: 6, left: 0, bottom: 0 }}>
               <defs>
                 <linearGradient id="pfContributed" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor={CONTRIBUTED_COLOR} stopOpacity={0.45} />
+                  <stop offset="0%" stopColor={CONTRIBUTED_COLOR} stopOpacity={0.3} />
                   <stop offset="100%" stopColor={CONTRIBUTED_COLOR} stopOpacity={0.04} />
                 </linearGradient>
                 <linearGradient id="pfGrowth" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor={GROWTH_COLOR} stopOpacity={0.5} />
-                  <stop offset="100%" stopColor={GROWTH_COLOR} stopOpacity={0.05} />
+                  <stop offset="0%" stopColor={GROWTH_COLOR} stopOpacity={0.3} />
+                  <stop offset="100%" stopColor={chartColors.ice} stopOpacity={0.04} />
                 </linearGradient>
               </defs>
 
@@ -243,7 +237,7 @@ export default function ProjectionResults({ sim, params }: Props) {
                 type="monotone"
                 dataKey="contributed"
                 stackId="1"
-                stroke={CONTRIBUTED_COLOR}
+                stroke={chartColors.iceStrong}
                 strokeWidth={2}
                 fill="url(#pfContributed)"
                 activeDot={{ ...activeDot, fill: CONTRIBUTED_COLOR }}
@@ -254,8 +248,8 @@ export default function ProjectionResults({ sim, params }: Props) {
                 type="monotone"
                 dataKey="growth"
                 stackId="1"
-                stroke={GROWTH_COLOR}
-                strokeWidth={2}
+                stroke={chartColors.brandStrong}
+                strokeWidth={2.25}
                 fill="url(#pfGrowth)"
                 activeDot={{ ...activeDot, fill: GROWTH_COLOR }}
                 isAnimationActive={!reduceMotion}
@@ -267,7 +261,7 @@ export default function ProjectionResults({ sim, params }: Props) {
         </div>
 
         <p className="mt-4 flex items-start gap-1.5 text-[11px] leading-relaxed text-slate-500">
-          <Info className="mt-0.5 h-3 w-3 shrink-0 text-cyan-300/80" />
+          <Info className="mt-0.5 h-3 w-3 shrink-0 text-sky-600" />
           This is the expected path with volatility switched off — the centre line of the same model. Contributions
           compound monthly at {(expectedReturn * 100).toFixed(1)}% a year. The spread of real outcomes is below.
         </p>
@@ -277,7 +271,7 @@ export default function ProjectionResults({ sim, params }: Props) {
       <div className="pf-panel pf-rise p-5 sm:p-6" style={{ animationDelay: '140ms' }}>
         <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex min-w-0 items-center gap-3">
-            <span className="pf-orbit icon-tile icon-tile-cyan icon-morph-container">
+            <span className="pf-orbit icon-tile icon-tile-sky icon-morph-container">
               <Gauge className="h-[18px] w-[18px]" />
             </span>
             <div className="min-w-0">
@@ -305,7 +299,7 @@ export default function ProjectionResults({ sim, params }: Props) {
                 key={point.percentile}
                 className={`pf-ladder-row surface-inset p-2.5 sm:p-3 ${
                   isMedian
-                    ? 'border-primary-400/40 bg-primary-500/[0.08] shadow-[0_0_24px_-12px_rgba(112,104,244,0.6)]'
+                    ? 'border-primary-200 bg-primary-50/80 shadow-xs'
                     : 'surface-inset-hover'
                 }`}
                 style={{ animationDelay: `${i * 70}ms` }}
@@ -314,10 +308,10 @@ export default function ProjectionResults({ sim, params }: Props) {
                   <div className="flex min-w-0 items-center gap-2">
                     <span
                       className="h-2 w-2 shrink-0 rounded-full"
-                      style={{ backgroundColor: meta.color, boxShadow: `0 0 8px ${meta.color}99` }}
+                      style={{ backgroundColor: meta.color, boxShadow: `0 0 0 3px ${meta.color}26` }}
                     />
                     <span
-                      className={`shrink-0 text-xs font-semibold ${isMedian ? 'text-primary-100' : 'text-slate-300'}`}
+                      className={`shrink-0 text-xs font-semibold ${isMedian ? 'text-primary-800' : 'text-ink-700'}`}
                     >
                       {meta.label}
                     </span>
@@ -325,13 +319,13 @@ export default function ProjectionResults({ sim, params }: Props) {
                   </div>
                   <span
                     className="num shrink-0 font-display text-sm font-semibold"
-                    style={{ color: isMedian ? '#6ee7b7' : '#eef0f8' }}
+                    style={{ color: isMedian ? '#047857' : chartColors.text }}
                   >
                     ₹{formatINR(point.value)}
                   </span>
                 </div>
 
-                <div className="mt-2 h-1.5 rounded-full bg-white/[0.06]">
+                <div className="mt-2 h-1.5 rounded-full bg-ink-900/[0.06]">
                   <div
                     className="pf-bar h-full"
                     style={{
@@ -339,7 +333,6 @@ export default function ProjectionResults({ sim, params }: Props) {
                       backgroundImage: `linear-gradient(90deg, ${meta.color}80, ${meta.color})`,
                       backgroundColor: meta.color,
                       animationDelay: `${200 + i * 70}ms`,
-                      boxShadow: `0 0 10px -2px ${meta.color}aa`,
                     }}
                   />
                 </div>
@@ -357,7 +350,7 @@ export default function ProjectionResults({ sim, params }: Props) {
           sub={`Median buying power after ${(INFLATION_ASSUMPTION * 100).toFixed(0)}% yearly inflation`}
           icon={<Coins className="h-4 w-4" />}
           accent={chartColors.warning}
-          tone="text-amber-300"
+          tone="text-amber-700"
           delay={0}
         />
         <Stat
@@ -366,7 +359,7 @@ export default function ProjectionResults({ sim, params }: Props) {
           sub="Chance of finishing above what you put in"
           icon={<Shield className="h-4 w-4" />}
           accent={chartColors.positive}
-          tone="text-emerald-300"
+          tone="text-emerald-700"
           delay={70}
         />
         <Stat
@@ -374,8 +367,8 @@ export default function ProjectionResults({ sim, params }: Props) {
           value={probDouble === null ? '—' : `${probDouble}%`}
           sub="Chance of at least 2× your invested capital"
           icon={<TrendingUp className="h-4 w-4" />}
-          accent={chartColors.cyan}
-          tone="text-cyan-300"
+          accent={chartColors.ice}
+          tone="text-ice-700"
           delay={140}
         />
         <Stat
@@ -388,35 +381,35 @@ export default function ProjectionResults({ sim, params }: Props) {
           }
           icon={<Shield className="h-4 w-4" />}
           accent={chartColors.negative}
-          tone="text-rose-300"
+          tone="text-rose-600"
           delay={210}
         />
       </div>
 
       {/* ================= READING GUIDE ================= */}
-      <div className="pf-panel pf-rise border-cyan-400/15 p-5 sm:p-6" style={{ animationDelay: '200ms' }}>
+      <div className="pf-panel pf-rise border-ice-100 p-5 sm:p-6" style={{ animationDelay: '200ms' }}>
         <div className="mb-3 flex items-center gap-2.5">
-          <span className="icon-tile icon-tile-sm icon-tile-cyan">
+          <span className="icon-tile icon-tile-sm icon-tile-sky">
             <Info className="h-4 w-4" />
           </span>
-          <h4 className="font-display text-sm font-semibold text-slate-100">How to read this</h4>
+          <h4 className="font-display text-sm font-semibold text-ink-900">How to read this</h4>
         </div>
-        <ul className="grid gap-x-6 gap-y-2.5 text-xs leading-relaxed text-slate-400 sm:grid-cols-2">
+        <ul className="grid gap-x-6 gap-y-2.5 text-xs leading-relaxed text-slate-600 sm:grid-cols-2">
           <li>
-            <strong className="font-semibold text-slate-200">Percentiles</strong> come from running the full horizon{' '}
+            <strong className="font-semibold text-ink-800">Percentiles</strong> come from running the full horizon{' '}
             {(sim?.simulations ?? 10000).toLocaleString('en-IN')} times with random monthly shocks, then sorting the
             final balances.
           </li>
           <li>
-            <strong className="font-semibold text-slate-200">Median beats mean</strong> as a planning number — the mean is dragged
+            <strong className="font-semibold text-ink-800">Median beats mean</strong> as a planning number — the mean is dragged
             upward by a handful of extreme winning paths.
           </li>
           <li>
-            <strong className="font-semibold text-slate-200">5th–95th percentile</strong> is the band that contains 90% of outcomes.
+            <strong className="font-semibold text-ink-800">5th–95th percentile</strong> is the band that contains 90% of outcomes.
             Minimum and maximum are single extreme paths and should not anchor a plan.
           </li>
           <li>
-            <strong className="font-semibold text-slate-200">Probabilities</strong> are interpolated from that simulated ladder, so
+            <strong className="font-semibold text-ink-800">Probabilities</strong> are interpolated from that simulated ladder, so
             treat them as close estimates rather than exact odds.
           </li>
         </ul>

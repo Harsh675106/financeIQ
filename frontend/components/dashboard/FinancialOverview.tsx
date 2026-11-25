@@ -50,7 +50,7 @@ function MetricCard({
   trendLabel,
   trendType = 'positive',
   delay = 0,
-  accentGlow = 'rgba(112, 104, 244, 0.18)',
+  accentGlow = 'rgba(56, 189, 248, 0.14)',
 }: {
   title: string
   value: number
@@ -86,7 +86,7 @@ function MetricCard({
       {/* Ambient accent glow */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute -right-12 -top-12 h-32 w-32 rounded-full opacity-70 blur-3xl transition-opacity duration-300 group-hover:opacity-100"
+        className="pointer-events-none absolute -right-10 -top-10 h-32 w-32 rounded-full opacity-80 blur-2xl transition-opacity duration-300 group-hover:opacity-100"
         style={{ background: accentGlow }}
       />
 
@@ -98,14 +98,14 @@ function MetricCard({
           </span>
         </div>
 
-        <p className="kpi-value counter-pulse text-2xl [overflow-wrap:anywhere] sm:text-3xl xl:text-2xl 2xl:text-3xl">
+        <p className="kpi-value counter-pulse text-2xl leading-tight [overflow-wrap:anywhere] sm:text-3xl xl:text-2xl 2xl:text-3xl">
           {prefix}
           {animatedValue.toLocaleString('en-IN')}
           {suffix}
         </p>
 
         {trendLabel && (
-          <div className="mt-3 flex flex-wrap items-center gap-2">
+          <div className="mt-3.5 flex flex-wrap items-center gap-2 border-t border-line pt-3.5">
             {trendType === 'positive' && (
               <span className="badge badge-success">
                 <ArrowUpRight className="h-3 w-3" aria-hidden="true" />
@@ -209,10 +209,10 @@ export default function FinancialOverview() {
   }
 
   const getHealthScoreColor = (score: number) => {
-    if (score >= 80) return 'text-emerald-400'
-    if (score >= 60) return 'text-primary-300'
-    if (score >= 40) return 'text-amber-400'
-    return 'text-rose-400'
+    if (score >= 80) return 'text-emerald-700'
+    if (score >= 60) return 'text-teal-700'
+    if (score >= 40) return 'text-amber-700'
+    return 'text-rose-600'
   }
 
   const getHealthScoreLabel = (score: number) => {
@@ -237,22 +237,22 @@ export default function FinancialOverview() {
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 xl:grid-cols-4">
         {/* Card 1: Interactive Health Score with SVG Circular Gauge */}
         <div className="card card-pad card-spotlight group cursor-pointer animate-fade-up stagger-1">
-          {/* Aurora ambient glow */}
+          {/* Soft mint / ice ambient wash */}
           <div
             aria-hidden="true"
-            className="pointer-events-none absolute -left-10 -top-16 h-40 w-40 rounded-full bg-primary-500/25 blur-3xl"
+            className="pointer-events-none absolute -left-12 -top-16 h-40 w-40 rounded-full bg-primary-100/80 blur-3xl"
           />
           <div
             aria-hidden="true"
-            className="pointer-events-none absolute -bottom-16 -right-10 h-36 w-36 rounded-full bg-cyan-400/10 blur-3xl"
+            className="pointer-events-none absolute -bottom-16 -right-12 h-36 w-36 rounded-full bg-ice-100/80 blur-3xl"
           />
 
           <div className="relative">
             <div className="mb-3 flex items-center justify-between">
               <span className="eyebrow">Health Score</span>
               <span className="relative flex h-2 w-2" aria-hidden="true">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75"></span>
-                <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400"></span>
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-60"></span>
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500"></span>
               </span>
             </div>
 
@@ -268,31 +268,34 @@ export default function FinancialOverview() {
                   </span>
                   <span className="text-xs font-semibold text-slate-500">/100</span>
                 </div>
-                <p className={`mt-1.5 text-xs font-medium ${getHealthScoreColor(data.healthScore)}`}>
+                <p className={`mt-1.5 text-xs font-semibold ${getHealthScoreColor(data.healthScore)}`}>
                   {getHealthScoreLabel(data.healthScore)}
                 </p>
               </div>
 
-              {/* Circular Mini Gauge — brand aurora gradient */}
+              {/* Circular Mini Gauge — mint → ice gradient on a soft track */}
               <div className="relative flex shrink-0 items-center justify-center">
-                <div aria-hidden="true" className="absolute inset-2 rounded-full bg-primary-500/20 blur-xl" />
+                <div
+                  aria-hidden="true"
+                  className="absolute inset-3 rounded-full bg-gradient-to-br from-primary-50 to-ice-50"
+                />
                 <svg
-                  className="relative h-20 w-20 -rotate-90 transform drop-shadow-[0_0_10px_rgba(138,136,251,0.45)]"
+                  className="relative h-20 w-20 -rotate-90 transform"
                   viewBox="0 0 70 70"
                   aria-hidden="true"
                 >
                   <defs>
                     <linearGradient id="fi-health-gauge-aurora" x1="0" y1="0" x2="1" y2="1">
-                      <stop offset="0%" stopColor="#8a88fb" />
-                      <stop offset="45%" stopColor="#a78bfa" />
-                      <stop offset="100%" stopColor="#22d3ee" />
+                      <stop offset="0%" stopColor="#10b981" />
+                      <stop offset="50%" stopColor="#14b8a6" />
+                      <stop offset="100%" stopColor="#38bdf8" />
                     </linearGradient>
                   </defs>
                   <circle
                     cx="35"
                     cy="35"
                     r={radius}
-                    className="stroke-white/[0.07]"
+                    stroke="#E6EFEC"
                     strokeWidth="6"
                     fill="transparent"
                   />
@@ -325,12 +328,12 @@ export default function FinancialOverview() {
           value={data.totalIncome}
           prefix="₹"
           icon={TrendingUp}
-          iconColor="text-emerald-300"
+          iconColor="text-emerald-600"
           iconBg="icon-tile-emerald"
           trendLabel="+8.2%"
           trendType="positive"
           delay={50}
-          accentGlow="rgba(16, 185, 129, 0.16)"
+          accentGlow="rgba(16, 185, 129, 0.14)"
         />
 
         {/* Card 3: Expenses */}
@@ -339,12 +342,12 @@ export default function FinancialOverview() {
           value={data.totalExpenses}
           prefix="₹"
           icon={TrendingDown}
-          iconColor="text-rose-300"
+          iconColor="text-rose-600"
           iconBg="icon-tile-rose"
           trendLabel="-3.5%"
           trendType="positive"
           delay={100}
-          accentGlow="rgba(244, 63, 94, 0.14)"
+          accentGlow="rgba(244, 63, 94, 0.1)"
         />
 
         {/* Card 4: Net Savings */}
@@ -353,12 +356,12 @@ export default function FinancialOverview() {
           value={data.savings}
           prefix="₹"
           icon={Percent}
-          iconColor="text-primary-200"
-          iconBg="icon-tile-brand"
+          iconColor="text-sky-600"
+          iconBg="icon-tile-sky"
           trendLabel={`${savingsRate}% Rate`}
           trendType="positive"
           delay={150}
-          accentGlow="rgba(112, 104, 244, 0.2)"
+          accentGlow="rgba(56, 189, 248, 0.16)"
         />
       </div>
 
@@ -368,20 +371,20 @@ export default function FinancialOverview() {
           <button
             onClick={() => setShowDiagnostics(!showDiagnostics)}
             aria-expanded={showDiagnostics}
-            className="flex w-full items-center justify-between gap-3 px-5 py-4 text-left transition-colors hover:bg-white/[0.03] sm:px-6"
+            className="flex w-full items-center justify-between gap-3 px-5 py-4 text-left transition-colors hover:bg-canvas-subtle/60 sm:px-6"
           >
             <div className="flex min-w-0 items-center gap-3">
               <span className="icon-tile icon-tile-sm icon-tile-brand">
                 <Sparkles className="h-4 w-4" />
               </span>
               <div className="min-w-0 sm:flex sm:items-baseline sm:gap-2">
-                <span className="block font-display text-sm font-semibold tracking-tight text-slate-100 sm:inline">
+                <span className="block font-display text-sm font-semibold tracking-tight text-ink-900 sm:inline">
                   Financial Health Diagnostics Breakdown
                 </span>
                 <span className="hidden text-xs text-slate-500 sm:inline">(5 Core Analytical Pillars)</span>
               </div>
             </div>
-            <div className="flex shrink-0 items-center gap-2 text-slate-400">
+            <div className="flex shrink-0 items-center gap-2 text-slate-500">
               <span className="hidden text-xs font-medium sm:inline">{showDiagnostics ? 'Collapse' : 'Expand'}</span>
               <span className="btn-icon h-8 w-8">
                 {showDiagnostics ? (
@@ -394,7 +397,7 @@ export default function FinancialOverview() {
           </button>
 
           {showDiagnostics && (
-            <div className="border-t border-white/[0.06] p-5 animate-fade-up sm:p-6">
+            <div className="border-t border-line p-5 animate-fade-up sm:p-6">
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3 xl:grid-cols-5">
                 {[
                   {
@@ -402,14 +405,14 @@ export default function FinancialOverview() {
                     value: data.healthBreakdown.savingsScore,
                     unit: '%',
                     help: 'Target: >20% income saved',
-                    color: 'bg-gradient-to-r from-primary-400 via-violet-400 to-cyan-400',
+                    color: 'bg-gradient-to-r from-primary-500 to-ice-400',
                   },
                   {
                     label: 'Emergency Fund',
                     value: data.healthBreakdown.emergencyScore,
                     unit: '%',
                     help: 'Target: 6 months reserve',
-                    color: 'bg-gradient-to-r from-primary-400 via-violet-400 to-cyan-400',
+                    color: 'bg-gradient-to-r from-primary-500 to-ice-400',
                   },
                   {
                     label: 'Debt Burden',
@@ -425,8 +428,8 @@ export default function FinancialOverview() {
                         : `₹${data.debt.total.toLocaleString('en-IN')} total debt`,
                     color:
                       (data.healthBreakdown.debtImpact || 0) > 40
-                        ? 'bg-gradient-to-r from-rose-500 to-pink-400'
-                        : 'bg-gradient-to-r from-emerald-400 to-teal-300',
+                        ? 'bg-gradient-to-r from-rose-500 to-orange-400'
+                        : 'bg-gradient-to-r from-emerald-500 to-teal-400',
                     isDebt: true,
                   },
                   {
@@ -434,14 +437,14 @@ export default function FinancialOverview() {
                     value: data.healthBreakdown.goalScore,
                     unit: '%',
                     help: 'Timeline progress score',
-                    color: 'bg-gradient-to-r from-primary-400 via-violet-400 to-cyan-400',
+                    color: 'bg-gradient-to-r from-primary-500 to-ice-400',
                   },
                   {
                     label: 'Asset Diversification',
                     value: data.healthBreakdown.diversificationScore,
                     unit: '%',
                     help: 'Cross-asset distribution',
-                    color: 'bg-gradient-to-r from-primary-400 via-violet-400 to-cyan-400',
+                    color: 'bg-gradient-to-r from-primary-500 to-ice-400',
                   },
                 ].map((item, idx) => {
                   const hasValue = item.value !== null && item.value !== undefined
@@ -453,16 +456,16 @@ export default function FinancialOverview() {
                       className="group surface-inset surface-inset-hover p-3.5 transition-transform duration-300 motion-safe:hover:-translate-y-0.5"
                     >
                       <div className="mb-2 flex items-center justify-between gap-2">
-                        <span className="min-w-0 truncate text-xs font-medium text-slate-400 transition-colors group-hover:text-slate-200">
+                        <span className="min-w-0 truncate text-xs font-medium text-slate-600 transition-colors group-hover:text-ink-900">
                           {item.label}
                         </span>
                         <span
                           className={`num text-xs font-bold ${
                             scoreVal === null
-                              ? 'text-slate-500'
+                              ? 'text-slate-400'
                               : item.isDebt && scoreVal === 0
-                              ? 'text-emerald-400'
-                              : 'text-primary-300'
+                              ? 'text-emerald-700'
+                              : 'text-ink-900'
                           }`}
                         >
                           {scoreVal === null ? '—' : `${scoreVal}%`}

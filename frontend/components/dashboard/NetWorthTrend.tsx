@@ -118,7 +118,7 @@ export default function NetWorthTrend() {
         subtitle={
           <>
             Current:{' '}
-            <span className="num font-display text-[13px] font-semibold text-slate-100">
+            <span className="num font-display text-[13px] font-semibold text-ink-900">
               ₹{animatedNetWorth.toLocaleString('en-IN')}
             </span>
           </>
@@ -146,7 +146,7 @@ export default function NetWorthTrend() {
 
       {loading ? (
         <div className="skeleton relative flex h-56 items-center justify-center sm:h-64" aria-busy="true">
-          <Activity className="h-6 w-6 animate-spin text-slate-600" />
+          <Activity className="h-6 w-6 animate-spin text-slate-400" />
         </div>
       ) : trend.length === 0 ? (
         <EmptyState
@@ -163,9 +163,9 @@ export default function NetWorthTrend() {
               <AreaChart data={trend} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                 <defs>
                   <linearGradient id="netWorthGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor={chartColors.brand} stopOpacity={0.45} />
-                    <stop offset="60%" stopColor={chartColors.violet} stopOpacity={0.12} />
-                    <stop offset="100%" stopColor={chartColors.brand} stopOpacity={0.0} />
+                    <stop offset="0%" stopColor={chartColors.brand} stopOpacity={0.28} />
+                    <stop offset="55%" stopColor={chartColors.ice} stopOpacity={0.1} />
+                    <stop offset="100%" stopColor={chartColors.ice} stopOpacity={0.02} />
                   </linearGradient>
                 </defs>
                 <CartesianGrid {...gridProps} />
@@ -179,7 +179,7 @@ export default function NetWorthTrend() {
                 <Area
                   type="monotone"
                   dataKey="netWorth"
-                  stroke={chartColors.brand}
+                  stroke={chartColors.brandStrong}
                   strokeWidth={2.5}
                   fillOpacity={1}
                   fill="url(#netWorthGradient)"
@@ -201,9 +201,9 @@ export default function NetWorthTrend() {
                 <Line
                   type="monotone"
                   dataKey="netWorth"
-                  stroke={chartColors.brand}
+                  stroke={chartColors.brandStrong}
                   strokeWidth={2.5}
-                  dot={{ r: 3, fill: chartColors.brand, strokeWidth: 1.5, stroke: chartColors.surface }}
+                  dot={{ r: 3, fill: chartColors.brandStrong, strokeWidth: 1.5, stroke: chartColors.surface }}
                   activeDot={activeDot}
                   isAnimationActive={!reduceMotion}
                   animationDuration={1200}

@@ -299,7 +299,7 @@ export default function GoalsPage() {
           <div className="card card-spotlight p-4 animate-fade-up sm:p-5" style={{ animationDelay: '60ms' }}>
             <div className="relative flex h-full flex-col">
               <div className="flex items-start justify-between gap-2">
-                <span className="min-w-0 text-xs font-medium leading-snug text-slate-400">
+                <span className="min-w-0 text-xs font-medium leading-snug text-slate-500">
                   {telemetry.activeCount > 0 ? 'Active Quests Capital' : 'Conquered Vault'}
                 </span>
                 <span className="icon-tile icon-tile-sm icon-tile-brand">
@@ -319,7 +319,7 @@ export default function GoalsPage() {
           <div className="card card-spotlight p-4 animate-fade-up sm:p-5" style={{ animationDelay: '120ms' }}>
             <div className="relative flex h-full flex-col">
               <div className="flex items-start justify-between gap-2">
-                <span className="min-w-0 text-xs font-medium leading-snug text-slate-400">
+                <span className="min-w-0 text-xs font-medium leading-snug text-slate-500">
                   {telemetry.activeCount > 0 ? 'Active Quests Index' : 'All Quests Conquered'}
                 </span>
                 <span className="icon-tile icon-tile-sm icon-tile-violet">
@@ -338,7 +338,7 @@ export default function GoalsPage() {
                   className={
                     telemetry.activeCount > 0
                       ? 'progress-fill'
-                      : 'progress-fill bg-gradient-to-r from-emerald-400 to-teal-300 shadow-[0_0_12px_-2px_rgba(52,211,153,0.7)]'
+                      : 'progress-fill bg-gradient-to-r from-emerald-400 to-emerald-600'
                   }
                   style={{ width: `${Math.min(100, telemetry.activeCount > 0 ? telemetry.activeProgress : 100)}%` }}
                 />
@@ -350,7 +350,7 @@ export default function GoalsPage() {
           <div className="card card-spotlight p-4 animate-fade-up sm:p-5" style={{ animationDelay: '180ms' }}>
             <div className="relative flex h-full flex-col">
               <div className="flex items-start justify-between gap-2">
-                <span className="min-w-0 text-xs font-medium leading-snug text-slate-400">Active Monthly Fuel</span>
+                <span className="min-w-0 text-xs font-medium leading-snug text-slate-500">Active Monthly Fuel</span>
                 <span className="icon-tile icon-tile-sm icon-tile-cyan">
                   <Zap className="h-4 w-4" />
                 </span>
@@ -368,15 +368,15 @@ export default function GoalsPage() {
           <div className="card card-spotlight p-4 animate-fade-up sm:p-5" style={{ animationDelay: '240ms' }}>
             <div className="relative flex h-full flex-col">
               <div className="flex items-start justify-between gap-2">
-                <span className="min-w-0 text-xs font-medium leading-snug text-slate-400">Conquered Treasury</span>
+                <span className="min-w-0 text-xs font-medium leading-snug text-slate-500">Conquered Treasury</span>
                 <span className="icon-tile icon-tile-sm icon-tile-emerald">
                   <CheckCircle2 className="h-4 w-4" />
                 </span>
               </div>
-              <div className="kpi-value mt-3 break-words text-lg text-emerald-300 sm:text-2xl">
+              <div className="kpi-value mt-3 break-words text-lg text-emerald-600 sm:text-2xl">
                 ₹{telemetry.conqueredSaved.toLocaleString('en-IN')}
               </div>
-              <span className="num mt-1 text-[11px] text-emerald-300/80">
+              <span className="num mt-1 text-[11px] font-medium text-emerald-700">
                 {telemetry.completedCount} Mastered • {telemetry.activeCount} In Flight
               </span>
             </div>
@@ -408,7 +408,7 @@ export default function GoalsPage() {
                     {tab.count !== undefined && (
                       <span
                         className={`num rounded-full px-1.5 text-[10px] leading-4 ${
-                          activeFilter === tab.id ? 'bg-white/15 text-white' : 'bg-white/[0.06] text-slate-400'
+                          activeFilter === tab.id ? 'bg-primary-50 text-primary-700' : 'bg-ink-900/[0.05] text-slate-500'
                         }`}
                       >
                         {tab.count}
@@ -448,10 +448,10 @@ export default function GoalsPage() {
         {loadingGoals ? (
           <div className="card card-pad flex flex-col items-center justify-center py-14 text-center" role="status">
             <div className="relative mb-4 h-12 w-12">
-              <div className="absolute inset-0 rounded-full border-2 border-white/10" />
-              <div className="absolute inset-0 animate-spin rounded-full border-2 border-transparent border-r-cyan-400/70 border-t-primary-400" />
+              <div className="absolute inset-0 rounded-full border-2 border-line" />
+              <div className="absolute inset-0 animate-spin rounded-full border-2 border-transparent border-r-ice-400 border-t-primary-500" />
             </div>
-            <p className="text-sm text-slate-400">Consulting the Financial Star Chart...</p>
+            <p className="text-sm text-slate-500">Consulting the Financial Star Chart...</p>
           </div>
         ) : goals.length === 0 ? (
           <div className="card card-pad mx-auto max-w-xl animate-fade-up">
@@ -544,16 +544,16 @@ export default function GoalsPage() {
               className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary-400/60 to-transparent"
               aria-hidden="true"
             />
-            <div className="flex items-start justify-between gap-4 border-b border-white/[0.06] pb-4">
+            <div className="flex items-start justify-between gap-4 border-b border-line pb-4">
               <div className="flex min-w-0 items-center gap-3">
                 <span className="icon-tile icon-tile-brand">
                   <Target className="h-5 w-5" />
                 </span>
                 <div className="min-w-0">
-                  <h2 className="font-display text-lg font-semibold tracking-tight text-white">
+                  <h2 className="font-display text-lg font-semibold tracking-tight text-ink-900">
                     {editingGoal ? 'Refine Goal Quest' : 'Declare New Goal Quest'}
                   </h2>
-                  <p className="mt-0.5 text-xs text-slate-400">Set your coordinates, target summit, and monthly fuel.</p>
+                  <p className="mt-0.5 text-xs text-slate-500">Set your coordinates, target summit, and monthly fuel.</p>
                 </div>
               </div>
               <button
@@ -657,14 +657,14 @@ export default function GoalsPage() {
               className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary-400/60 to-transparent"
               aria-hidden="true"
             />
-            <div className="flex items-start justify-between gap-4 border-b border-white/[0.06] pb-4">
+            <div className="flex items-start justify-between gap-4 border-b border-line pb-4">
               <div className="flex min-w-0 items-center gap-3">
                 <span className="icon-tile icon-tile-brand">
                   <Coins className="h-5 w-5" />
                 </span>
                 <div className="min-w-0">
-                  <h2 className="font-display text-lg font-semibold tracking-tight text-white">Add Capital Deposit</h2>
-                  <p className="mt-0.5 truncate text-xs font-semibold text-primary-200">
+                  <h2 className="font-display text-lg font-semibold tracking-tight text-ink-900">Add Capital Deposit</h2>
+                  <p className="mt-0.5 truncate text-xs font-semibold text-primary-700">
                     {contributingGoal.name}
                   </p>
                 </div>
@@ -679,8 +679,8 @@ export default function GoalsPage() {
             </div>
 
             <div className="surface-inset my-4 flex items-center justify-between gap-3 p-3.5 text-xs">
-              <span className="shrink-0 text-slate-400">Current Progress</span>
-              <span className="num text-right font-semibold text-slate-100">
+              <span className="shrink-0 text-slate-500">Current Progress</span>
+              <span className="num text-right font-semibold text-ink-900">
                 ₹{contributingGoal.current_amount.toLocaleString('en-IN')} / ₹{contributingGoal.target_amount.toLocaleString('en-IN')} (
                 {((contributingGoal.current_amount / contributingGoal.target_amount) * 100).toFixed(0)}%)
               </span>

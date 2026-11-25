@@ -13,9 +13,9 @@ export default function LoadingScreen({ label = 'Loading your workspace...' }: L
       aria-live="polite"
     >
       <div className="relative flex h-20 w-20 items-center justify-center">
-        <div className="absolute inset-0 rounded-full bg-primary-500/20 blur-2xl" />
-        <div className="absolute inset-0 rounded-full border border-white/10" />
-        <div className="absolute inset-0 animate-spin rounded-full border-2 border-transparent border-t-primary-400 border-r-cyan-400/70" />
+        <div className="absolute inset-0 rounded-full bg-primary-200/60 blur-2xl" />
+        <div className="absolute inset-0 rounded-full border border-line" />
+        <div className="absolute inset-0 animate-spin rounded-full border-2 border-transparent border-t-primary-500 border-r-ice-400" />
         <div className="brand-mark h-10 w-10 rounded-xl">
           <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
             <path d="M3 17l6-6 4 4 8-8" />
@@ -24,8 +24,8 @@ export default function LoadingScreen({ label = 'Loading your workspace...' }: L
         </div>
       </div>
       <div className="text-center">
-        <p className="font-display text-sm font-semibold tracking-tight text-slate-100">FinanceIQ</p>
-        <p className="mt-1 text-sm text-slate-400">{label}</p>
+        <p className="font-display text-sm font-semibold tracking-tight text-ink-900">FinanceIQ</p>
+        <p className="mt-1 text-sm text-slate-500">{label}</p>
       </div>
     </div>
   )

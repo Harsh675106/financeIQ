@@ -10,7 +10,8 @@ import {
   CheckCircle2,
   Calendar,
   Tag,
-  DollarSign
+  DollarSign,
+  AlertCircle
 } from 'lucide-react'
 import { api } from '@/lib/api'
 import { TransactionItem } from './TransactionItemCard'
@@ -130,13 +131,13 @@ export default function TransactionModal({
       >
         <div
           aria-hidden="true"
-          className={`pointer-events-none absolute -right-20 -top-20 h-48 w-48 rounded-full blur-3xl opacity-20 ${
-            isIncome ? 'bg-emerald-500' : 'bg-rose-500'
+          className={`pointer-events-none absolute -right-20 -top-20 h-48 w-48 rounded-full blur-3xl opacity-60 ${
+            isIncome ? 'bg-emerald-100' : 'bg-rose-100'
           }`}
         />
 
         {/* Mobile sheet handle */}
-        <div aria-hidden="true" className="mx-auto mb-4 h-1 w-10 rounded-full bg-white/15 sm:hidden" />
+        <div aria-hidden="true" className="mx-auto mb-4 h-1 w-10 rounded-full bg-slate-200 sm:hidden" />
 
         {/* Close button */}
         <button
@@ -155,11 +156,11 @@ export default function TransactionModal({
           <div className="min-w-0">
             <h2
               id="transaction-modal-title"
-              className="font-display text-xl font-semibold tracking-tight text-white sm:text-2xl"
+              className="font-display text-xl font-semibold tracking-tight text-ink-900 sm:text-2xl"
             >
               {editingTransaction ? 'Edit Transaction' : 'Record New Transaction'}
             </h2>
-            <p className="mt-1 text-xs text-slate-400 sm:text-sm">
+            <p className="mt-1 text-xs text-slate-500 sm:text-sm">
               Log financial flow events to update cash velocity and analytics
             </p>
           </div>
@@ -173,7 +174,7 @@ export default function TransactionModal({
             aria-pressed={!isIncome}
             className={`segmented-item flex-1 py-2.5 text-[13px] ${
               !isIncome
-                ? 'bg-rose-500/15 !text-rose-200 shadow-[inset_0_0_0_1px_rgba(251,113,133,0.35),0_4px_14px_-6px_rgba(244,63,94,0.6)]'
+                ? 'bg-white !text-rose-600 shadow-[inset_0_0_0_1px_rgba(244,63,94,0.3),0_1px_2px_0_rgba(16,40,38,0.08)]'
                 : ''
             }`}
           >
@@ -186,7 +187,7 @@ export default function TransactionModal({
             aria-pressed={isIncome}
             className={`segmented-item flex-1 py-2.5 text-[13px] ${
               isIncome
-                ? 'bg-emerald-500/15 !text-emerald-200 shadow-[inset_0_0_0_1px_rgba(52,211,153,0.35),0_4px_14px_-6px_rgba(16,185,129,0.6)]'
+                ? 'bg-white !text-emerald-700 shadow-[inset_0_0_0_1px_rgba(16,185,129,0.35),0_1px_2px_0_rgba(16,40,38,0.08)]'
                 : ''
             }`}
           >
@@ -198,7 +199,7 @@ export default function TransactionModal({
         {/* Quick Presets */}
         <div className="relative mb-5 space-y-2">
           <span className="eyebrow flex items-center gap-1.5">
-            <Sparkles className="h-3.5 w-3.5 text-primary-300" />
+            <Sparkles className="h-3.5 w-3.5 text-primary-600" />
             Quick Presets:
           </span>
           <div className="flex flex-wrap gap-1.5">
@@ -210,8 +211,8 @@ export default function TransactionModal({
                 aria-pressed={formData.category === p.cat}
                 className={`rounded-lg border px-2.5 py-1.5 text-xs font-medium transition-colors ${
                   formData.category === p.cat
-                    ? 'border-primary-400/50 bg-primary-500/15 text-primary-100 shadow-[0_4px_14px_-8px_rgba(112,104,244,0.8)]'
-                    : 'border-white/10 bg-white/[0.03] text-slate-300 hover:border-white/20 hover:bg-white/[0.06] hover:text-white'
+                    ? 'border-primary-300 bg-primary-50 text-primary-700 shadow-xs'
+                    : 'border-line-strong bg-white text-slate-600 hover:border-primary-200 hover:bg-canvas-subtle hover:text-ink-900'
                 }`}
               >
                 + {p.label}
@@ -221,24 +222,24 @@ export default function TransactionModal({
         </div>
 
         {/* Live Preview Card */}
-        <div className="surface-inset relative mb-6 p-4">
-          <div className="mb-1.5 flex items-center justify-between gap-3 text-xs text-slate-400">
-            <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-primary-300">
+        <div className="surface-highlight relative mb-6 p-4">
+          <div className="mb-1.5 flex items-center justify-between gap-3 text-xs text-slate-500">
+            <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-primary-700">
               Live Preview
             </span>
             <span
               className={`num truncate font-display text-base font-semibold sm:text-lg ${
-                isIncome ? 'text-emerald-400' : 'text-slate-100'
+                isIncome ? 'text-emerald-700' : 'text-rose-600'
               }`}
             >
               {isIncome ? '+' : '-'}₹{Math.round(previewAmount).toLocaleString('en-IN')}
             </span>
           </div>
           <div className="min-w-0 text-xs">
-            <p className="truncate text-sm font-semibold text-slate-100">
+            <p className="truncate text-sm font-semibold text-ink-900">
               {formData.description || formData.category || 'Untitled Transaction'}
             </p>
-            <p className="mt-0.5 truncate text-[11px] text-slate-400">
+            <p className="mt-0.5 truncate text-[11px] text-slate-500">
               Category: {formData.category || 'General'} • Date: {formData.date}
             </p>
           </div>
@@ -308,9 +309,10 @@ export default function TransactionModal({
           {error && (
             <p
               role="alert"
-              className="rounded-xl border border-rose-500/25 bg-rose-500/10 px-3 py-2 text-xs font-medium text-rose-300"
+              className="flex items-start gap-2 rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-xs font-medium text-rose-700"
             >
-              {error}
+              <AlertCircle className="mt-px h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+              <span>{error}</span>
             </p>
           )}
 
@@ -327,8 +329,8 @@ export default function TransactionModal({
               disabled={submitting}
               className={`btn flex-1 py-3 hover:brightness-110 ${
                 isIncome
-                  ? 'bg-gradient-to-r from-emerald-400 to-teal-300 text-slate-950 shadow-[0_8px_24px_-10px_rgba(16,185,129,0.75)]'
-                  : 'bg-gradient-to-r from-rose-500 to-pink-400 text-white shadow-[0_8px_24px_-10px_rgba(244,63,94,0.75)]'
+                  ? 'bg-gradient-to-r from-emerald-600 to-teal-700 text-white shadow-glow-primary'
+                  : 'bg-gradient-to-r from-rose-600 to-rose-700 text-white shadow-[0_8px_24px_-10px_rgba(225,29,72,0.55)]'
               }`}
             >
               {submitting ? 'Recording...' : editingTransaction ? 'Update Entry' : 'Record Transaction'}
