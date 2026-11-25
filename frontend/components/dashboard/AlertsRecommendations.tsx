@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react'
 import { api } from '@/lib/api'
 import { AlertTriangle, ArrowRight, CheckCircle, ShieldAlert, Sparkles } from 'lucide-react'
 import Link from 'next/link'
+import SectionHeader from '@/components/ui/SectionHeader'
+import EmptyState from '@/components/ui/EmptyState'
 
 interface Recommendation {
   alert_type: string
@@ -16,10 +18,10 @@ interface Recommendation {
 }
 
 function sevStyle(sev: string) {
-  if (sev === 'critical') return 'border-rose-500/30 bg-rose-500/10 text-rose-200 hover:border-rose-500/50'
-  if (sev === 'high') return 'border-orange-500/30 bg-orange-500/10 text-orange-200 hover:border-orange-500/50'
-  if (sev === 'warning') return 'border-amber-500/30 bg-amber-500/10 text-amber-200 hover:border-amber-500/50'
-  return 'border-emerald-500/30 bg-emerald-500/10 text-emerald-200 hover:border-emerald-500/50'
+  if (sev === 'critical') return 'border-rose-500/25 bg-rose-500/[0.07] text-rose-200 hover:border-rose-400/45'
+  if (sev === 'high') return 'border-orange-500/25 bg-orange-500/[0.07] text-orange-200 hover:border-orange-400/45'
+  if (sev === 'warning') return 'border-amber-500/25 bg-amber-500/[0.07] text-amber-200 hover:border-amber-400/45'
+  return 'border-sky-500/20 bg-sky-500/[0.06] text-sky-200 hover:border-sky-400/40'
 }
 
 export default function AlertsRecommendations() {
@@ -45,71 +47,64 @@ export default function AlertsRecommendations() {
   }, [])
 
   return (
-    <div className="card card-pad card-spotlight group animate-fade-up">
+    <div className="card card-pad card-spotlight group h-full animate-fade-up">
       {/* Header */}
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center space-x-2.5">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary-500/10 border border-primary-500/20 text-primary-400 icon-morph-container">
-            <ShieldAlert className="h-5 w-5" />
-          </div>
-          <div>
-            <h2 className="text-base font-bold text-slate-50">Recommended Actions</h2>
-            <p className="text-xs text-slate-400">High-priority risk mitigations</p>
-          </div>
-        </div>
-
-        <Link
-          href="/dashboard/alerts"
-          className="text-xs font-semibold text-primary-400 hover:text-primary-300 flex items-center gap-1 transition-colors"
-        >
-          View All
-          <ArrowRight className="h-3 w-3" />
-        </Link>
-      </div>
+      <SectionHeader
+        icon={ShieldAlert}
+        tone="amber"
+        title="Recommended Actions"
+        subtitle="High-priority risk mitigations"
+        className="relative mb-5"
+        actions={
+          <Link href="/dashboard/alerts" className="btn-soft btn-sm">
+            View All
+            <ArrowRight className="h-3 w-3" aria-hidden="true" />
+          </Link>
+        }
+      />
 
       {loading ? (
-        <div className="space-y-3">
+        <div className="relative space-y-2.5" aria-busy="true">
           {[...Array(3)].map((_, i) => (
-            <div key={i} className="h-14 bg-slate-800/50 rounded-xl animate-pulse" />
+            <div key={i} className="skeleton h-14" />
           ))}
         </div>
       ) : items.length === 0 ? (
-        <div className="py-8 text-center text-slate-400">
-          <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-xl bg-slate-800/50 mb-2">
-            <CheckCircle className="h-5 w-5 text-emerald-400" />
-          </div>
-          <p className="text-xs font-medium">No critical risk warnings detected!</p>
-        </div>
+        <EmptyState
+          compact
+          icon={CheckCircle}
+          tone="emerald"
+          title="No critical risk warnings detected!"
+          className="relative"
+        />
       ) : (
-        <div className="space-y-2.5 max-h-64 overflow-y-auto pr-1">
+        <div className="scroll-thin relative max-h-64 space-y-2.5 overflow-y-auto pr-1">
           {items.map((item, idx) => (
             <div
               key={idx}
-              className={`p-3 rounded-xl border transition-all duration-300 ${sevStyle(
-                item.severity
-              )} hover:scale-[1.01]`}
+              className={`rounded-xl border p-3 transition-colors duration-200 ${sevStyle(item.severity)}`}
             >
-              <div className="flex items-start justify-between gap-2">
-                <div className="flex-1">
-                  <p className="text-xs font-bold text-slate-100">{item.title || item.message}</p>
-                  <p className="mt-1 text-[11px] opacity-90 leading-tight">{item.message}</p>
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0 flex-1">
+                  <p className="break-words text-xs font-semibold text-slate-100">{item.title || item.message}</p>
+                  <p className="mt-1 break-words text-[11px] leading-snug opacity-90">{item.message}</p>
                   {item.recommendation && (
-                    <div className="mt-1.5 flex items-center gap-1 text-[11px] font-medium text-emerald-300">
-                      <Sparkles className="h-3 w-3" />
-                      <span>{item.recommendation}</span>
+                    <div className="mt-2 flex items-start gap-1.5 text-[11px] font-medium text-violet-200">
+                      <Sparkles className="mt-0.5 h-3 w-3 shrink-0 text-violet-300" aria-hidden="true" />
+                      <span className="min-w-0 break-words">{item.recommendation}</span>
                     </div>
                   )}
                 </div>
 
                 {/* Badges */}
-                <div className="text-right shrink-0 space-y-1">
+                <div className="flex shrink-0 flex-col items-end gap-1 text-right">
                   {item.confidence && (
-                    <span className="inline-block rounded-md bg-slate-900/80 px-1.5 py-0.5 text-[10px] font-semibold text-slate-300">
+                    <span className="badge badge-neutral num px-2 text-[10px] leading-4">
                       {Math.round(item.confidence)}% conf.
                     </span>
                   )}
                   {item.estimatedMonthlyImpact && (
-                    <div className="text-[10px] font-bold text-emerald-400">
+                    <div className="num text-[10px] font-bold text-emerald-400">
                       +₹{Math.round(item.estimatedMonthlyImpact).toLocaleString('en-IN')}/mo
                     </div>
                   )}

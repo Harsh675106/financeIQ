@@ -121,42 +121,60 @@ export default function TransactionModal({
   const previewAmount = parseFloat(formData.amount) || 0
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-md animate-fade-in overflow-y-auto">
-      <div className="relative my-8 w-full max-w-lg overflow-hidden rounded-3xl border border-slate-700/80 bg-gradient-to-b from-slate-900 via-slate-900 to-slate-950 p-6 sm:p-8 shadow-2xl animate-scale-in">
+    <div className="modal-backdrop animate-fade-in">
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="transaction-modal-title"
+        className="modal-panel max-w-lg overflow-y-auto p-5 animate-scale-in sm:p-7"
+      >
         <div
+          aria-hidden="true"
           className={`pointer-events-none absolute -right-20 -top-20 h-48 w-48 rounded-full blur-3xl opacity-20 ${
             isIncome ? 'bg-emerald-500' : 'bg-rose-500'
           }`}
         />
 
+        {/* Mobile sheet handle */}
+        <div aria-hidden="true" className="mx-auto mb-4 h-1 w-10 rounded-full bg-white/15 sm:hidden" />
+
         {/* Close button */}
         <button
           onClick={onClose}
-          className="absolute right-4 top-4 rounded-xl p-2 text-slate-400 hover:bg-slate-800 hover:text-white transition"
+          className="btn-icon absolute right-4 top-4 z-10 sm:right-5 sm:top-5"
+          aria-label="Close"
         >
-          <X className="h-5 w-5" />
+          <X className="h-[18px] w-[18px]" />
         </button>
 
         {/* Header */}
-        <div className="mb-6">
-          <h2 className="text-xl sm:text-2xl font-black text-slate-50 flex items-center gap-2">
-            {editingTransaction ? 'Edit Transaction' : 'Record New Transaction'}
-            <Sparkles className="h-5 w-5 text-primary-400" />
-          </h2>
-          <p className="text-xs text-slate-400 mt-1">
-            Log financial flow events to update cash velocity and analytics
-          </p>
+        <div className="relative mb-6 flex items-start gap-3 pr-12">
+          <span className="icon-tile">
+            <Sparkles className="h-[18px] w-[18px]" />
+          </span>
+          <div className="min-w-0">
+            <h2
+              id="transaction-modal-title"
+              className="font-display text-xl font-semibold tracking-tight text-white sm:text-2xl"
+            >
+              {editingTransaction ? 'Edit Transaction' : 'Record New Transaction'}
+            </h2>
+            <p className="mt-1 text-xs text-slate-400 sm:text-sm">
+              Log financial flow events to update cash velocity and analytics
+            </p>
+          </div>
         </div>
 
         {/* Type Toggle Pills */}
-        <div className="mb-5 flex rounded-2xl bg-slate-800/80 p-1.5 border border-slate-700/60">
+        <div className="segmented relative mb-5 flex w-full">
           <button
             type="button"
             onClick={() => setFormData({ ...formData, type: 'expense' })}
-            className={`flex-1 flex items-center justify-center gap-2 rounded-xl py-2.5 text-xs font-bold transition-all duration-300 ${
+            aria-pressed={!isIncome}
+            className={`segmented-item flex-1 py-2.5 text-[13px] ${
               !isIncome
-                ? 'bg-rose-500 text-slate-950 shadow-lg font-black'
-                : 'text-slate-400 hover:text-slate-200'
+                ? 'bg-rose-500/15 !text-rose-200 shadow-[inset_0_0_0_1px_rgba(251,113,133,0.35),0_4px_14px_-6px_rgba(244,63,94,0.6)]'
+                : ''
             }`}
           >
             <ArrowDownRight className="h-4 w-4" />
@@ -165,10 +183,11 @@ export default function TransactionModal({
           <button
             type="button"
             onClick={() => setFormData({ ...formData, type: 'income' })}
-            className={`flex-1 flex items-center justify-center gap-2 rounded-xl py-2.5 text-xs font-bold transition-all duration-300 ${
+            aria-pressed={isIncome}
+            className={`segmented-item flex-1 py-2.5 text-[13px] ${
               isIncome
-                ? 'bg-emerald-400 text-slate-950 shadow-lg font-black'
-                : 'text-slate-400 hover:text-slate-200'
+                ? 'bg-emerald-500/15 !text-emerald-200 shadow-[inset_0_0_0_1px_rgba(52,211,153,0.35),0_4px_14px_-6px_rgba(16,185,129,0.6)]'
+                : ''
             }`}
           >
             <ArrowUpRight className="h-4 w-4" />
@@ -177,9 +196,9 @@ export default function TransactionModal({
         </div>
 
         {/* Quick Presets */}
-        <div className="mb-5 space-y-2">
-          <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
-            <Sparkles className="h-3.5 w-3.5 text-primary-400" />
+        <div className="relative mb-5 space-y-2">
+          <span className="eyebrow flex items-center gap-1.5">
+            <Sparkles className="h-3.5 w-3.5 text-primary-300" />
             Quick Presets:
           </span>
           <div className="flex flex-wrap gap-1.5">
@@ -188,10 +207,11 @@ export default function TransactionModal({
                 key={p.label}
                 type="button"
                 onClick={() => applyPreset(p)}
-                className={`rounded-xl border px-3 py-1 text-xs font-semibold transition ${
+                aria-pressed={formData.category === p.cat}
+                className={`rounded-lg border px-2.5 py-1.5 text-xs font-medium transition-colors ${
                   formData.category === p.cat
-                    ? 'border-primary-400 bg-primary-500/20 text-primary-300 shadow-sm'
-                    : 'border-slate-700/80 bg-slate-800/70 text-slate-300 hover:border-slate-600 hover:text-white'
+                    ? 'border-primary-400/50 bg-primary-500/15 text-primary-100 shadow-[0_4px_14px_-8px_rgba(112,104,244,0.8)]'
+                    : 'border-white/10 bg-white/[0.03] text-slate-300 hover:border-white/20 hover:bg-white/[0.06] hover:text-white'
                 }`}
               >
                 + {p.label}
@@ -201,33 +221,33 @@ export default function TransactionModal({
         </div>
 
         {/* Live Preview Card */}
-        <div className="mb-6 rounded-2xl border border-slate-800 bg-slate-950/70 p-4">
-          <div className="flex items-center justify-between text-xs text-slate-400 mb-1.5">
-            <span className="uppercase tracking-wider text-[10px] font-bold text-primary-400">
+        <div className="surface-inset relative mb-6 p-4">
+          <div className="mb-1.5 flex items-center justify-between gap-3 text-xs text-slate-400">
+            <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-primary-300">
               Live Preview
             </span>
             <span
-              className={`font-mono text-base font-black ${
+              className={`num truncate font-display text-base font-semibold sm:text-lg ${
                 isIncome ? 'text-emerald-400' : 'text-slate-100'
               }`}
             >
               {isIncome ? '+' : '-'}₹{Math.round(previewAmount).toLocaleString('en-IN')}
             </span>
           </div>
-          <div className="text-xs">
-            <p className="font-bold text-slate-200">
+          <div className="min-w-0 text-xs">
+            <p className="truncate text-sm font-semibold text-slate-100">
               {formData.description || formData.category || 'Untitled Transaction'}
             </p>
-            <p className="text-slate-400 text-[11px] mt-0.5">
+            <p className="mt-0.5 truncate text-[11px] text-slate-400">
               Category: {formData.category || 'General'} • Date: {formData.date}
             </p>
           </div>
         </div>
 
         {/* Form Inputs */}
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="relative space-y-4">
           <div>
-            <label className="block text-xs font-bold text-slate-300 mb-1.5">
+            <label className="label">
               Amount (₹) *
             </label>
             <input
@@ -239,13 +259,13 @@ export default function TransactionModal({
               value={formData.amount}
               onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
               placeholder="0.00"
-              className="w-full rounded-2xl border border-slate-700 bg-slate-800/90 px-4 py-3 text-sm font-mono text-slate-100 placeholder-slate-500 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20"
+              className="input num font-display text-base font-semibold sm:text-lg"
             />
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
-              <label className="block text-xs font-bold text-slate-300 mb-1.5">
+              <label className="label">
                 Category *
               </label>
               <input
@@ -254,12 +274,12 @@ export default function TransactionModal({
                 value={formData.category}
                 onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                 placeholder="e.g. Dining, Groceries, Salary"
-                className="w-full rounded-2xl border border-slate-700 bg-slate-800/90 px-4 py-2.5 text-xs text-slate-100 placeholder-slate-500 focus:border-primary-500 focus:outline-none"
+                className="input"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-300 mb-1.5">
+              <label className="label">
                 Transaction Date *
               </label>
               <input
@@ -267,13 +287,13 @@ export default function TransactionModal({
                 required
                 value={formData.date}
                 onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                className="w-full rounded-2xl border border-slate-700 bg-slate-800/90 px-4 py-2.5 text-xs text-slate-100 focus:border-primary-500 focus:outline-none"
+                className="input"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-slate-300 mb-1.5">
+            <label className="label">
               Description / Notes
             </label>
             <input
@@ -281,27 +301,34 @@ export default function TransactionModal({
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               placeholder="e.g. Starbucks Coffee, Monthly House Rent"
-              className="w-full rounded-2xl border border-slate-700 bg-slate-800/90 px-4 py-2.5 text-xs text-slate-100 placeholder-slate-500 focus:border-primary-500 focus:outline-none"
+              className="input"
             />
           </div>
 
-          {error && <p className="text-xs font-bold text-rose-400">{error}</p>}
+          {error && (
+            <p
+              role="alert"
+              className="rounded-xl border border-rose-500/25 bg-rose-500/10 px-3 py-2 text-xs font-medium text-rose-300"
+            >
+              {error}
+            </p>
+          )}
 
-          <div className="flex gap-3 pt-3">
+          <div className="flex gap-3 pt-2 pb-[env(safe-area-inset-bottom)]">
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 rounded-2xl border border-slate-700 bg-slate-800 px-5 py-3 text-xs font-bold text-slate-300 hover:bg-slate-700 transition"
+              className="btn-secondary flex-1 py-3"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={submitting}
-              className={`flex-1 rounded-2xl px-5 py-3 text-xs font-black text-slate-950 transition flex items-center justify-center gap-2 shadow-lg ${
+              className={`btn flex-1 py-3 hover:brightness-110 ${
                 isIncome
-                  ? 'bg-emerald-400 hover:bg-emerald-300 shadow-emerald-500/20'
-                  : 'bg-rose-400 hover:bg-rose-300 shadow-rose-500/20'
+                  ? 'bg-gradient-to-r from-emerald-400 to-teal-300 text-slate-950 shadow-[0_8px_24px_-10px_rgba(16,185,129,0.75)]'
+                  : 'bg-gradient-to-r from-rose-500 to-pink-400 text-white shadow-[0_8px_24px_-10px_rgba(244,63,94,0.75)]'
               }`}
             >
               {submitting ? 'Recording...' : editingTransaction ? 'Update Entry' : 'Record Transaction'}

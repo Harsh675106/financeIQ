@@ -1,14 +1,58 @@
 /** @type {import('tailwindcss').Config} */
+const defaultTheme = require('tailwindcss/defaultTheme')
+
+/*
+ * FinanceIQ — "Obsidian Aurora" design tokens
+ *
+ * - `slate` is re-tuned into a cool, ink-tinted neutral scale so every
+ *   surface, border and muted text in the app shares one premium tone.
+ *   Luminance steps mirror Tailwind's slate, so contrast ratios are kept.
+ * - `primary` is the brand "iris" (indigo → violet). Emerald stays the
+ *   semantic colour for gains / positive values, rose for losses.
+ */
 module.exports = {
   content: [
     './pages/**/*.{js,ts,jsx,tsx,mdx}',
     './components/**/*.{js,ts,jsx,tsx,mdx}',
     './app/**/*.{js,ts,jsx,tsx,mdx}',
+    './lib/**/*.{js,ts,jsx,tsx}',
+    './hooks/**/*.{js,ts,jsx,tsx}',
   ],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ['var(--font-sans)', 'Inter', ...defaultTheme.fontFamily.sans],
+        display: ['var(--font-display)', 'var(--font-sans)', ...defaultTheme.fontFamily.sans],
+        mono: ['var(--font-mono)', ...defaultTheme.fontFamily.mono],
+      },
       colors: {
+        slate: {
+          50: '#f7f8fc',
+          100: '#eef0f8',
+          200: '#dde1ef',
+          300: '#bcc3db',
+          400: '#9099b8',
+          500: '#666f91',
+          600: '#4a5170',
+          700: '#323853',
+          800: '#1f2339',
+          900: '#121528',
+          950: '#090b17',
+        },
         primary: {
+          50: '#f0f1ff',
+          100: '#e3e5ff',
+          200: '#cacdff',
+          300: '#a9acff',
+          400: '#8a88fb',
+          500: '#7068f4',
+          600: '#5f50e6',
+          700: '#5041cb',
+          800: '#4237a4',
+          900: '#383381',
+          950: '#221e4b',
+        },
+        success: {
           50: '#ecfdf5',
           100: '#d1fae5',
           200: '#a7f3d0',
@@ -20,136 +64,39 @@ module.exports = {
           800: '#065f46',
           900: '#064e3b',
         },
-        success: {
-          50: '#f0fdf4',
-          100: '#dcfce7',
-          200: '#bbf7d0',
-          300: '#86efac',
-          400: '#4ade80',
-          500: '#22c55e',
-          600: '#16a34a',
-          700: '#15803d',
-          800: '#166534',
-          900: '#14532d',
-        },
         danger: {
-          50: '#fef2f2',
-          100: '#fee2e2',
-          200: '#fecaca',
-          300: '#fca5a5',
-          400: '#f87171',
-          500: '#ef4444',
-          600: '#dc2626',
-          700: '#b91c1c',
-          800: '#991b1b',
-          900: '#7f1d1d',
+          50: '#fff1f2',
+          100: '#ffe4e6',
+          200: '#fecdd3',
+          300: '#fda4af',
+          400: '#fb7185',
+          500: '#f43f5e',
+          600: '#e11d48',
+          700: '#be123c',
+          800: '#9f1239',
+          900: '#881337',
         },
         surface: {
-          950: '#020617',
-          900: '#020817',
-          800: '#020c1f',
+          950: '#06070f',
+          900: '#090b17',
+          800: '#0e1121',
         },
+      },
+      borderRadius: {
+        '4xl': '2rem',
       },
       boxShadow: {
-        'glow-primary': '0 0 40px rgba(16, 185, 129, 0.35)',
+        'glow-primary': '0 0 0 1px rgba(112, 104, 244, 0.35), 0 10px 40px -10px rgba(112, 104, 244, 0.55)',
+        'glow-emerald': '0 0 0 1px rgba(52, 211, 153, 0.3), 0 10px 36px -12px rgba(16, 185, 129, 0.5)',
+        glass: 'inset 0 1px 0 0 rgba(255, 255, 255, 0.06), 0 1px 2px 0 rgba(0, 0, 0, 0.4), 0 24px 48px -28px rgba(0, 0, 0, 0.8)',
+        elevated: 'inset 0 1px 0 0 rgba(255, 255, 255, 0.08), 0 2px 4px 0 rgba(0, 0, 0, 0.35), 0 32px 64px -24px rgba(0, 0, 0, 0.85)',
       },
-      keyframes: {
-        'float-soft': {
-          '0%, 100%': { transform: 'translateY(0px)' },
-          '50%': { transform: 'translateY(-8px)' },
-        },
-        'fade-up': {
-          '0%': { opacity: '0', transform: 'translateY(10px)' },
-          '100%': { opacity: '1', transform: 'translateY(0px)' },
-        },
-        'fade-in': {
-          '0%': { opacity: '0' },
-          '100%': { opacity: '1' },
-        },
-        'blob-move': {
-          '0%': { transform: 'translate(0px, 0px) scale(1)' },
-          '33%': { transform: 'translate(20px, -30px) scale(1.05)' },
-          '66%': { transform: 'translate(-20px, 10px) scale(0.98)' },
-          '100%': { transform: 'translate(0px, 0px) scale(1)' },
-        },
-        'slide-in-left': {
-          '0%': { opacity: '0', transform: 'translateX(-20px)' },
-          '100%': { opacity: '1', transform: 'translateX(0)' },
-        },
-        'slide-in-right': {
-          '0%': { opacity: '0', transform: 'translateX(20px)' },
-          '100%': { opacity: '1', transform: 'translateX(0)' },
-        },
-        'scale-in': {
-          '0%': { opacity: '0', transform: 'scale(0.95)' },
-          '100%': { opacity: '1', transform: 'scale(1)' },
-        },
-        'bounce-subtle': {
-          '0%, 100%': { transform: 'translateY(0)' },
-          '50%': { transform: 'translateY(-4px)' },
-        },
-        'shimmer': {
-          '0%': { backgroundPosition: '-1000px 0' },
-          '100%': { backgroundPosition: '1000px 0' },
-        },
-        'glow-pulse': {
-          '0%, 100%': { opacity: '1', filter: 'drop-shadow(0 0 10px rgba(16, 185, 129, 0.3))' },
-          '50%': { opacity: '0.8', filter: 'drop-shadow(0 0 20px rgba(16, 185, 129, 0.6))' },
-        },
-        'gradient-shift': {
-          '0%': { backgroundPosition: '0% 50%' },
-          '50%': { backgroundPosition: '100% 50%' },
-          '100%': { backgroundPosition: '0% 50%' },
-        },
-        'rotate-slow': {
-          '0%': { transform: 'rotate(0deg)' },
-          '100%': { transform: 'rotate(360deg)' },
-        },
-        'pulse-ring': {
-          '0%': { boxShadow: '0 0 0 0 rgba(16, 185, 129, 0.7)' },
-          '50%': { boxShadow: '0 0 0 10px rgba(16, 185, 129, 0)' },
-          '100%': { boxShadow: '0 0 0 0 rgba(16, 185, 129, 0)' },
-        },
-        'flip': {
-          '0%': { transform: 'rotateY(0deg)' },
-          '100%': { transform: 'rotateY(360deg)' },
-        },
-        'breathe': {
-          '0%, 100%': { transform: 'scale(1)' },
-          '50%': { transform: 'scale(1.05)' },
-        },
-        'border-beam': {
-          '100%': { 'offset-distance': '100%' },
-        },
-        'radar-ping': {
-          '0%': { transform: 'scale(0.8)', opacity: '0.8' },
-          '70%, 100%': { transform: 'scale(2.2)', opacity: '0' },
-        },
-        'pop-in': {
-          '0%': { opacity: '0', transform: 'scale(0.85) translateY(6px)' },
-          '70%': { transform: 'scale(1.02) translateY(0)' },
-          '100%': { opacity: '1', transform: 'scale(1) translateY(0)' },
-        },
+      transitionTimingFunction: {
+        'out-expo': 'cubic-bezier(0.16, 1, 0.3, 1)',
+        spring: 'cubic-bezier(0.34, 1.56, 0.64, 1)',
       },
-      animation: {
-        'float-soft': 'float-soft 14s ease-in-out infinite',
-        'fade-up': 'fade-up 500ms ease-out both',
-        'fade-in': 'fade-in 350ms ease-out both',
-        'blob-slow': 'blob-move 28s ease-in-out infinite',
-        'slide-in-left': 'slide-in-left 600ms ease-out',
-        'slide-in-right': 'slide-in-right 600ms ease-out',
-        'scale-in': 'scale-in 500ms ease-out',
-        'bounce-subtle': 'bounce-subtle 2s ease-in-out infinite',
-        'shimmer': 'shimmer 2s infinite',
-        'glow-pulse': 'glow-pulse 2.5s ease-in-out infinite',
-        'gradient-shift': 'gradient-shift 3s ease infinite',
-        'rotate-slow': 'rotate-slow 20s linear infinite',
-        'pulse-ring': 'pulse-ring 2s infinite',
-        'flip': 'flip 3s ease-in-out infinite',
-        'breathe': 'breathe 3s ease-in-out infinite',
-        'radar-ping': 'radar-ping 2s cubic-bezier(0, 0, 0.2, 1) infinite',
-        'pop-in': 'pop-in 350ms cubic-bezier(0.16, 1, 0.3, 1) both',
-      },
+      // Keyframes and `animate-*` utilities live in app/globals.css so every
+      // decorative animation can be gated behind prefers-reduced-motion.
     },
   },
   plugins: [],

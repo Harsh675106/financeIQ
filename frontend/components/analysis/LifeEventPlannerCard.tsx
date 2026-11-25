@@ -2,7 +2,8 @@
 
 import { useState } from 'react'
 import { api } from '@/lib/api'
-import { CalendarHeart } from 'lucide-react'
+import { CalendarHeart, CheckCircle2, Sparkles, Target } from 'lucide-react'
+import SectionHeader from '@/components/ui/SectionHeader'
 
 const eventOptions = [
   { value: 'car_purchase', label: 'Car purchase', defaultAmount: 500000 },
@@ -94,18 +95,22 @@ export default function LifeEventPlannerCard() {
   }
 
   return (
-    <div className="card card-pad card-hover">
-      <div className="flex items-center gap-2 mb-4">
-        <CalendarHeart className="h-5 w-5 text-primary-300" />
-        <h3 className="text-lg font-semibold text-slate-50">Life Event Planner</h3>
-      </div>
+    <div className="card card-pad">
+      <SectionHeader
+        icon={CalendarHeart}
+        tone="brand"
+        title="Life Event Planner"
+        subtitle="Turn real-life plans into funding targets, monthly saving goals, and tradeoff guidance."
+        as="h3"
+      />
 
-      <p className="text-sm text-slate-400 mb-4">
-        Turn real-life plans into funding targets, monthly saving goals, and tradeoff guidance.
-      </p>
-
-      <div className="grid md:grid-cols-3 gap-3 mb-4">
-        <select value={eventType} onChange={(e) => updateEventType(e.target.value)} className="input">
+      <div className="mt-5 grid gap-3 md:grid-cols-3">
+        <select
+          value={eventType}
+          onChange={(e) => updateEventType(e.target.value)}
+          className="input"
+          aria-label="Life event"
+        >
           {eventOptions.map((item) => (
             <option key={item.value} value={item.value}>
               {item.label}
@@ -116,8 +121,9 @@ export default function LifeEventPlannerCard() {
           value={targetAmount}
           onChange={(e) => setTargetAmount(e.target.value)}
           type="number"
-          className="input"
+          className="input num"
           placeholder="Target amount"
+          aria-label="Target amount"
           disabled={eventType === 'layoff_recovery'}
         />
         <input
@@ -125,106 +131,122 @@ export default function LifeEventPlannerCard() {
           onChange={(e) => setTargetDate(e.target.value)}
           type="date"
           className="input"
+          aria-label="Target date"
         />
       </div>
 
-      <button onClick={runPlanner} disabled={loading} className="btn-primary mb-4">
+      <button onClick={runPlanner} disabled={loading} className="btn-primary mt-4 w-full sm:w-auto">
+        <Sparkles className="h-4 w-4" />
         {loading ? 'Planning...' : 'Build plan'}
       </button>
 
       {result ? (
-        <div className="space-y-4">
-          <div className="rounded-2xl border border-slate-800/70 bg-slate-900/40 p-4">
-            <div className="flex items-start justify-between gap-3">
-              <div>
-                <p className="text-xs uppercase tracking-wide text-slate-500">{result.eventLabel}</p>
-                <h4 className="mt-1 text-base font-semibold text-slate-50">{result.summary}</h4>
+        <div className="mt-6 space-y-4">
+          <div className="rounded-2xl border border-primary-400/20 bg-gradient-to-br from-primary-500/[0.08] via-transparent to-cyan-500/[0.05] p-4 sm:p-5">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+              <div className="min-w-0">
+                <p className="eyebrow">{result.eventLabel}</p>
+                <h4 className="mt-1.5 text-base font-semibold leading-snug text-slate-50">{result.summary}</h4>
               </div>
-              <span className="rounded-full bg-primary-500/10 px-3 py-1 text-xs text-primary-200">
+              <span className="badge badge-brand num shrink-0 self-start px-3 py-1">
+                <Target className="h-3.5 w-3.5" />
                 {result.successProbability}% success chance
               </span>
             </div>
-            <div className="grid md:grid-cols-3 gap-3 mt-4">
-              <div className="rounded-xl border border-slate-800/70 bg-slate-950/40 p-3">
-                <p className="text-xs uppercase tracking-wide text-slate-500">Required monthly</p>
-                <p className="mt-2 text-lg font-semibold text-slate-100">
+            <div className="mt-4 grid gap-3 sm:grid-cols-3">
+              <div className="surface-inset p-3 sm:p-4">
+                <p className="eyebrow">Required monthly</p>
+                <p className="kpi-value mt-2 text-lg sm:text-xl">
                   {Math.round(result.requiredMonthly).toLocaleString('en-IN')}
                 </p>
               </div>
-              <div className="rounded-xl border border-slate-800/70 bg-slate-950/40 p-3">
-                <p className="text-xs uppercase tracking-wide text-slate-500">Comfortable monthly</p>
-                <p className="mt-2 text-lg font-semibold text-emerald-300">
+              <div className="surface-inset p-3 sm:p-4">
+                <p className="eyebrow">Comfortable monthly</p>
+                <p className="kpi-value mt-2 text-lg text-emerald-300 sm:text-xl">
                   {Math.round(result.comfortableMonthly).toLocaleString('en-IN')}
                 </p>
               </div>
-              <div className="rounded-xl border border-slate-800/70 bg-slate-950/40 p-3">
-                <p className="text-xs uppercase tracking-wide text-slate-500">Monthly gap</p>
-                <p className={`mt-2 text-lg font-semibold ${result.monthlyGap > 0 ? 'text-rose-300' : 'text-slate-100'}`}>
+              <div className="surface-inset p-3 sm:p-4">
+                <p className="eyebrow">Monthly gap</p>
+                <p className={`kpi-value mt-2 text-lg sm:text-xl ${result.monthlyGap > 0 ? 'text-rose-300' : 'text-slate-100'}`}>
                   {Math.round(result.monthlyGap).toLocaleString('en-IN')}
                 </p>
               </div>
             </div>
           </div>
 
-          <div className="grid lg:grid-cols-2 gap-4">
-            <div className="rounded-2xl border border-slate-800/70 bg-slate-900/40 p-4">
-              <p className="text-xs uppercase tracking-wide text-slate-500 mb-3">Recommendations</p>
+          <div className="grid gap-4 lg:grid-cols-2">
+            <div className="surface-inset p-4">
+              <p className="eyebrow mb-3">Recommendations</p>
               <div className="space-y-2">
                 {result.recommendations.map((item) => (
-                  <p key={item} className="text-sm text-slate-200">{item}</p>
+                  <p key={item} className="flex gap-2.5 text-sm leading-relaxed text-slate-200">
+                    <span aria-hidden="true" className="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full bg-primary-400" />
+                    <span className="min-w-0">{item}</span>
+                  </p>
                 ))}
               </div>
             </div>
-            <div className="rounded-2xl border border-slate-800/70 bg-slate-900/40 p-4">
-              <p className="text-xs uppercase tracking-wide text-slate-500 mb-3">Tradeoffs</p>
+            <div className="surface-inset p-4">
+              <p className="eyebrow mb-3">Tradeoffs</p>
               <div className="space-y-2">
                 {result.tradeoffs.length === 0 ? (
                   <p className="text-sm text-slate-400">No major tradeoffs detected right now.</p>
                 ) : (
                   result.tradeoffs.map((item) => (
-                    <p key={item} className="text-sm text-slate-200">{item}</p>
+                    <p key={item} className="flex gap-2.5 text-sm leading-relaxed text-slate-200">
+                      <span aria-hidden="true" className="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full bg-amber-400" />
+                      <span className="min-w-0">{item}</span>
+                    </p>
                   ))
                 )}
               </div>
             </div>
           </div>
 
-          <div className="grid lg:grid-cols-3 gap-4">
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {result.milestones.map((item) => (
-              <div key={item.label} className="rounded-2xl border border-slate-800/70 bg-slate-900/40 p-4">
-                <p className="text-xs uppercase tracking-wide text-slate-500">{item.label}</p>
-                <p className="mt-2 text-sm text-slate-200">{item.detail}</p>
+              <div key={item.label} className="surface-inset relative overflow-hidden p-4">
+                <span aria-hidden="true" className="absolute inset-y-3 left-0 w-0.5 rounded-full bg-gradient-to-b from-primary-400 to-cyan-400" />
+                <p className="eyebrow">{item.label}</p>
+                <p className="mt-2 text-sm leading-relaxed text-slate-200">{item.detail}</p>
               </div>
             ))}
           </div>
 
-          <div className="grid lg:grid-cols-2 gap-4">
-            <div className="rounded-2xl border border-slate-800/70 bg-slate-900/40 p-4">
-              <p className="text-xs uppercase tracking-wide text-slate-500">Assumptions</p>
+          <div className="grid gap-4 lg:grid-cols-2">
+            <div className="surface-inset p-4">
+              <p className="eyebrow">Assumptions</p>
               <div className="mt-2 space-y-2">
                 {result.assumptions.map((item) => (
-                  <p key={item} className="text-sm text-slate-300">{item}</p>
+                  <p key={item} className="text-sm leading-relaxed text-slate-300">{item}</p>
                 ))}
               </div>
             </div>
-            <div className="rounded-2xl border border-slate-800/70 bg-slate-900/40 p-4">
-              <p className="text-xs uppercase tracking-wide text-slate-500">If assumptions change</p>
-              <p className="mt-2 text-sm text-slate-300">{result.whatChangesIfWrong}</p>
-              <p className="mt-3 text-xs text-slate-500">Confidence: {Math.round(result.confidence)}%</p>
+            <div className="surface-inset p-4">
+              <p className="eyebrow">If assumptions change</p>
+              <p className="mt-2 text-sm leading-relaxed text-slate-300">{result.whatChangesIfWrong}</p>
+              <p className="mt-3 text-xs text-slate-500">
+                <span className="badge badge-ai num">Confidence: {Math.round(result.confidence)}%</span>
+              </p>
             </div>
           </div>
 
-          <div className="flex items-center justify-between gap-3">
-            <p className={`text-sm ${saveMessage.includes('successfully') ? 'text-emerald-300' : 'text-slate-400'}`}>
+          <div className="flex flex-col gap-3 border-t border-white/[0.06] pt-4 sm:flex-row sm:items-center sm:justify-between">
+            <p className={`flex items-center gap-2 text-sm ${saveMessage.includes('successfully') ? 'text-emerald-300' : 'text-slate-400'}`}>
+              {saveMessage.includes('successfully') && <CheckCircle2 className="h-4 w-4 shrink-0" />}
               {saveMessage || 'Turn this plan into a tracked goal with the recommended monthly contribution.'}
             </p>
-            <button onClick={saveAsGoal} disabled={savingGoal} className="btn-primary">
+            <button onClick={saveAsGoal} disabled={savingGoal} className="btn-primary w-full shrink-0 sm:w-auto">
               {savingGoal ? 'Saving...' : 'Save as goal'}
             </button>
           </div>
         </div>
       ) : (
-        <div className="text-sm text-slate-400">
+        <div className="surface-inset mt-5 flex items-center gap-3 border-dashed p-4 text-sm text-slate-400">
+          <span className="icon-tile icon-tile-sm icon-tile-slate">
+            <CalendarHeart className="h-4 w-4" />
+          </span>
           Plan events like a car purchase, higher studies, wedding, or emergency-fund rebuild after a layoff.
         </div>
       )}

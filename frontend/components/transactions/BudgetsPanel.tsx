@@ -11,6 +11,7 @@ import {
   TrendingDown,
   Layers
 } from 'lucide-react'
+import EmptyState from '@/components/ui/EmptyState'
 
 export default function BudgetsPanel({ refreshKey = 0 }: { refreshKey?: number }) {
   const [budgets, setBudgets] = useState<any[]>([])
@@ -54,21 +55,26 @@ export default function BudgetsPanel({ refreshKey = 0 }: { refreshKey?: number }
   }
 
   return (
-    <div className="relative overflow-hidden rounded-3xl border border-slate-700/80 bg-gradient-to-br from-slate-900/95 via-slate-900/85 to-slate-950/95 p-6 md:p-8 shadow-2xl backdrop-blur-xl stage-card-lift">
+    <div className="card card-pad relative overflow-hidden">
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-primary-500/10 blur-3xl"
+      />
+
       {/* Header */}
-      <div className="flex flex-wrap items-center justify-between gap-3 mb-6 border-b border-slate-800/80 pb-4">
-        <div className="flex items-center gap-3">
-          <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500/25 to-purple-500/15 border border-indigo-500/40 shadow-lg text-indigo-400">
-            <Layers className="h-6 w-6" />
-          </div>
-          <div>
-            <h3 className="text-base sm:text-lg font-bold text-slate-100 flex items-center gap-2">
-              Monthly Budget Guardrails
-              <span className="inline-flex items-center gap-1 rounded-full bg-indigo-500/15 px-2.5 py-0.5 text-xs font-semibold text-indigo-300 border border-indigo-500/30">
-                <Sparkles className="h-3.5 w-3.5" /> Active Watchdog
+      <div className="relative mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex min-w-0 items-center gap-3">
+          <span className="icon-tile">
+            <Layers className="h-[18px] w-[18px]" />
+          </span>
+          <div className="min-w-0">
+            <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+              <h3 className="card-title">Monthly Budget Guardrails</h3>
+              <span className="badge badge-brand">
+                <Sparkles className="h-3 w-3" /> Active Watchdog
               </span>
-            </h3>
-            <p className="text-xs text-slate-400 mt-0.5">
+            </div>
+            <p className="card-subtitle">
               {period ? `Current cycle: ${period.start} → ${period.end}` : 'Track spending thresholds against monthly targets'}
             </p>
           </div>
@@ -76,7 +82,8 @@ export default function BudgetsPanel({ refreshKey = 0 }: { refreshKey?: number }
 
         <button
           onClick={() => setShowAddForm(!showAddForm)}
-          className="flex items-center gap-1.5 rounded-2xl bg-slate-800/90 px-4 py-2 text-xs font-bold text-primary-400 border border-primary-500/30 hover:bg-primary-500/15 transition shadow-sm"
+          aria-expanded={showAddForm}
+          className="btn-soft btn-sm h-9 self-start px-3.5 sm:self-auto"
         >
           <Plus className="h-3.5 w-3.5" />
           <span>{showAddForm ? 'Close Target Form' : 'New Budget Cap'}</span>
@@ -85,20 +92,20 @@ export default function BudgetsPanel({ refreshKey = 0 }: { refreshKey?: number }
 
       {/* Add Budget Form */}
       {showAddForm && (
-        <form onSubmit={save} className="mb-6 rounded-2xl border border-slate-700/80 bg-slate-950/60 p-4 space-y-3 animate-scale-in">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <form onSubmit={save} className="surface-inset relative mb-6 space-y-4 p-4 animate-scale-in">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
-              <label className="block text-xs font-bold text-slate-300 mb-1">Category</label>
+              <label className="label">Category</label>
               <input
                 value={form.category}
                 onChange={(e) => setForm({ ...form, category: e.target.value })}
                 placeholder="e.g. Dining, Groceries, Shopping"
                 required
-                className="w-full rounded-xl border border-slate-700 bg-slate-900 px-3.5 py-2 text-xs text-slate-100 placeholder-slate-500 focus:border-primary-500 focus:outline-none"
+                className="input"
               />
             </div>
             <div>
-              <label className="block text-xs font-bold text-slate-300 mb-1">Monthly Budget Cap (₹)</label>
+              <label className="label">Monthly Budget Cap (₹)</label>
               <input
                 value={form.amountMonthly}
                 onChange={(e) => setForm({ ...form, amountMonthly: e.target.value })}
@@ -107,13 +114,13 @@ export default function BudgetsPanel({ refreshKey = 0 }: { refreshKey?: number }
                 step="100"
                 min="100"
                 required
-                className="w-full rounded-xl border border-slate-700 bg-slate-900 px-3.5 py-2 text-xs font-mono text-slate-100 placeholder-slate-500 focus:border-primary-500 focus:outline-none"
+                className="input num"
               />
             </div>
           </div>
           <button
             type="submit"
-            className="w-full rounded-xl bg-primary-500 px-4 py-2 text-xs font-black text-slate-950 shadow-md transition hover:bg-primary-400"
+            className="btn-primary w-full"
           >
             Save Target Cap
           </button>
@@ -122,13 +129,22 @@ export default function BudgetsPanel({ refreshKey = 0 }: { refreshKey?: number }
 
       {/* Budgets List */}
       {loading ? (
-        <div className="h-32 bg-slate-800/40 rounded-2xl animate-pulse border border-slate-800" />
+        <div className="grid grid-cols-1 gap-3 sm:gap-4 md:grid-cols-2">
+          <div className="skeleton h-28" />
+          <div className="skeleton hidden h-28 md:block" />
+        </div>
       ) : budgets.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-slate-800/90 bg-slate-900/40 p-6 text-center text-xs text-slate-400">
-          No category budgets configured yet. Add budget targets above to prevent overspending.
+        <div className="relative rounded-2xl border border-dashed border-white/10">
+          <EmptyState
+            compact
+            icon={Wallet}
+            tone="slate"
+            title="No category budgets configured yet."
+            description="Add budget targets above to prevent overspending."
+          />
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="relative grid grid-cols-1 gap-3 sm:gap-4 md:grid-cols-2">
           {budgets.map((b: any) => {
             const isOver = b.overspending || b.spent > b.amountMonthly
             const pct = Math.min(100, Math.round((b.spent / b.amountMonthly) * 100))
@@ -136,39 +152,44 @@ export default function BudgetsPanel({ refreshKey = 0 }: { refreshKey?: number }
             return (
               <div
                 key={b.id}
-                className={`rounded-2xl border p-4.5 transition ${
+                className={`surface-inset p-4 transition-colors ${
                   isOver
-                    ? 'border-rose-500/40 bg-rose-950/20 shadow-lg shadow-rose-500/5'
-                    : 'border-slate-800/90 bg-slate-900/60 hover:border-slate-700'
+                    ? 'border-rose-500/30 bg-rose-500/[0.06] shadow-[0_12px_32px_-20px_rgba(244,63,94,0.6)]'
+                    : 'hover:border-white/10'
                 }`}
               >
-                <div className="flex items-center justify-between mb-2">
-                  <div className="flex items-center gap-2">
-                    <span className={`h-2.5 w-2.5 rounded-full ${isOver ? 'bg-rose-500 animate-ping' : 'bg-emerald-400'}`} />
-                    <h4 className="text-sm font-bold text-slate-100">{b.category}</h4>
+                <div className="flex items-center justify-between gap-3">
+                  <div className="flex min-w-0 items-center gap-2">
+                    <span
+                      aria-hidden="true"
+                      className={`h-2.5 w-2.5 shrink-0 rounded-full ${
+                        isOver ? 'animate-pulse bg-rose-500 shadow-[0_0_10px_rgba(244,63,94,0.7)]' : 'bg-emerald-400'
+                      }`}
+                    />
+                    <h4 className="truncate text-sm font-semibold text-slate-100">{b.category}</h4>
                   </div>
-                  <span className={`text-xs font-bold font-mono ${isOver ? 'text-rose-400' : 'text-slate-300'}`}>
+                  <span className={`num shrink-0 text-xs font-semibold ${isOver ? 'text-rose-300' : 'text-slate-300'}`}>
                     {pct}% Consumed
                   </span>
                 </div>
 
                 {/* Progress bar */}
-                <div className="h-2 w-full rounded-full bg-slate-800 overflow-hidden my-2.5">
+                <div className="progress-track my-3">
                   <div
-                    className={`h-full rounded-full transition-all duration-700 ${
+                    className={`h-full rounded-full bg-gradient-to-r transition-[width] duration-700 ${
                       isOver
-                        ? 'bg-rose-500'
+                        ? 'from-rose-500 to-pink-400'
                         : pct > 80
-                        ? 'bg-amber-400'
-                        : 'bg-gradient-to-r from-emerald-500 to-cyan-400'
+                        ? 'from-amber-400 to-orange-400'
+                        : 'from-emerald-400 to-teal-300'
                     }`}
                     style={{ width: `${pct}%` }}
                   />
                 </div>
 
-                <div className="flex items-center justify-between text-xs text-slate-400 font-mono mt-2">
+                <div className="num flex flex-wrap items-center justify-between gap-x-3 gap-y-1 text-xs text-slate-400">
                   <span>Spent: ₹{Math.round(b.spent).toLocaleString('en-IN')}</span>
-                  <span className={isOver ? 'text-rose-400 font-bold' : 'text-emerald-400'}>
+                  <span className={isOver ? 'font-semibold text-rose-300' : 'text-emerald-300'}>
                     {isOver
                       ? `Exceeded by ₹${Math.round(b.spent - b.amountMonthly).toLocaleString('en-IN')}`
                       : `Safe: ₹${Math.round(b.amountMonthly - b.spent).toLocaleString('en-IN')} left`}

@@ -42,58 +42,73 @@ export default function GoalSimulatorModal({
   const monthsSaved = Math.max(0, currentMonths - acceleratedMonths)
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 p-4 backdrop-blur-md animate-fade-in">
-      <div className="story-glass-card relative w-full max-w-lg rounded-3xl p-6 sm:p-7 shadow-2xl border border-emerald-500/30 animate-pop-in">
+    <div className="modal-backdrop animate-fade-in">
+      <div
+        className="modal-panel max-w-lg overflow-y-auto p-5 animate-pop-in sm:p-6"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Storyline Journey Accelerator"
+      >
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary-400/60 to-transparent"
+        />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute -right-20 -top-20 h-48 w-48 rounded-full bg-primary-500/15 blur-3xl"
+        />
+
         {/* Header */}
-        <div className="flex items-center justify-between pb-4 border-b border-slate-800">
-          <div className="flex items-center gap-2.5">
-            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-tr from-emerald-500/20 to-cyan-500/20 border border-emerald-500/30 text-emerald-300 shadow-[0_0_15px_rgba(16,185,129,0.3)]">
-              <Zap className="h-5 w-5 animate-pulse" />
-            </div>
-            <div>
-              <h3 className="text-lg font-bold text-slate-100">
+        <div className="relative flex items-start justify-between gap-4 border-b border-white/[0.06] pb-4">
+          <div className="flex min-w-0 items-center gap-3">
+            <span className="icon-tile icon-tile-brand">
+              <Zap className="h-5 w-5" />
+            </span>
+            <div className="min-w-0">
+              <h3 className="font-display text-lg font-semibold tracking-tight text-white">
                 Storyline Journey Accelerator
               </h3>
-              <p className="text-xs text-slate-400">
-                Simulating velocity for <span className="text-emerald-300 font-semibold">{goal.name}</span>
+              <p className="mt-0.5 text-xs text-slate-400">
+                Simulating velocity for <span className="break-words font-semibold text-primary-200">{goal.name}</span>
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="rounded-xl p-1.5 text-slate-400 hover:bg-slate-800 hover:text-slate-100 transition-colors"
+            className="btn-icon"
+            aria-label="Close"
           >
-            <X className="h-5 w-5" />
+            <X className="h-4 w-4" />
           </button>
         </div>
 
         {/* Storyline Speed Metrics */}
-        <div className="mt-5 grid grid-cols-2 gap-3">
-          <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-3.5 text-center">
-            <span className="text-[11px] font-mono text-slate-400 uppercase">Current Trajectory</span>
-            <div className="mt-1 text-2xl font-black text-slate-200">
-              {currentMonths} <span className="text-xs font-normal text-slate-400">months</span>
+        <div className="relative mt-5 grid grid-cols-2 gap-3">
+          <div className="surface-inset p-3.5 text-center">
+            <span className="eyebrow text-[10px]">Current Trajectory</span>
+            <div className="kpi-value mt-1.5 text-2xl text-slate-200">
+              {currentMonths} <span className="font-sans text-xs font-normal text-slate-400">months</span>
             </div>
-            <span className="text-[10px] text-slate-500">at ₹{currentMonthly.toLocaleString('en-IN')}/mo</span>
+            <span className="num text-[10px] text-slate-500">at ₹{currentMonthly.toLocaleString('en-IN')}/mo</span>
           </div>
 
-          <div className="rounded-2xl border border-emerald-500/30 bg-emerald-950/30 p-3.5 text-center relative overflow-hidden">
-            <div className="absolute -right-4 -top-4 h-12 w-12 rounded-full bg-emerald-500/20 blur-xl"></div>
-            <span className="text-[11px] font-mono text-emerald-400 uppercase font-semibold">Accelerated Speed</span>
-            <div className="mt-1 text-2xl font-black text-emerald-300">
-              {acceleratedMonths} <span className="text-xs font-normal text-emerald-400">months</span>
+          <div className="relative overflow-hidden rounded-[0.875rem] border border-primary-400/30 bg-gradient-to-br from-primary-500/15 via-violet-500/10 to-cyan-500/10 p-3.5 text-center shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]">
+            <div className="absolute -right-4 -top-4 h-12 w-12 rounded-full bg-cyan-400/20 blur-xl"></div>
+            <span className="eyebrow relative text-[10px] text-primary-200">Accelerated Speed</span>
+            <div className="kpi-value relative mt-1.5 text-2xl">
+              <span className="text-gradient">{acceleratedMonths}</span> <span className="font-sans text-xs font-normal text-primary-200">months</span>
             </div>
-            <span className="text-[10px] text-emerald-400/80 font-bold">
+            <span className="relative text-[10px] font-semibold text-emerald-300">
               ⚡ Saves {monthsSaved} {monthsSaved === 1 ? 'month' : 'months'}
             </span>
           </div>
         </div>
 
         {/* Interactive Boost Slider */}
-        <div className="mt-5 space-y-3">
-          <div className="flex justify-between items-center text-xs">
-            <span className="text-slate-300 font-medium">Extra Monthly Power Boost</span>
-            <span className="font-mono font-bold text-emerald-300 bg-emerald-500/15 border border-emerald-500/30 px-2.5 py-0.5 rounded-full">
+        <div className="relative mt-5 space-y-3">
+          <div className="flex items-center justify-between gap-3 text-xs">
+            <span className="font-medium text-slate-300">Extra Monthly Power Boost</span>
+            <span className="badge badge-brand num text-xs">
               +₹{boostMonthly.toLocaleString('en-IN')}/mo
             </span>
           </div>
@@ -105,10 +120,11 @@ export default function GoalSimulatorModal({
             step="200"
             value={boostMonthly}
             onChange={(e) => setBoostMonthly(Number(e.target.value))}
-            className="w-full accent-emerald-400 h-2 bg-slate-800 rounded-lg cursor-pointer"
+            className="pf-range cursor-pointer"
+            aria-label="Extra Monthly Power Boost"
           />
 
-          <div className="flex justify-between text-[10px] text-slate-500 font-mono">
+          <div className="num flex justify-between text-[10px] text-slate-500">
             <span>+₹200</span>
             <span>+₹5,000</span>
             <span>+₹10,000</span>
@@ -117,16 +133,17 @@ export default function GoalSimulatorModal({
         </div>
 
         {/* Preset Boost Pills */}
-        <div className="mt-4 flex flex-wrap gap-2">
+        <div className="relative mt-4 flex flex-wrap gap-2">
           {[500, 1000, 2500, 5000].map((amt) => (
             <button
               key={amt}
               type="button"
               onClick={() => setBoostMonthly(amt)}
-              className={`text-xs px-3 py-1.5 rounded-xl border font-semibold transition-all ${
+              aria-pressed={boostMonthly === amt}
+              className={`num rounded-lg border px-3 py-1.5 text-xs font-semibold transition-colors ${
                 boostMonthly === amt
-                  ? 'bg-emerald-500/20 border-emerald-400 text-emerald-300 shadow-[0_0_12px_rgba(16,185,129,0.3)]'
-                  : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-slate-200'
+                  ? 'border-primary-400/50 bg-primary-500/20 text-white shadow-[0_4px_16px_-6px_rgba(112,104,244,0.8)]'
+                  : 'border-white/[0.08] bg-white/[0.03] text-slate-400 hover:border-white/15 hover:text-slate-100'
               }`}
             >
               +₹{amt.toLocaleString('en-IN')}
@@ -135,24 +152,24 @@ export default function GoalSimulatorModal({
         </div>
 
         {/* Motivational Story Narrative */}
-        <div className="mt-5 rounded-2xl border border-slate-800/80 bg-slate-950/70 p-3.5 flex items-start gap-3">
-          <Sparkles className="h-4 w-4 text-emerald-400 shrink-0 mt-0.5" />
-          <p className="text-xs text-slate-300 leading-relaxed">
-            By boosting your monthly fuel by <strong className="text-emerald-300">₹{boostMonthly.toLocaleString('en-IN')}</strong>, you reach the summit{' '}
-            <strong className="text-emerald-400">{monthsSaved} months sooner</strong>, conquering your goal in approximately{' '}
-            <strong className="text-slate-100">{acceleratedMonths} months</strong> instead of {currentMonths} months!
+        <div className="surface-inset relative mt-5 flex items-start gap-3 p-3.5">
+          <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-primary-300" />
+          <p className="text-xs leading-relaxed text-slate-300">
+            By boosting your monthly fuel by <strong className="font-semibold text-primary-200">₹{boostMonthly.toLocaleString('en-IN')}</strong>, you reach the summit{' '}
+            <strong className="font-semibold text-emerald-300">{monthsSaved} months sooner</strong>, conquering your goal in approximately{' '}
+            <strong className="font-semibold text-slate-100">{acceleratedMonths} months</strong> instead of {currentMonths} months!
           </p>
         </div>
 
         {/* Actions */}
-        <div className="mt-6 flex items-center gap-3">
+        <div className="relative mt-6 flex flex-col gap-2.5 sm:flex-row sm:items-center">
           <button
             type="button"
             onClick={() => {
               onContributeQuick(goal, boostMonthly)
               onClose()
             }}
-            className="flex-1 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 px-4 py-3 text-sm font-bold text-slate-950 shadow-[0_0_20px_rgba(16,185,129,0.4)] transition-all hover:brightness-110 hover:shadow-[0_0_25px_rgba(16,185,129,0.6)] flex items-center justify-center gap-2"
+            className="btn-primary h-11 flex-1"
           >
             <Sparkles className="h-4 w-4" />
             Apply ₹{boostMonthly.toLocaleString('en-IN')} Deposit Now
@@ -160,7 +177,7 @@ export default function GoalSimulatorModal({
           <button
             type="button"
             onClick={onClose}
-            className="rounded-2xl border border-slate-800 bg-slate-900/80 px-4 py-3 text-sm font-semibold text-slate-400 hover:text-slate-200 transition-colors"
+            className="btn-secondary h-11"
           >
             Close
           </button>

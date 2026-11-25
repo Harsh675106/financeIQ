@@ -76,68 +76,67 @@ export default function QuickAdjustModal({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-4 backdrop-blur-sm animate-fade-in">
-      <div className="relative w-full max-w-md overflow-hidden rounded-2xl border border-slate-700 bg-gradient-to-b from-slate-900 via-slate-900 to-slate-950 p-6 shadow-2xl animate-scale-in">
+    <div className="modal-backdrop animate-fade-in">
+      <div className="modal-panel max-w-md overflow-y-auto p-5 animate-scale-in sm:p-6">
         {/* Ambient glow */}
         <div
-          className={`pointer-events-none absolute -top-16 -right-16 h-36 w-36 rounded-full blur-3xl opacity-25 ${
+          aria-hidden="true"
+          className={`pointer-events-none absolute -right-16 -top-16 h-40 w-40 rounded-full opacity-20 blur-3xl ${
             isSaving ? 'bg-emerald-500' : 'bg-rose-500'
           }`}
         />
 
+        {/* Mobile sheet handle */}
+        <div aria-hidden="true" className="relative mx-auto -mt-1 mb-4 h-1 w-10 rounded-full bg-white/15 sm:hidden" />
+
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute right-4 top-4 rounded-lg p-1.5 text-slate-400 hover:bg-slate-800 hover:text-white transition"
+          aria-label="Close"
+          className="btn-icon absolute right-4 top-4 z-10"
         >
-          <X className="h-5 w-5" />
+          <X className="h-4 w-4" />
         </button>
 
         {/* Title */}
-        <div className="flex items-center gap-2.5 mb-4">
-          <div
-            className={`flex h-9 w-9 items-center justify-center rounded-xl border ${
-              isSaving
-                ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
-                : 'bg-rose-500/10 text-rose-400 border-rose-500/20'
-            }`}
-          >
+        <div className="relative mb-5 flex items-center gap-3 pr-12">
+          <span className={`icon-tile ${isSaving ? 'icon-tile-emerald' : 'icon-tile-rose'}`}>
             {isSaving ? <PlusCircle className="h-5 w-5" /> : <MinusCircle className="h-5 w-5" />}
-          </div>
-          <div>
-            <h3 className="text-base font-bold text-slate-100">
+          </span>
+          <div className="min-w-0">
+            <h3 className="font-display text-base font-semibold tracking-tight text-slate-50 sm:text-lg">
               {isSaving ? 'Deposit to Savings' : 'Record Debt Paydown'}
             </h3>
-            <p className="text-xs text-slate-400 truncate max-w-[260px]">{title}</p>
+            <p className="truncate text-xs text-slate-400">{title}</p>
           </div>
         </div>
 
         {/* Live Calculation Preview Card */}
-        <div className="mb-4 rounded-xl border border-slate-800 bg-slate-950/60 p-3.5 space-y-2">
-          <div className="flex items-center justify-between text-xs text-slate-400">
+        <div className="surface-inset relative mb-5 space-y-2.5 p-4">
+          <div className="flex items-center justify-between gap-3 text-xs text-slate-400">
             <span>Current Balance:</span>
-            <span className="font-mono text-slate-200">₹{formatINR(currentAmount)}</span>
+            <span className="num font-medium text-slate-200">₹{formatINR(currentAmount)}</span>
           </div>
 
-          <div className="flex items-center justify-between text-xs text-slate-400">
+          <div className="flex items-center justify-between gap-3 text-xs text-slate-400">
             <span>{isSaving ? 'Deposit Amount:' : 'Payment Applied:'}</span>
-            <span className={`font-mono font-semibold ${isSaving ? 'text-emerald-400' : 'text-rose-400'}`}>
+            <span className={`num font-semibold ${isSaving ? 'text-emerald-300' : 'text-rose-300'}`}>
               {isSaving ? '+' : '-'}₹{formatINR(adjustValue)}
             </span>
           </div>
 
-          <div className="border-t border-slate-800 pt-2 flex items-center justify-between text-xs font-bold">
+          <div className="flex items-center justify-between gap-3 border-t border-white/[0.06] pt-2.5 text-xs font-semibold">
             <span className="text-slate-300">Updated Balance:</span>
-            <span className="font-mono text-sm text-slate-50">
+            <span className="kpi-value text-base">
               ₹{formatINR(previewNewAmount)}
             </span>
           </div>
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="relative space-y-4">
           <div>
-            <label className="block text-xs font-medium text-slate-300 mb-1.5">
+            <label className="label">
               Enter Amount (₹)
             </label>
             <input
@@ -149,7 +148,7 @@ export default function QuickAdjustModal({
               value={amountInput}
               onChange={(e) => setAmountInput(e.target.value)}
               placeholder="e.g. 5000"
-              className="w-full rounded-xl border border-slate-700 bg-slate-800/80 px-3.5 py-2.5 text-sm font-mono text-slate-100 placeholder-slate-500 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+              className="input num"
             />
           </div>
 
@@ -160,30 +159,37 @@ export default function QuickAdjustModal({
                 type="button"
                 key={preset}
                 onClick={() => setAmountInput(preset.toString())}
-                className="rounded-lg border border-slate-700 bg-slate-800/60 px-2.5 py-1 text-xs font-mono font-medium text-slate-300 hover:border-primary-500 hover:text-white transition"
+                className="num rounded-lg border border-white/[0.08] bg-white/[0.03] px-2.5 py-1.5 text-xs font-medium text-slate-300 transition-colors hover:border-primary-400/45 hover:bg-primary-500/10 hover:text-white"
               >
                 +₹{preset.toLocaleString('en-IN')}
               </button>
             ))}
           </div>
 
-          {error && <p className="text-xs text-rose-400">{error}</p>}
+          {error && (
+            <p
+              role="alert"
+              className="rounded-xl border border-rose-400/25 bg-rose-500/10 px-3 py-2 text-xs text-rose-200"
+            >
+              {error}
+            </p>
+          )}
 
-          <div className="flex gap-2.5 pt-2">
+          <div className="flex gap-3 border-t border-white/[0.06] pt-4">
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 rounded-xl border border-slate-700 bg-slate-800 px-4 py-2 text-xs font-semibold text-slate-300 hover:bg-slate-700 transition"
+              className="btn-secondary h-11 flex-1"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={submitting}
-              className={`flex-1 rounded-xl px-4 py-2 text-xs font-bold text-slate-950 transition flex items-center justify-center gap-1.5 ${
+              className={`btn h-11 flex-1 text-white ${
                 isSaving
-                  ? 'bg-emerald-400 hover:bg-emerald-300 shadow-lg shadow-emerald-500/20'
-                  : 'bg-rose-400 hover:bg-rose-300 shadow-lg shadow-rose-500/20'
+                  ? 'bg-gradient-to-r from-emerald-500 to-teal-500 shadow-[inset_0_1px_0_rgba(255,255,255,0.2),0_8px_24px_-10px_rgba(16,185,129,0.75)] hover:brightness-110'
+                  : 'bg-gradient-to-r from-rose-500 to-pink-500 shadow-[inset_0_1px_0_rgba(255,255,255,0.2),0_8px_24px_-10px_rgba(244,63,94,0.75)] hover:brightness-110'
               }`}
             >
               {submitting ? 'Applying...' : isSaving ? 'Confirm Deposit' : 'Confirm Paydown'}

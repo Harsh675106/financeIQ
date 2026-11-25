@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { api } from '@/lib/api'
 import { ShieldCheck } from 'lucide-react'
+import SectionHeader from '@/components/ui/SectionHeader'
 
 export default function BudgetAutopilotCard() {
   const [data, setData] = useState<any>(null)
@@ -25,35 +26,39 @@ export default function BudgetAutopilotCard() {
 
   return (
     <div className="card card-pad card-hover">
-      <div className="flex items-center gap-2 mb-4">
-        <ShieldCheck className="h-5 w-5 text-primary-300" />
-        <h3 className="text-lg font-semibold text-slate-50">AI Budget Autopilot</h3>
-      </div>
+      <SectionHeader as="h3" icon={ShieldCheck} tone="violet" title="AI Budget Autopilot" className="mb-5" />
 
       {loading ? (
-        <div className="h-24 bg-slate-800/60 rounded-xl animate-pulse" />
+        <div className="space-y-3">
+          <div className="skeleton h-24" />
+          <div className="skeleton h-14" />
+        </div>
       ) : !data ? (
         <div className="text-sm text-slate-400">No autopilot data available.</div>
       ) : (
         <div className="space-y-4">
-          <div className="rounded-2xl border border-primary-500/20 bg-primary-500/10 p-4">
-            <p className="text-xs uppercase tracking-wide text-primary-200">Weekly safe to spend</p>
-            <p className="text-2xl font-semibold text-slate-50 mt-2">
+          <div className="relative overflow-hidden rounded-2xl border border-primary-400/20 bg-gradient-to-br from-primary-500/[0.16] via-violet-500/[0.08] to-cyan-500/[0.05] p-4">
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute -right-8 -top-10 h-24 w-24 rounded-full bg-primary-500/25 blur-2xl"
+            />
+            <p className="relative text-[11px] font-semibold uppercase tracking-[0.14em] text-primary-200">Weekly safe to spend</p>
+            <p className="kpi-value relative mt-2 break-words text-2xl sm:text-3xl">
               {Math.round(data.weeklySafeToSpend).toLocaleString('en-IN')}
             </p>
-            <p className="text-xs text-slate-300 mt-2">Confidence {data.confidence}%</p>
+            <p className="num relative mt-2 text-xs text-slate-300">Confidence {data.confidence}%</p>
           </div>
 
-          <div className="space-y-3">
+          <div className="space-y-2">
             {(data.recommendations || []).slice(0, 4).map((item: any) => (
-              <div key={item.category} className="p-3 rounded-xl border border-slate-800/70 bg-slate-900/40">
+              <div key={item.category} className="surface-inset p-3">
                 <div className="flex items-center justify-between gap-3">
-                  <div className="text-sm font-medium text-slate-100">{item.category}</div>
-                  <div className="text-xs text-slate-400">
+                  <div className="min-w-0 truncate text-sm font-medium text-slate-100">{item.category}</div>
+                  <div className="num shrink-0 text-xs text-slate-400">
                     Target {Math.round(item.autopilotBudget).toLocaleString('en-IN')}
                   </div>
                 </div>
-                <p className="text-xs text-slate-300 mt-2">{item.recommendation}</p>
+                <p className="mt-1.5 text-xs leading-relaxed text-slate-300">{item.recommendation}</p>
               </div>
             ))}
           </div>

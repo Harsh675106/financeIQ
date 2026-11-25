@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
+import { prefersReducedMotion } from '@/hooks/useReducedMotion'
 
 interface UseCountUpOptions {
   duration?: number
@@ -27,6 +28,12 @@ export function useCountUp(
     startTimeRef.current = null
 
     if (initialValueRef.current === sanitizedEndValue) {
+      return
+    }
+
+    // Respect reduced-motion: show the final number immediately.
+    if (prefersReducedMotion()) {
+      setValue(sanitizedEndValue)
       return
     }
 

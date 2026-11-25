@@ -3,6 +3,8 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { api } from '@/lib/api'
+import SectionHeader from '@/components/ui/SectionHeader'
+import EmptyState from '@/components/ui/EmptyState'
 import {
   Lightbulb,
   AlertTriangle,
@@ -27,26 +29,42 @@ interface DashboardResponse {
 function severityStyle(sev: string) {
   switch (sev) {
     case 'critical':
-      return 'border-rose-500/30 bg-rose-500/10 text-rose-200 hover:border-rose-500/50'
+      return 'border-rose-500/25 bg-rose-500/[0.07] text-rose-100 hover:border-rose-400/45'
     case 'warning':
-      return 'border-amber-500/30 bg-amber-500/10 text-amber-200 hover:border-amber-500/50'
+      return 'border-amber-500/25 bg-amber-500/[0.07] text-amber-100 hover:border-amber-400/45'
     case 'info':
-      return 'border-emerald-500/30 bg-emerald-500/10 text-emerald-200 hover:border-emerald-500/50'
+      return 'border-cyan-500/20 bg-cyan-500/[0.06] text-cyan-50 hover:border-cyan-400/40'
     default:
-      return 'border-slate-800 bg-slate-900/60 text-slate-200 hover:border-slate-700'
+      return 'border-white/[0.06] bg-white/[0.025] text-slate-200 hover:border-white/[0.12]'
   }
 }
 
 function severityIcon(sev: string) {
   switch (sev) {
     case 'critical':
-      return <AlertTriangle className="h-4 w-4 text-rose-400 animate-pulse" />
+      return (
+        <span className="icon-tile icon-tile-sm icon-tile-rose h-7 w-7">
+          <AlertTriangle className="h-3.5 w-3.5" />
+        </span>
+      )
     case 'warning':
-      return <AlertTriangle className="h-4 w-4 text-amber-400" />
+      return (
+        <span className="icon-tile icon-tile-sm icon-tile-amber h-7 w-7">
+          <AlertTriangle className="h-3.5 w-3.5" />
+        </span>
+      )
     case 'info':
-      return <Info className="h-4 w-4 text-emerald-400" />
+      return (
+        <span className="icon-tile icon-tile-sm icon-tile-cyan h-7 w-7">
+          <Info className="h-3.5 w-3.5" />
+        </span>
+      )
     default:
-      return <CheckCircle2 className="h-4 w-4 text-slate-400" />
+      return (
+        <span className="icon-tile icon-tile-sm icon-tile-slate h-7 w-7">
+          <CheckCircle2 className="h-3.5 w-3.5" />
+        </span>
+      )
   }
 }
 
@@ -86,79 +104,72 @@ export default function InsightsCard() {
   })
 
   return (
-    <div className="card card-pad card-spotlight group animate-fade-up">
+    <div className="card card-pad card-spotlight group h-full animate-fade-up">
       {/* Header with Filter Pill Tabs */}
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center space-x-2.5">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary-500/10 border border-primary-500/20 text-primary-400 icon-morph-container">
-            <Lightbulb className="h-5 w-5" />
+      <SectionHeader
+        icon={Lightbulb}
+        tone="violet"
+        title="Smart Insights"
+        subtitle="AI-generated financial intelligence"
+        className="relative mb-5"
+        actions={
+          <div className="segmented" role="group" aria-label="Filter insights">
+            <button
+              onClick={() => setFilter('all')}
+              aria-pressed={filter === 'all'}
+              className={`segmented-item ${filter === 'all' ? 'segmented-item-active' : ''}`}
+            >
+              All
+            </button>
+            <button
+              onClick={() => setFilter('priority')}
+              aria-pressed={filter === 'priority'}
+              className={`segmented-item ${filter === 'priority' ? 'segmented-item-active' : ''}`}
+            >
+              Priority
+            </button>
           </div>
-          <div>
-            <h2 className="text-base font-bold text-slate-50">Smart Insights</h2>
-            <p className="text-xs text-slate-400">AI-generated financial intelligence</p>
-          </div>
-        </div>
-
-        {/* Filter */}
-        <div className="flex rounded-lg border border-slate-800 bg-slate-950/70 p-0.5 text-xs">
-          <button
-            onClick={() => setFilter('all')}
-            className={`rounded-md px-2 py-1 font-medium transition-all ${
-              filter === 'all'
-                ? 'bg-primary-500/20 text-primary-300 ring-1 ring-primary-500/30'
-                : 'text-slate-400 hover:text-slate-200'
-            }`}
-          >
-            All
-          </button>
-          <button
-            onClick={() => setFilter('priority')}
-            className={`rounded-md px-2 py-1 font-medium transition-all ${
-              filter === 'priority'
-                ? 'bg-primary-500/20 text-primary-300 ring-1 ring-primary-500/30'
-                : 'text-slate-400 hover:text-slate-200'
-            }`}
-          >
-            Priority
-          </button>
-        </div>
-      </div>
+        }
+      />
 
       {loading ? (
-        <div className="space-y-3">
+        <div className="relative space-y-2.5" aria-busy="true">
           {[...Array(3)].map((_, i) => (
-            <div key={i} className="h-14 bg-slate-800/50 rounded-xl animate-pulse"></div>
+            <div key={i} className="skeleton h-14"></div>
           ))}
         </div>
       ) : filteredInsights.length === 0 ? (
-        <div className="py-8 text-center text-slate-400">
-          <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-xl bg-slate-800/50 mb-2">
-            <Sparkles className="h-5 w-5 text-emerald-400" />
-          </div>
-          <p className="text-xs">All caught up! No active recommendations right now.</p>
-        </div>
+        <EmptyState
+          compact
+          icon={Sparkles}
+          tone="emerald"
+          title="All caught up!"
+          description="No active recommendations right now."
+          className="relative"
+        />
       ) : (
-        <div className="space-y-2.5 max-h-64 overflow-y-auto pr-1">
+        <div className="scroll-thin relative max-h-64 space-y-2.5 overflow-y-auto pr-1">
           {filteredInsights.map((ins, idx) => (
             <div
               key={idx}
-              className={`group/item flex items-start justify-between gap-3 p-3 rounded-xl border transition-all duration-300 ${severityStyle(
+              className={`group/item flex items-start justify-between gap-3 rounded-xl border p-3 transition-colors duration-200 ${severityStyle(
                 ins.severity
-              )} hover:scale-[1.01]`}
+              )}`}
             >
-              <div className="flex items-start gap-2.5">
-                <div className="mt-0.5">{severityIcon(ins.severity)}</div>
-                <div>
-                  <p className="text-xs font-medium leading-relaxed">{ins.message}</p>
+              <div className="flex min-w-0 items-start gap-2.5">
+                <div className="shrink-0">{severityIcon(ins.severity)}</div>
+                <div className="min-w-0 pt-1">
+                  <p className="break-words text-xs font-medium leading-relaxed">{ins.message}</p>
                 </div>
               </div>
 
               {/* Action Buttons */}
-              <div className="flex items-center gap-1 opacity-80 group-hover/item:opacity-100 transition-opacity">
+              <div className="flex shrink-0 items-center gap-1 opacity-80 transition-opacity group-hover/item:opacity-100">
                 <button
                   onClick={() => handleResolve(idx)}
-                  className="rounded-lg p-1 text-slate-400 hover:bg-slate-800/80 hover:text-emerald-300 transition-colors"
+                  className="btn-icon h-8 w-8 hover:!text-emerald-300"
                   title="Mark as reviewed"
+                  aria-label="Mark as reviewed"
                 >
                   <Check className="h-3.5 w-3.5" />
                 </button>

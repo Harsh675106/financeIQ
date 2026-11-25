@@ -16,6 +16,14 @@ import { api } from '@/lib/api'
 import { safeNumber, formatINR } from '@/lib/formatters'
 import { WealthCategory, WealthItem } from './WealthItemCard'
 
+// Literal class map so Tailwind keeps every tone (savings/assets read positive, debts as liabilities).
+const previewToneClass: Record<WealthCategory, string> = {
+  savings: 'text-emerald-300',
+  debts: 'text-rose-300',
+  assets: 'text-cyan-200',
+  liabilities: 'text-amber-200',
+}
+
 interface WealthModalProps {
   isOpen: boolean
   initialCategory: WealthCategory
@@ -254,42 +262,52 @@ export default function WealthModal({
       : safeNumber(formData.amount, 0)
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-md animate-fade-in overflow-y-auto">
-      <div className="relative my-8 w-full max-w-lg overflow-hidden rounded-2xl border border-slate-700/80 bg-gradient-to-b from-slate-900 via-slate-900 to-slate-950 p-6 shadow-2xl animate-scale-in">
+    <div className="modal-backdrop animate-fade-in">
+      <div className="modal-panel max-w-lg overflow-y-auto p-5 animate-scale-in sm:p-6">
         {/* Glow backdrop */}
-        <div className="pointer-events-none absolute -right-20 -top-20 h-48 w-48 rounded-full bg-primary-500/15 blur-3xl" />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute -right-20 -top-20 h-48 w-48 rounded-full bg-primary-500/15 blur-3xl"
+        />
+
+        {/* Mobile sheet handle */}
+        <div aria-hidden="true" className="relative mx-auto -mt-1 mb-4 h-1 w-10 rounded-full bg-white/15 sm:hidden" />
 
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute right-4 top-4 rounded-lg p-2 text-slate-400 hover:bg-slate-800 hover:text-white transition"
+          aria-label="Close"
+          className="btn-icon absolute right-4 top-4 z-10"
         >
-          <X className="h-5 w-5" />
+          <X className="h-4 w-4" />
         </button>
 
         {/* Header Title */}
-        <div className="mb-4">
-          <h2 className="text-xl font-bold text-slate-50 flex items-center gap-2">
-            {editingItem ? 'Edit Entry' : 'Add New Wealth Entry'}
-            <Sparkles className="h-4 w-4 text-primary-400" />
-          </h2>
-          <p className="text-xs text-slate-400 mt-0.5">
-            Maintain high balance sheet fidelity for accurate AI projections
-          </p>
+        <div className="relative mb-5 flex items-start gap-3 pr-12">
+          <span className="icon-tile">
+            <Sparkles className="h-[18px] w-[18px]" />
+          </span>
+          <div className="min-w-0">
+            <h2 className="font-display text-lg font-semibold tracking-tight text-slate-50 sm:text-xl">
+              {editingItem ? 'Edit Entry' : 'Add New Wealth Entry'}
+            </h2>
+            <p className="mt-0.5 text-xs text-slate-400">
+              Maintain high balance sheet fidelity for accurate AI projections
+            </p>
+          </div>
         </div>
 
         {/* Category Tabs (disabled during editing for consistency) */}
         {!editingItem && (
-          <div className="mb-5 flex rounded-xl bg-slate-800/80 p-1 border border-slate-700/60">
+          <div className="segmented relative mb-5 flex w-full">
             {(['savings', 'debts', 'assets', 'liabilities'] as const).map((tab) => (
               <button
                 key={tab}
                 type="button"
                 onClick={() => setActiveTab(tab)}
-                className={`flex-1 rounded-lg py-1.5 text-xs font-semibold capitalize transition-all duration-200 ${
-                  activeTab === tab
-                    ? 'bg-primary-500 text-slate-950 shadow-md font-bold'
-                    : 'text-slate-400 hover:text-slate-200'
+                aria-pressed={activeTab === tab}
+                className={`segmented-item flex-1 px-2 py-2 capitalize ${
+                  activeTab === tab ? 'segmented-item-active' : ''
                 }`}
               >
                 {tab}
@@ -299,9 +317,9 @@ export default function WealthModal({
         )}
 
         {/* Quick Presets */}
-        <div className="mb-5 space-y-1.5">
-          <span className="text-[11px] font-medium text-slate-400 flex items-center gap-1">
-            <Sparkles className="h-3 w-3 text-primary-400" />
+        <div className="relative mb-5 space-y-2">
+          <span className="eyebrow flex items-center gap-1.5 text-[10px]">
+            <Sparkles className="h-3 w-3 text-primary-300" />
             Quick Presets:
           </span>
           <div className="flex flex-wrap gap-1.5">
@@ -310,7 +328,7 @@ export default function WealthModal({
                 key={p.label}
                 type="button"
                 onClick={() => applyPreset(p)}
-                className="rounded-lg border border-slate-700 bg-slate-800/70 px-2.5 py-1 text-[11px] font-medium text-slate-300 hover:border-primary-400 hover:text-white transition"
+                className="rounded-lg border border-white/[0.08] bg-white/[0.03] px-2.5 py-1.5 text-[11px] font-medium text-slate-300 transition-colors hover:border-primary-400/45 hover:bg-primary-500/10 hover:text-white"
               >
                 + {p.label}
               </button>
@@ -319,17 +337,18 @@ export default function WealthModal({
         </div>
 
         {/* Live Preview Card */}
-        <div className="mb-5 rounded-xl border border-slate-800 bg-slate-950/70 p-3.5">
-          <div className="flex items-center justify-between text-xs text-slate-400 mb-1">
-            <span className="uppercase tracking-wider text-[10px] font-bold text-primary-400">
+        <div className="surface-inset relative mb-5 overflow-hidden p-4">
+          <div aria-hidden="true" className="absolute inset-y-0 left-0 w-[3px] bg-gradient-to-b from-primary-400 via-violet-400 to-cyan-400" />
+          <div className="mb-1.5 flex items-center justify-between gap-3">
+            <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-primary-300">
               Live Card Preview
             </span>
-            <span className="font-mono text-sm font-bold text-slate-100">
+            <span className={`kpi-value break-words text-base ${previewToneClass[activeTab]}`}>
               ₹{formatINR(previewAmount)}
             </span>
           </div>
-          <div className="text-xs">
-            <p className="font-semibold text-slate-200">
+          <div className="min-w-0 text-xs">
+            <p className="truncate font-semibold text-slate-100">
               {activeTab === 'savings'
                 ? formData.account_type || 'Savings Account'
                 : activeTab === 'debts'
@@ -338,18 +357,18 @@ export default function WealthModal({
                 ? `${formData.type || 'Asset'}${formData.symbol ? ` (${formData.symbol.toUpperCase()})` : ''}`
                 : formData.type || 'Liability'}
             </p>
-            <p className="text-slate-400 text-[11px] mt-0.5 truncate">
+            <p className="mt-0.5 truncate text-[11px] text-slate-400">
               {formData.description || 'No notes added'}
             </p>
           </div>
         </div>
 
         {/* Form Inputs */}
-        <form onSubmit={handleSubmit} className="space-y-3.5">
+        <form onSubmit={handleSubmit} className="relative space-y-4">
           {/* Amount (for savings, debts, liabilities) */}
           {activeTab !== 'assets' && (
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1">
+              <label className="label">
                 Amount (₹) *
               </label>
               <input
@@ -360,7 +379,7 @@ export default function WealthModal({
                 value={formData.amount}
                 onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
                 placeholder="0.00"
-                className="w-full rounded-xl border border-slate-700 bg-slate-800/80 px-3.5 py-2 text-sm font-mono text-slate-100 placeholder-slate-500 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                className="input num"
               />
             </div>
           )}
@@ -368,7 +387,7 @@ export default function WealthModal({
           {/* Savings specific */}
           {activeTab === 'savings' && (
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1">
+              <label className="label">
                 Account Type *
               </label>
               <input
@@ -377,7 +396,7 @@ export default function WealthModal({
                 value={formData.account_type}
                 onChange={(e) => setFormData({ ...formData, account_type: e.target.value })}
                 placeholder="e.g. Emergency Fund, Fixed Deposit, Liquid Mutual Fund"
-                className="w-full rounded-xl border border-slate-700 bg-slate-800/80 px-3.5 py-2 text-sm text-slate-100 placeholder-slate-500 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                className="input"
               />
             </div>
           )}
@@ -386,7 +405,7 @@ export default function WealthModal({
           {activeTab === 'debts' && (
             <>
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">
+                <label className="label">
                   Debt / Loan Type *
                 </label>
                 <input
@@ -395,12 +414,12 @@ export default function WealthModal({
                   value={formData.debt_type}
                   onChange={(e) => setFormData({ ...formData, debt_type: e.target.value })}
                   placeholder="e.g. Credit Card, Home Mortgage, Personal Loan"
-                  className="w-full rounded-xl border border-slate-700 bg-slate-800/80 px-3.5 py-2 text-sm text-slate-100 placeholder-slate-500 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                  className="input"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">
+                <label className="label">
                   Annual Interest Rate (% APR)
                 </label>
                 <input
@@ -411,7 +430,7 @@ export default function WealthModal({
                   value={formData.interest_rate}
                   onChange={(e) => setFormData({ ...formData, interest_rate: e.target.value })}
                   placeholder="e.g. 12.5"
-                  className="w-full rounded-xl border border-slate-700 bg-slate-800/80 px-3.5 py-2 text-sm font-mono text-slate-100 placeholder-slate-500 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                  className="input num"
                 />
               </div>
             </>
@@ -420,9 +439,9 @@ export default function WealthModal({
           {/* Assets specific */}
           {activeTab === 'assets' && (
             <>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">
+                  <label className="label">
                     Asset Type *
                   </label>
                   <input
@@ -431,11 +450,11 @@ export default function WealthModal({
                     value={formData.type}
                     onChange={(e) => setFormData({ ...formData, type: e.target.value })}
                     placeholder="e.g. Mutual Fund, Stock"
-                    className="w-full rounded-xl border border-slate-700 bg-slate-800/80 px-3.5 py-2 text-sm text-slate-100 placeholder-slate-500 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                    className="input"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">
+                  <label className="label">
                     Symbol / Ticker
                   </label>
                   <input
@@ -443,14 +462,14 @@ export default function WealthModal({
                     value={formData.symbol}
                     onChange={(e) => setFormData({ ...formData, symbol: e.target.value })}
                     placeholder="e.g. NIFTY50, INFY"
-                    className="w-full rounded-xl border border-slate-700 bg-slate-800/80 px-3.5 py-2 text-sm font-mono text-slate-100 placeholder-slate-500 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                    className="input num"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">
+                  <label className="label">
                     Quantity / Units *
                   </label>
                   <input
@@ -461,11 +480,11 @@ export default function WealthModal({
                     value={formData.quantity}
                     onChange={(e) => setFormData({ ...formData, quantity: e.target.value })}
                     placeholder="100"
-                    className="w-full rounded-xl border border-slate-700 bg-slate-800/80 px-3.5 py-2 text-sm font-mono text-slate-100 placeholder-slate-500 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                    className="input num"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">
+                  <label className="label">
                     Unit Price (₹) *
                   </label>
                   <input
@@ -476,20 +495,20 @@ export default function WealthModal({
                     value={formData.price}
                     onChange={(e) => setFormData({ ...formData, price: e.target.value })}
                     placeholder="250.00"
-                    className="w-full rounded-xl border border-slate-700 bg-slate-800/80 px-3.5 py-2 text-sm font-mono text-slate-100 placeholder-slate-500 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                    className="input num"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">
+                <label className="label">
                   Purchase Date
                 </label>
                 <input
                   type="date"
                   value={formData.purchase_date}
                   onChange={(e) => setFormData({ ...formData, purchase_date: e.target.value })}
-                  className="w-full rounded-xl border border-slate-700 bg-slate-800/80 px-3.5 py-2 text-sm text-slate-100 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                  className="input"
                 />
               </div>
             </>
@@ -499,7 +518,7 @@ export default function WealthModal({
           {activeTab === 'liabilities' && (
             <>
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">
+                <label className="label">
                   Liability Type *
                 </label>
                 <input
@@ -508,13 +527,13 @@ export default function WealthModal({
                   value={formData.type}
                   onChange={(e) => setFormData({ ...formData, type: e.target.value })}
                   placeholder="e.g. Tax Liability, Overdraft, Informal Loan"
-                  className="w-full rounded-xl border border-slate-700 bg-slate-800/80 px-3.5 py-2 text-sm text-slate-100 placeholder-slate-500 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                  className="input"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">
+                  <label className="label">
                     Rate (%)
                   </label>
                   <input
@@ -524,18 +543,18 @@ export default function WealthModal({
                     value={formData.rate}
                     onChange={(e) => setFormData({ ...formData, rate: e.target.value })}
                     placeholder="0.0"
-                    className="w-full rounded-xl border border-slate-700 bg-slate-800/80 px-3.5 py-2 text-sm font-mono text-slate-100 placeholder-slate-500 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                    className="input num"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">
+                  <label className="label">
                     Due Date
                   </label>
                   <input
                     type="date"
                     value={formData.due_date}
                     onChange={(e) => setFormData({ ...formData, due_date: e.target.value })}
-                    className="w-full rounded-xl border border-slate-700 bg-slate-800/80 px-3.5 py-2 text-sm text-slate-100 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                    className="input"
                   />
                 </div>
               </div>
@@ -544,7 +563,7 @@ export default function WealthModal({
 
           {/* Description */}
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1">
+            <label className="label">
               Notes & Description
             </label>
             <input
@@ -552,25 +571,33 @@ export default function WealthModal({
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               placeholder="e.g. Maintained at HDFC Bank / ICICI Direct"
-              className="w-full rounded-xl border border-slate-700 bg-slate-800/80 px-3.5 py-2 text-sm text-slate-100 placeholder-slate-500 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+              className="input"
             />
           </div>
 
-          {error && <p className="text-xs text-rose-400 font-medium">{error}</p>}
+          {error && (
+            <p
+              role="alert"
+              className="flex items-start gap-2 rounded-xl border border-rose-400/25 bg-rose-500/10 px-3 py-2 text-xs font-medium text-rose-200"
+            >
+              <AlertCircle className="mt-px h-3.5 w-3.5 shrink-0 text-rose-300" />
+              <span>{error}</span>
+            </p>
+          )}
 
           {/* Action buttons */}
-          <div className="flex gap-3 pt-3">
+          <div className="flex gap-3 border-t border-white/[0.06] pt-4">
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 rounded-xl border border-slate-700 bg-slate-800 px-4 py-2.5 text-xs font-bold text-slate-300 hover:bg-slate-700 transition"
+              className="btn-secondary h-11 flex-1"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={submitting}
-              className="flex-1 rounded-xl bg-primary-500 px-4 py-2.5 text-xs font-bold text-slate-950 hover:bg-primary-400 shadow-lg shadow-primary-500/20 transition flex items-center justify-center gap-1.5"
+              className="btn-primary h-11 flex-1"
             >
               {submitting ? 'Saving...' : editingItem ? 'Update Entry' : 'Create Entry'}
             </button>

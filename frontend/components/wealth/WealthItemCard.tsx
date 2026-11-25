@@ -110,62 +110,60 @@ export default function WealthItemCard({
   // Dynamic Icon Selection
   const getCategoryIcon = () => {
     const t = (title + ' ' + (item.debt_type || '') + ' ' + (item.account_type || '')).toLowerCase()
-    if (t.includes('card')) return <CreditCard className="h-5 w-5 text-rose-400" />
+    if (t.includes('card')) return <CreditCard className="h-5 w-5" />
     if (t.includes('home') || t.includes('mortgage') || t.includes('real estate') || t.includes('property'))
-      return <Home className="h-5 w-5 text-indigo-400" />
+      return <Home className="h-5 w-5" />
     if (t.includes('car') || t.includes('vehicle') || t.includes('auto'))
-      return <Car className="h-5 w-5 text-amber-400" />
+      return <Car className="h-5 w-5" />
     if (t.includes('gold') || t.includes('crypto') || t.includes('stock') || t.includes('fund') || t.includes('equity'))
-      return <Coins className="h-5 w-5 text-emerald-400" />
-    if (category === 'savings') return <PiggyBank className="h-5 w-5 text-emerald-400" />
-    if (category === 'debts') return <AlertCircle className="h-5 w-5 text-rose-400" />
-    if (category === 'assets') return <TrendingUp className="h-5 w-5 text-cyan-400" />
-    return <Zap className="h-5 w-5 text-amber-400" />
+      return <Coins className="h-5 w-5" />
+    if (category === 'savings') return <PiggyBank className="h-5 w-5" />
+    if (category === 'debts') return <AlertCircle className="h-5 w-5" />
+    if (category === 'assets') return <TrendingUp className="h-5 w-5" />
+    return <Zap className="h-5 w-5" />
   }
 
   // Color theme mapping
   const getTheme = () => {
     if (category === 'savings') {
       return {
-        amountColor: 'text-emerald-400',
-        glowBg: 'hover:border-emerald-500/50 hover:shadow-emerald-500/10',
-        iconBg: 'bg-emerald-500/15 border-emerald-500/30 text-emerald-400',
-        badgeClass: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30',
-        cardBorder: 'border-slate-800/90 hover:border-emerald-500/40',
-        accentGlow: 'from-emerald-500/5 to-transparent',
+        amountColor: 'text-emerald-300',
+        glowBg: 'hover:border-emerald-400/30',
+        iconBg: 'icon-tile-emerald',
+        badgeClass: 'badge-success',
+        cardBorder: '',
+        accentGlow: 'from-emerald-500/[0.07] to-transparent',
       }
     }
     if (category === 'debts') {
       return {
-        amountColor: isHighApr ? 'text-rose-400' : 'text-rose-300',
+        amountColor: isHighApr ? 'text-rose-300' : 'text-rose-200',
         glowBg: isHighApr
-          ? 'border-rose-500/50 shadow-rose-500/15 hover:border-rose-500/70'
-          : 'hover:border-rose-500/50 hover:shadow-rose-500/10',
-        iconBg: 'bg-rose-500/15 border-rose-500/30 text-rose-400',
-        badgeClass: isHighApr
-          ? 'bg-rose-500/20 text-rose-300 border-rose-500/50 font-bold animate-pulse'
-          : 'bg-rose-500/15 text-rose-300 border-rose-500/30',
-        cardBorder: isHighApr ? 'border-rose-500/40' : 'border-slate-800/90 hover:border-rose-500/40',
-        accentGlow: 'from-rose-500/5 to-transparent',
+          ? 'shadow-[0_18px_44px_-28px_rgba(244,63,94,0.7)] hover:border-rose-400/50'
+          : 'hover:border-rose-400/30',
+        iconBg: 'icon-tile-rose',
+        badgeClass: isHighApr ? 'badge-danger ring-1 ring-rose-400/40' : 'badge-danger',
+        cardBorder: isHighApr ? 'border-rose-400/35' : '',
+        accentGlow: 'from-rose-500/[0.07] to-transparent',
       }
     }
     if (category === 'assets') {
       return {
-        amountColor: 'text-cyan-300',
-        glowBg: 'hover:border-cyan-500/50 hover:shadow-cyan-500/10',
-        iconBg: 'bg-cyan-500/15 border-cyan-500/30 text-cyan-400',
-        badgeClass: 'bg-cyan-500/15 text-cyan-300 border-cyan-500/30',
-        cardBorder: 'border-slate-800/90 hover:border-cyan-500/40',
-        accentGlow: 'from-cyan-500/5 to-transparent',
+        amountColor: 'text-cyan-200',
+        glowBg: 'hover:border-cyan-400/30',
+        iconBg: 'icon-tile-cyan',
+        badgeClass: 'badge-info',
+        cardBorder: '',
+        accentGlow: 'from-cyan-500/[0.07] to-transparent',
       }
     }
     return {
-      amountColor: 'text-amber-300',
-      glowBg: 'hover:border-amber-500/50 hover:shadow-amber-500/10',
-      iconBg: 'bg-amber-500/15 border-amber-500/30 text-amber-400',
-      badgeClass: 'bg-amber-500/15 text-amber-300 border-amber-500/30',
-      cardBorder: 'border-slate-800/90 hover:border-amber-500/40',
-      accentGlow: 'from-amber-500/5 to-transparent',
+      amountColor: 'text-amber-200',
+      glowBg: 'hover:border-amber-400/30',
+      iconBg: 'icon-tile-amber',
+      badgeClass: 'badge-warning',
+      cardBorder: '',
+      accentGlow: 'from-amber-500/[0.07] to-transparent',
     }
   }
 
@@ -176,98 +174,106 @@ export default function WealthItemCard({
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       style={{ animationDelay: `${index * 50}ms` }}
-      className={`group relative overflow-hidden rounded-2xl border ${theme.cardBorder} bg-gradient-to-br from-slate-900/95 via-slate-900/85 to-slate-950/95 p-5 md:p-6 shadow-xl backdrop-blur-xl stage-card-lift ${theme.glowBg}`}
+      className="h-full animate-fade-up"
     >
-      {/* Top subtle light accent */}
-      <div className={`pointer-events-none absolute inset-x-0 top-0 h-24 bg-gradient-to-b ${theme.accentGlow}`} />
+      <div
+        className={`card stage-card-lift group relative h-full overflow-hidden p-5 sm:p-6 ${theme.cardBorder} ${theme.glowBg}`}
+      >
+        {/* Top subtle light accent */}
+        <div
+          aria-hidden="true"
+          className={`pointer-events-none absolute inset-x-0 top-0 h-24 bg-gradient-to-b ${theme.accentGlow}`}
+        />
 
-      {/* High APR top warning stripe */}
-      {isHighApr && (
-        <div className="absolute top-0 inset-x-0 h-1.5 bg-gradient-to-r from-rose-500 via-amber-400 to-rose-500 shadow-sm" />
-      )}
-
-      {/* Main Content Layout */}
-      <div className="relative z-10 flex flex-col sm:flex-row sm:items-start justify-between gap-4">
-        {/* Left Side: Icon & Details */}
-        <div className="flex items-start gap-4 flex-1 min-w-0">
+        {/* High APR top warning stripe */}
+        {isHighApr && (
           <div
-            className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border shadow-lg transition-transform duration-300 group-hover:scale-110 ${theme.iconBg}`}
-          >
-            {getCategoryIcon()}
-          </div>
+            aria-hidden="true"
+            className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-rose-500 via-amber-400 to-rose-500 shadow-[0_0_14px_rgba(244,63,94,0.6)]"
+          />
+        )}
 
-          <div className="min-w-0 flex-1 space-y-1">
-            <div className="flex items-center gap-2 flex-wrap">
-              <h4 className="font-bold text-slate-100 text-base group-hover:text-white transition tracking-tight">
-                {title}
-              </h4>
-              {badgeText && (
-                <span
-                  className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[11px] font-semibold border tracking-wide uppercase ${theme.badgeClass}`}
-                >
-                  {isHighApr && <ShieldAlert className="h-3 w-3 text-rose-400" />}
-                  {badgeText}
-                </span>
-              )}
+        {/* Main Content Layout */}
+        <div className="relative z-10 flex flex-col justify-between gap-4 sm:flex-row sm:items-start">
+          {/* Left Side: Icon & Details */}
+          <div className="flex min-w-0 flex-1 items-start gap-4">
+            <div className={`icon-tile icon-tile-lg ${theme.iconBg}`}>
+              {getCategoryIcon()}
             </div>
 
-            <p className="text-xs text-slate-400 leading-relaxed line-clamp-2">
-              {subtitle}
+            <div className="min-w-0 flex-1 space-y-1.5">
+              <div className="flex flex-wrap items-center gap-2">
+                <h4 className="min-w-0 break-words font-display text-[15px] font-semibold tracking-tight text-slate-100 transition-colors group-hover:text-white sm:text-base">
+                  {title}
+                </h4>
+                {badgeText && (
+                  <span className={`badge num uppercase tracking-wide ${theme.badgeClass}`}>
+                    {isHighApr && <ShieldAlert className="h-3 w-3" />}
+                    {badgeText}
+                  </span>
+                )}
+              </div>
+
+              <p className="line-clamp-2 text-xs leading-relaxed text-slate-400">
+                {subtitle}
+              </p>
+            </div>
+          </div>
+
+          {/* Right Side: Big Numeric Balance */}
+          <div className="surface-inset shrink-0 p-3 text-left sm:border-0 sm:bg-transparent sm:p-0 sm:text-right">
+            <p className={`kpi-value break-words text-xl sm:text-2xl ${theme.amountColor}`}>
+              ₹{formatINR(amount)}
             </p>
+            <span className="eyebrow mt-1 block text-[10px] text-slate-500">
+              {category === 'savings' || category === 'assets' ? 'Total Asset Value' : 'Principal Balance'}
+            </span>
           </div>
         </div>
 
-        {/* Right Side: Big Numeric Balance */}
-        <div className="text-left sm:text-right shrink-0 bg-slate-950/40 sm:bg-transparent p-3 sm:p-0 rounded-xl sm:rounded-none border sm:border-0 border-slate-800/80">
-          <p className={`text-xl sm:text-2xl font-black font-mono tracking-tight ${theme.amountColor}`}>
-            ₹{formatINR(amount)}
-          </p>
-          <span className="text-[10px] uppercase tracking-wider text-slate-500 font-bold block mt-0.5">
-            {category === 'savings' || category === 'assets' ? 'Total Asset Value' : 'Principal Balance'}
-          </span>
-        </div>
-      </div>
+        {/* Action Footer Bar with Generous Padding */}
+        <div className="relative z-10 mt-5 flex items-center justify-between gap-2 border-t border-white/[0.06] pt-4">
+          <div className="flex items-center gap-2">
+            {onQuickAdjust && (category === 'savings' || category === 'debts') && (
+              <button
+                onClick={() => onQuickAdjust(item, category)}
+                className="btn-secondary btn-sm h-9 px-3"
+              >
+                {category === 'savings' ? (
+                  <>
+                    <PlusCircle className="h-3.5 w-3.5 text-emerald-300" />
+                    <span>Deposit Funds</span>
+                  </>
+                ) : (
+                  <>
+                    <MinusCircle className="h-3.5 w-3.5 text-rose-300" />
+                    <span>Record Payment</span>
+                  </>
+                )}
+              </button>
+            )}
+          </div>
 
-      {/* Action Footer Bar with Generous Padding */}
-      <div className="relative z-10 mt-5 flex items-center justify-between border-t border-slate-800/90 pt-3.5">
-        <div className="flex items-center gap-2">
-          {onQuickAdjust && (category === 'savings' || category === 'debts') && (
+          <div className="flex items-center gap-1">
             <button
-              onClick={() => onQuickAdjust(item, category)}
-              className="flex items-center gap-1.5 rounded-xl bg-slate-800/90 px-3 py-1.5 text-xs font-semibold text-slate-200 transition hover:bg-slate-700 hover:text-white border border-slate-700/80 shadow-sm active:scale-95"
+              onClick={() => onEdit(item, category)}
+              className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-transparent px-2.5 text-slate-400 transition-colors hover:border-white/[0.08] hover:bg-white/[0.05] hover:text-primary-200"
+              title="Edit Entry"
+              aria-label="Edit Entry"
             >
-              {category === 'savings' ? (
-                <>
-                  <PlusCircle className="h-3.5 w-3.5 text-emerald-400" />
-                  <span>Deposit Funds</span>
-                </>
-              ) : (
-                <>
-                  <MinusCircle className="h-3.5 w-3.5 text-rose-400" />
-                  <span>Record Payment</span>
-                </>
-              )}
+              <Edit className="h-4 w-4" />
+              <span className="hidden text-xs font-medium sm:inline">Edit</span>
             </button>
-          )}
-        </div>
-
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => onEdit(item, category)}
-            className="flex items-center gap-1 rounded-xl p-2 text-slate-400 transition hover:bg-slate-800 hover:text-primary-300 border border-transparent hover:border-slate-700"
-            title="Edit Entry"
-          >
-            <Edit className="h-4 w-4" />
-            <span className="text-xs font-medium hidden sm:inline">Edit</span>
-          </button>
-          <button
-            onClick={() => onDelete(item.id, category)}
-            className="flex items-center gap-1 rounded-xl p-2 text-slate-400 transition hover:bg-rose-950/40 hover:text-rose-400 border border-transparent hover:border-rose-800/50"
-            title="Delete Entry"
-          >
-            <Trash2 className="h-4 w-4" />
-            <span className="text-xs font-medium hidden sm:inline">Delete</span>
-          </button>
+            <button
+              onClick={() => onDelete(item.id, category)}
+              className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-transparent px-2.5 text-slate-400 transition-colors hover:border-rose-400/20 hover:bg-rose-500/10 hover:text-rose-300"
+              title="Delete Entry"
+              aria-label="Delete Entry"
+            >
+              <Trash2 className="h-4 w-4" />
+              <span className="hidden text-xs font-medium sm:inline">Delete</span>
+            </button>
+          </div>
         </div>
       </div>
     </div>

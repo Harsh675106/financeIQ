@@ -32,107 +32,134 @@ export default function TransactionStatsStrip({
   const savingsRate = incomeTotal > 0 ? Math.round(((incomeTotal - expenseTotal) / incomeTotal) * 100) : 0
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
       {/* 1. Total Inflow */}
-      <div className="group relative overflow-hidden rounded-3xl border border-emerald-500/30 bg-gradient-to-br from-emerald-950/40 via-slate-900/90 to-slate-950/95 p-5 shadow-2xl backdrop-blur-xl stage-card-lift">
-        <div className="pointer-events-none absolute -right-10 -top-10 h-28 w-28 rounded-full bg-emerald-500/15 blur-2xl group-hover:scale-150 transition-all duration-500" />
-        
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-2">
-            <span className="flex h-2 w-2 rounded-full bg-emerald-400 animate-ping" />
-            <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Inflow</span>
-          </div>
-          <div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-emerald-500/15 border border-emerald-500/30 shadow-inner group-hover:scale-110 transition">
-            <ArrowUpRight className="h-4.5 w-4.5 text-emerald-400" />
-          </div>
-        </div>
+      <div className="card card-pad card-spotlight group animate-fade-up">
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute -right-12 -top-12 h-32 w-32 rounded-full bg-emerald-500/10 blur-2xl"
+        />
 
-        <p className="text-2xl sm:text-3xl font-black font-mono tracking-tight text-emerald-400">
-          +₹{Math.round(incomeTotal).toLocaleString('en-IN')}
-        </p>
+        <div className="relative">
+          <div className="flex items-start justify-between gap-3">
+            <div className="flex min-w-0 items-center gap-2 pt-1">
+              <span className="relative flex h-2 w-2 shrink-0" aria-hidden="true">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-60" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
+              </span>
+              <span className="eyebrow truncate">Total Inflow</span>
+            </div>
+            <span className="icon-tile icon-tile-emerald">
+              <ArrowUpRight className="h-[18px] w-[18px]" />
+            </span>
+          </div>
 
-        <div className="flex items-center justify-between mt-4 text-xs text-slate-400 border-t border-slate-800/90 pt-3">
-          <span className="font-medium">{incomeCount} Income Events</span>
-          <span className="text-emerald-400 font-bold flex items-center gap-1">
-            <TrendingUp className="h-3.5 w-3.5" /> Cash Added
-          </span>
+          <p className="kpi-value mt-3 break-words text-2xl text-emerald-400 2xl:text-[1.75rem]">
+            +₹{Math.round(incomeTotal).toLocaleString('en-IN')}
+          </p>
+
+          <div className="mt-4 flex items-center justify-between gap-2 border-t border-white/[0.06] pt-3 text-xs text-slate-400">
+            <span className="num min-w-0 truncate">{incomeCount} Income Events</span>
+            <span className="flex shrink-0 items-center gap-1 font-semibold text-emerald-300">
+              <TrendingUp className="h-3.5 w-3.5" /> Cash Added
+            </span>
+          </div>
         </div>
       </div>
 
       {/* 2. Total Outflow / Burn */}
-      <div className="group relative overflow-hidden rounded-3xl border border-rose-500/30 bg-gradient-to-br from-rose-950/40 via-slate-900/90 to-slate-950/95 p-5 shadow-2xl backdrop-blur-xl stage-card-lift">
-        <div className="pointer-events-none absolute -right-10 -top-10 h-28 w-28 rounded-full bg-rose-500/15 blur-2xl group-hover:scale-150 transition-all duration-500" />
+      <div className="card card-pad card-spotlight group animate-fade-up" style={{ animationDelay: '60ms' }}>
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute -right-12 -top-12 h-32 w-32 rounded-full bg-rose-500/10 blur-2xl"
+        />
 
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-2">
-            <span className="flex h-2 w-2 rounded-full bg-rose-400 animate-pulse" />
-            <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Outflow</span>
+        <div className="relative">
+          <div className="flex items-start justify-between gap-3">
+            <div className="flex min-w-0 items-center gap-2 pt-1">
+              <span className="flex h-2 w-2 shrink-0 animate-pulse rounded-full bg-rose-400" aria-hidden="true" />
+              <span className="eyebrow truncate">Total Outflow</span>
+            </div>
+            <span className="icon-tile icon-tile-rose">
+              <ArrowDownRight className="h-[18px] w-[18px]" />
+            </span>
           </div>
-          <div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-rose-500/15 border border-rose-500/30 shadow-inner group-hover:scale-110 transition">
-            <ArrowDownRight className="h-4.5 w-4.5 text-rose-400" />
+
+          <p className="kpi-value mt-3 break-words text-2xl text-rose-400 2xl:text-[1.75rem]">
+            -₹{Math.round(expenseTotal).toLocaleString('en-IN')}
+          </p>
+
+          <div className="mt-4 flex items-center justify-between gap-2 border-t border-white/[0.06] pt-3 text-xs text-slate-400">
+            <span className="num min-w-0 truncate">{expenseCount} Expenses Recorded</span>
+            <span className="flex shrink-0 items-center gap-1 font-semibold text-rose-300">
+              <Flame className="h-3.5 w-3.5" /> Burn Tracked
+            </span>
           </div>
-        </div>
-
-        <p className="text-2xl sm:text-3xl font-black font-mono tracking-tight text-rose-400">
-          -₹{Math.round(expenseTotal).toLocaleString('en-IN')}
-        </p>
-
-        <div className="flex items-center justify-between mt-4 text-xs text-slate-400 border-t border-slate-800/90 pt-3">
-          <span className="font-medium">{expenseCount} Expenses Recorded</span>
-          <span className="text-rose-400 font-bold flex items-center gap-1">
-            <Flame className="h-3.5 w-3.5" /> Burn Tracked
-          </span>
         </div>
       </div>
 
       {/* 3. Net Savings Rate */}
-      <div className="group relative overflow-hidden rounded-3xl border border-cyan-500/30 bg-gradient-to-br from-cyan-950/40 via-slate-900/90 to-slate-950/95 p-5 shadow-2xl backdrop-blur-xl stage-card-lift">
-        <div className="pointer-events-none absolute -right-10 -top-10 h-28 w-28 rounded-full bg-cyan-500/15 blur-2xl group-hover:scale-150 transition-all duration-500" />
+      <div className="card card-pad card-spotlight group animate-fade-up" style={{ animationDelay: '120ms' }}>
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute -right-12 -top-12 h-32 w-32 rounded-full bg-cyan-500/10 blur-2xl"
+        />
 
-        <div className="flex items-center justify-between mb-3">
-          <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Savings Velocity</span>
-          <div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-cyan-500/15 border border-cyan-500/30 shadow-inner group-hover:scale-110 transition">
-            <Sparkles className="h-4.5 w-4.5 text-cyan-400" />
+        <div className="relative">
+          <div className="flex items-start justify-between gap-3">
+            <span className="eyebrow truncate pt-1">Savings Velocity</span>
+            <span className="icon-tile icon-tile-cyan">
+              <Sparkles className="h-[18px] w-[18px]" />
+            </span>
           </div>
-        </div>
 
-        <p className="text-2xl sm:text-3xl font-black font-mono tracking-tight text-cyan-300">
-          {savingsRate}% <span className="text-xs text-slate-400 font-normal">Retained</span>
-        </p>
+          <p className="kpi-value mt-3 break-words text-2xl text-cyan-200 2xl:text-[1.75rem]">
+            {savingsRate}% <span className="font-sans text-xs font-normal text-slate-400">Retained</span>
+          </p>
 
-        <div className="flex items-center justify-between mt-4 text-xs text-slate-400 border-t border-slate-800/90 pt-3">
-          <div className="h-2 flex-1 rounded-full bg-slate-800 overflow-hidden mr-2">
-            <div
-              className="h-full rounded-full bg-gradient-to-r from-cyan-400 to-emerald-400 transition-all duration-700"
-              style={{ width: `${Math.max(0, Math.min(100, savingsRate))}%` }}
-            />
+          <div className="mt-4 flex items-center justify-between gap-3 border-t border-white/[0.06] pt-3 text-xs text-slate-400">
+            <div className="progress-track h-1.5 flex-1">
+              <div
+                className="progress-fill"
+                style={{ width: `${Math.max(0, Math.min(100, savingsRate))}%` }}
+              />
+            </div>
+            <span className="badge badge-info shrink-0">
+              {savingsRate >= 30 ? 'High Retention' : savingsRate > 0 ? 'Moderate' : 'Negative'}
+            </span>
           </div>
-          <span className="text-cyan-400 font-bold text-[11px] whitespace-nowrap">
-            {savingsRate >= 30 ? 'High Retention' : savingsRate > 0 ? 'Moderate' : 'Negative'}
-          </span>
         </div>
       </div>
 
       {/* 4. Net Cash Position */}
-      <div className="group relative overflow-hidden rounded-3xl border border-indigo-500/30 bg-gradient-to-br from-indigo-950/40 via-slate-900/90 to-slate-950/95 p-5 shadow-2xl backdrop-blur-xl stage-card-lift">
-        <div className="pointer-events-none absolute -right-10 -top-10 h-28 w-28 rounded-full bg-indigo-500/15 blur-2xl group-hover:scale-150 transition-all duration-500" />
+      <div className="card card-pad card-spotlight group animate-fade-up" style={{ animationDelay: '180ms' }}>
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute -right-12 -top-12 h-32 w-32 rounded-full bg-primary-500/15 blur-2xl"
+        />
 
-        <div className="flex items-center justify-between mb-3">
-          <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Net Cash Spread</span>
-          <div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-indigo-500/15 border border-indigo-500/30 shadow-inner group-hover:scale-110 transition">
-            <Wallet className="h-4.5 w-4.5 text-indigo-400" />
+        <div className="relative">
+          <div className="flex items-start justify-between gap-3">
+            <span className="eyebrow truncate pt-1">Net Cash Spread</span>
+            <span className="icon-tile icon-tile-brand">
+              <Wallet className="h-[18px] w-[18px]" />
+            </span>
           </div>
-        </div>
 
-        <p className={`text-2xl sm:text-3xl font-black font-mono tracking-tight ${netFlow >= 0 ? 'text-indigo-300' : 'text-rose-400'}`}>
-          {netFlow >= 0 ? '+' : ''}₹{Math.round(netFlow).toLocaleString('en-IN')}
-        </p>
+          <p
+            className={`kpi-value mt-3 break-words text-2xl 2xl:text-[1.75rem] ${
+              netFlow >= 0 ? 'text-primary-200' : 'text-rose-400'
+            }`}
+          >
+            {netFlow >= 0 ? '+' : ''}₹{Math.round(netFlow).toLocaleString('en-IN')}
+          </p>
 
-        <div className="flex items-center justify-between mt-4 text-xs text-slate-400 border-t border-slate-800/90 pt-3">
-          <span>{transactionCount} Total Logged</span>
-          <span className={`font-bold uppercase ${netFlow >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
-            {netFlow >= 0 ? 'Surplus' : 'Deficit'}
-          </span>
+          <div className="mt-4 flex items-center justify-between gap-2 border-t border-white/[0.06] pt-3 text-xs text-slate-400">
+            <span className="num min-w-0 truncate">{transactionCount} Total Logged</span>
+            <span className={`badge shrink-0 uppercase tracking-wide ${netFlow >= 0 ? 'badge-success' : 'badge-danger'}`}>
+              {netFlow >= 0 ? 'Surplus' : 'Deficit'}
+            </span>
+          </div>
         </div>
       </div>
     </div>

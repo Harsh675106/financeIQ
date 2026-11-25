@@ -5,7 +5,11 @@ import { useRouter } from 'next/navigation'
 import { useAuth } from '@/hooks/useAuth'
 import DashboardLayout from '@/components/layouts/DashboardLayout'
 import PageBackground from '@/components/layouts/PageBackground'
-import { AlertCircle, CheckCircle, X, AlertTriangle, Info } from 'lucide-react'
+import PageHeader from '@/components/ui/PageHeader'
+import SectionHeader from '@/components/ui/SectionHeader'
+import EmptyState from '@/components/ui/EmptyState'
+import LoadingScreen from '@/components/ui/LoadingScreen'
+import { AlertCircle, CheckCircle, X, AlertTriangle, Info, ShieldAlert, Sparkles } from 'lucide-react'
 import { api } from '@/lib/api'
 
 interface Alert {
@@ -105,37 +109,49 @@ export default function AlertsPage() {
   const getSeverityIcon = (severity: string) => {
     switch (severity) {
       case 'critical':
-        return <AlertCircle className="h-5 w-5 text-danger-300" />
+        return (
+          <span className="icon-tile icon-tile-rose">
+            <AlertCircle className="h-[18px] w-[18px]" />
+          </span>
+        )
       case 'high':
-        return <AlertTriangle className="h-5 w-5 text-danger-300" />
+        return (
+          <span className="icon-tile icon-tile-rose">
+            <AlertTriangle className="h-[18px] w-[18px]" />
+          </span>
+        )
       case 'warning':
       case 'medium':
-        return <Info className="h-5 w-5 text-yellow-300" />
+        return (
+          <span className="icon-tile icon-tile-amber">
+            <Info className="h-[18px] w-[18px]" />
+          </span>
+        )
       default:
-        return <Info className="h-5 w-5 text-primary-300" />
+        return (
+          <span className="icon-tile icon-tile-sky">
+            <Info className="h-[18px] w-[18px]" />
+          </span>
+        )
     }
   }
 
   const getSeverityColor = (severity: string) => {
     switch (severity) {
       case 'critical':
-        return 'border-danger-500/30 bg-danger-500/10'
+        return 'border-rose-500/30 bg-rose-500/[0.07]'
       case 'high':
-        return 'border-danger-500/20 bg-danger-500/10'
+        return 'border-rose-500/20 bg-rose-500/[0.05]'
       case 'warning':
       case 'medium':
-        return 'border-yellow-500/25 bg-yellow-500/10'
+        return 'border-amber-500/25 bg-amber-500/[0.06]'
       default:
-        return 'border-primary-500/25 bg-primary-500/10'
+        return 'border-sky-500/20 bg-sky-500/[0.05]'
     }
   }
 
   if (loading || !user) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
-      </div>
-    )
+    return <LoadingScreen label="Loading risk alerts..." />
   }
 
   const unreadCount = alerts.filter(a => !a.is_read).length
@@ -143,84 +159,104 @@ export default function AlertsPage() {
   return (
     <DashboardLayout>
       <PageBackground variant="warning" />
-      <div className="relative z-10 space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-slate-50">Risk Alerts</h1>
-            <p className="text-slate-400 mt-1">
-              {unreadCount > 0 ? `${unreadCount} unread alert${unreadCount > 1 ? 's' : ''}` : 'All clear'}
-            </p>
-          </div>
-          {unreadCount > 0 && (
-            <button
-              onClick={markAllAsRead}
-              className="btn-primary"
-            >
-              <CheckCircle className="h-5 w-5" />
-              <span>Mark All Read</span>
-            </button>
-          )}
-        </div>
+      <div className="relative z-10 space-y-6 lg:space-y-8">
+        <PageHeader
+          eyebrow="Intelligence"
+          eyebrowIcon={ShieldAlert}
+          eyebrowTone="warning"
+          title="Risk Alerts"
+          description={
+            unreadCount > 0 ? `${unreadCount} unread alert${unreadCount > 1 ? 's' : ''}` : 'All clear'
+          }
+          actions={
+            unreadCount > 0 ? (
+              <button onClick={markAllAsRead} className="btn-primary">
+                <CheckCircle className="h-4 w-4" />
+                <span>Mark All Read</span>
+              </button>
+            ) : undefined
+          }
+        />
 
         {loadingAlerts ? (
-          <div className="text-center py-12 text-slate-400">Loading alerts...</div>
-        ) : alerts.length === 0 && recommendations.length === 0 ? (
-          <div className="card card-pad text-center">
-            <CheckCircle className="h-16 w-16 text-success-300 mx-auto mb-4" />
-            <h2 className="text-xl font-semibold text-slate-50 mb-2">All Clear</h2>
-            <p className="text-slate-400">No active risk alerts at this time</p>
-          </div>
-        ) : (
-          <div className="space-y-4">
-            {recommendations.length > 0 ? (
-              <div className="card card-pad">
-                <div className="flex items-center justify-between gap-3 mb-4">
-                  <div>
-                    <h2 className="text-xl font-semibold text-slate-50">Priority Recommendations</h2>
-                    <p className="text-sm text-slate-400">Ranked by urgency and expected monthly impact.</p>
+          <div className="space-y-4" aria-busy="true">
+            <span className="sr-only">Loading alerts...</span>
+            {[...Array(3)].map((_, i) => (
+              <div key={i} className="card card-pad">
+                <div className="flex items-start gap-4">
+                  <div className="skeleton h-10 w-10 shrink-0 rounded-xl" />
+                  <div className="flex-1 space-y-2.5">
+                    <div className="skeleton h-4 w-1/4" />
+                    <div className="skeleton h-4 w-3/4" />
+                    <div className="skeleton h-3 w-1/3" />
                   </div>
                 </div>
+              </div>
+            ))}
+          </div>
+        ) : alerts.length === 0 && recommendations.length === 0 ? (
+          <div className="card card-pad animate-fade-up">
+            <EmptyState
+              icon={CheckCircle}
+              tone="emerald"
+              title="All Clear"
+              description="No active risk alerts at this time"
+            />
+          </div>
+        ) : (
+          <div className="space-y-4 sm:space-y-6">
+            {recommendations.length > 0 ? (
+              <div className="card card-pad animate-fade-up">
+                <SectionHeader
+                  icon={Sparkles}
+                  tone="violet"
+                  title="Priority Recommendations"
+                  subtitle="Ranked by urgency and expected monthly impact."
+                  className="mb-5"
+                />
                 <div className="space-y-4">
                   {recommendations.map((item, index) => (
                     <div
                       key={`${item.alert_type}-${index}`}
-                      className={`rounded-2xl border p-4 ${getSeverityColor(item.severity)}`}
+                      className={`rounded-2xl border p-4 sm:p-5 ${getSeverityColor(item.severity)}`}
                     >
-                      <div className="flex items-start justify-between gap-4">
-                        <div className="space-y-2">
-                          <div className="flex items-center gap-2">
-                            {getSeverityIcon(item.severity)}
-                            <h3 className="font-semibold text-slate-50">{item.title}</h3>
+                      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
+                        <div className="flex min-w-0 items-start gap-3">
+                          <div className="shrink-0">{getSeverityIcon(item.severity)}</div>
+                          <div className="min-w-0 space-y-1.5">
+                            <h3 className="break-words font-display text-[15px] font-semibold text-slate-50">
+                              {item.title}
+                            </h3>
+                            <p className="break-words text-sm text-slate-200">{item.message}</p>
+                            <p className="break-words text-sm text-slate-400">{item.recommendation}</p>
                           </div>
-                          <p className="text-slate-100">{item.message}</p>
-                          <p className="text-sm text-slate-300">{item.recommendation}</p>
                         </div>
-                        <div className="text-right text-xs text-slate-300 min-w-[110px]">
-                          <div>{Math.round(item.confidence)}% confidence</div>
-                          <div className="mt-1">
+                        <div className="flex shrink-0 flex-wrap gap-1.5 pl-[3.25rem] sm:flex-col sm:items-end sm:pl-0">
+                          <span className="badge badge-neutral num">{Math.round(item.confidence)}% confidence</span>
+                          <span className="badge badge-success num">
                             {Math.round(item.estimatedMonthlyImpact).toLocaleString('en-IN')}/mo impact
-                          </div>
+                          </span>
                         </div>
                       </div>
 
                       <div className="mt-4 grid gap-3 lg:grid-cols-3">
-                        <div className="rounded-xl border border-slate-800/70 bg-slate-950/40 p-3">
-                          <p className="text-[11px] uppercase tracking-wide text-slate-500">Why</p>
-                          <p className="mt-2 text-sm text-slate-300">{item.whyItTriggered}</p>
+                        <div className="surface-inset p-3.5">
+                          <p className="eyebrow text-[10px] text-slate-500">Why</p>
+                          <p className="mt-2 break-words text-sm text-slate-300">{item.whyItTriggered}</p>
                         </div>
-                        <div className="rounded-xl border border-slate-800/70 bg-slate-950/40 p-3">
-                          <p className="text-[11px] uppercase tracking-wide text-slate-500">Assumptions</p>
+                        <div className="surface-inset p-3.5">
+                          <p className="eyebrow text-[10px] text-slate-500">Assumptions</p>
                           <div className="mt-2 space-y-1">
                             {item.assumptions.map((assumption) => (
-                              <p key={assumption} className="text-sm text-slate-300">
+                              <p key={assumption} className="break-words text-sm text-slate-300">
                                 {assumption}
                               </p>
                             ))}
                           </div>
                         </div>
-                        <div className="rounded-xl border border-slate-800/70 bg-slate-950/40 p-3">
-                          <p className="text-[11px] uppercase tracking-wide text-slate-500">If Assumptions Change</p>
-                          <p className="mt-2 text-sm text-slate-300">{item.whatChangesIfWrong}</p>
+                        <div className="surface-inset p-3.5">
+                          <p className="eyebrow text-[10px] text-slate-500">If Assumptions Change</p>
+                          <p className="mt-2 break-words text-sm text-slate-300">{item.whatChangesIfWrong}</p>
                         </div>
                       </div>
                     </div>
@@ -232,51 +268,53 @@ export default function AlertsPage() {
             {alerts.map((alert) => (
               <div
                 key={alert.id}
-                className={`card card-pad border-2 ${
-                  alert.is_read ? 'border-slate-800/70 opacity-70' : getSeverityColor(alert.severity)
+                className={`card card-pad animate-fade-up transition-opacity ${
+                  alert.is_read ? 'opacity-70' : getSeverityColor(alert.severity)
                 }`}
               >
-                <div className="flex items-start space-x-4">
-                  <div className="flex-shrink-0 mt-1">
+                <div className="flex items-start gap-3 sm:gap-4">
+                  <div className="shrink-0">
                     {getSeverityIcon(alert.severity)}
                   </div>
-                  <div className="flex-1">
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center space-x-2">
+                  <div className="min-w-0 flex-1">
+                    <div className="mb-2 flex items-center justify-between gap-2">
+                      <div className="flex flex-wrap items-center gap-2">
                         <span
-                          className={`px-2 py-1 rounded-xl text-xs font-medium ${
+                          className={`badge ${
                             alert.severity === 'critical'
-                              ? 'bg-danger-500/15 text-danger-200 ring-1 ring-danger-500/25'
+                              ? 'badge-danger'
                               : alert.severity === 'high'
-                              ? 'bg-danger-500/10 text-danger-200 ring-1 ring-danger-500/20'
+                              ? 'badge-danger'
                               : alert.severity === 'medium'
-                              ? 'bg-yellow-500/10 text-yellow-200 ring-1 ring-yellow-500/20'
-                              : 'bg-primary-500/10 text-primary-200 ring-1 ring-primary-500/20'
+                              ? 'badge-warning'
+                              : 'badge-info'
                           }`}
                         >
                           {alert.severity.toUpperCase()}
                         </span>
-                        <span className="text-xs text-slate-500">
+                        <span className="num text-xs text-slate-500">
                           {new Date(alert.created_at).toLocaleDateString()}
                         </span>
                       </div>
                       {!alert.is_read && (
-                        <span className="h-2 w-2 bg-primary-400 rounded-full"></span>
+                        <span className="h-2 w-2 shrink-0 rounded-full bg-primary-400 shadow-[0_0_8px_rgba(138,136,251,0.8)]">
+                          <span className="sr-only">Unread</span>
+                        </span>
                       )}
                     </div>
-                    <p className="text-slate-100">{alert.message}</p>
-                    <div className="flex items-center space-x-4 mt-4">
+                    <p className="break-words text-slate-100">{alert.message}</p>
+                    <div className="mt-4 flex flex-wrap items-center gap-2">
                       {!alert.is_read && (
                         <button
                           onClick={() => markAsRead(alert.id)}
-                          className="text-sm text-primary-200 hover:text-primary-100 font-medium"
+                          className="btn-soft btn-sm"
                         >
                           Mark as Read
                         </button>
                       )}
                       <button
                         onClick={() => deleteAlert(alert.id)}
-                        className="text-sm text-danger-300 hover:text-danger-200 font-medium"
+                        className="btn-ghost btn-sm text-rose-300 hover:!bg-rose-500/10 hover:!text-rose-200"
                       >
                         Dismiss
                       </button>
@@ -284,9 +322,10 @@ export default function AlertsPage() {
                   </div>
                   <button
                     onClick={() => deleteAlert(alert.id)}
-                    className="flex-shrink-0 text-slate-400 hover:text-slate-200"
+                    className="btn-icon h-8 w-8"
+                    aria-label="Dismiss alert"
                   >
-                    <X className="h-5 w-5" />
+                    <X className="h-4 w-4" />
                   </button>
                 </div>
               </div>

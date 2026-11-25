@@ -5,24 +5,26 @@ import { api } from '@/lib/api'
 import { AlertTriangle, Brain, CheckCircle2, Info, ShieldAlert, Zap } from 'lucide-react'
 import { formatINR, safeNumber } from '@/lib/formatters'
 import { compactINR } from '@/lib/portfolioMath'
+import { chartColors } from '@/lib/chartTheme'
+import EmptyState from '@/components/ui/EmptyState'
 
 const SEVERITY: Record<string, { ring: string; bg: string; text: string; icon: React.ReactNode }> = {
   high: {
-    ring: 'border-danger-500/30',
-    bg: 'bg-danger-500/[0.07]',
-    text: 'text-danger-300',
+    ring: 'border-rose-400/25',
+    bg: 'bg-rose-500/[0.07]',
+    text: 'text-rose-300',
     icon: <AlertTriangle className="h-3.5 w-3.5" />,
   },
   medium: {
-    ring: 'border-amber-500/30',
+    ring: 'border-amber-400/25',
     bg: 'bg-amber-500/[0.07]',
     text: 'text-amber-300',
     icon: <ShieldAlert className="h-3.5 w-3.5" />,
   },
   low: {
-    ring: 'border-primary-500/25',
-    bg: 'bg-primary-500/[0.06]',
-    text: 'text-primary-300',
+    ring: 'border-sky-400/20',
+    bg: 'bg-sky-500/[0.06]',
+    text: 'text-sky-300',
     icon: <Info className="h-3.5 w-3.5" />,
   },
 }
@@ -47,7 +49,9 @@ export default function PortfolioExplainabilityCard() {
   }, [])
 
   if (loading) {
-    return <div className="pf-skeleton h-52 w-full" />
+    return (
+      <div className="pf-skeleton h-52 w-full rounded-[1.25rem]" role="status" aria-label="Loading portfolio explainability" />
+    )
   }
 
   const explanations: any[] = data?.explanations ?? []
@@ -56,19 +60,19 @@ export default function PortfolioExplainabilityCard() {
   return (
     <div className="pf-panel pf-sheen pf-rise p-5 sm:p-6" style={{ animationDelay: '240ms' }}>
       {/* ---------- Header ---------- */}
-      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center gap-2.5">
-          <div className="pf-orbit icon-morph-container flex h-9 w-9 items-center justify-center rounded-xl border border-purple-500/25 bg-purple-500/10 text-purple-300">
-            <Brain className="h-5 w-5" />
-          </div>
-          <div>
-            <h2 className="text-base font-bold text-slate-50">AI Portfolio Explainability</h2>
-            <p className="text-xs text-slate-400">Risks the model found, and how shocks would land</p>
+      <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex min-w-0 items-center gap-3">
+          <span className="pf-orbit icon-tile icon-tile-violet icon-morph-container">
+            <Brain className="h-[18px] w-[18px]" />
+          </span>
+          <div className="min-w-0">
+            <h2 className="card-title truncate">AI Portfolio Explainability</h2>
+            <p className="card-subtitle">Risks the model found, and how shocks would land</p>
           </div>
         </div>
 
         {explanations.length > 0 && (
-          <span className="chip bg-danger-500/10 text-danger-300 ring-1 ring-danger-500/25">
+          <span className="badge badge-danger self-start px-3 py-1 sm:self-auto">
             <AlertTriangle className="h-3.5 w-3.5" />
             {explanations.length} finding{explanations.length === 1 ? '' : 's'}
           </span>
@@ -76,15 +80,17 @@ export default function PortfolioExplainabilityCard() {
       </div>
 
       {!data ? (
-        <p className="text-sm text-slate-400">No portfolio explainability available yet.</p>
+        <EmptyState icon={Brain} tone="violet" title="No portfolio explainability available yet." compact />
       ) : (
-        <div className="space-y-5">
+        <div className="space-y-6">
           {/* ---------- Findings ---------- */}
           <div className="space-y-2.5">
             {explanations.length === 0 ? (
-              <div className="flex items-center gap-2.5 rounded-xl border border-primary-500/20 bg-primary-500/5 p-3">
-                <CheckCircle2 className="h-4 w-4 shrink-0 text-primary-400" />
-                <p className="text-xs text-slate-300">
+              <div className="flex items-center gap-3 rounded-[0.875rem] border border-emerald-400/20 bg-emerald-500/[0.06] p-3">
+                <span className="icon-tile icon-tile-sm icon-tile-emerald">
+                  <CheckCircle2 className="h-4 w-4" />
+                </span>
+                <p className="text-xs leading-relaxed text-slate-300">
                   No major allocation, liquidity or leverage mismatch detected right now.
                 </p>
               </div>
@@ -94,20 +100,20 @@ export default function PortfolioExplainabilityCard() {
                 return (
                   <div
                     key={item.type ?? i}
-                    className={`pf-ladder-row rounded-xl border p-3.5 ${tone.ring} ${tone.bg}`}
+                    className={`pf-ladder-row rounded-[0.875rem] border p-3.5 sm:p-4 ${tone.ring} ${tone.bg}`}
                     style={{ animationDelay: `${i * 80}ms` }}
                   >
                     <div className="flex flex-wrap items-center justify-between gap-2">
-                      <div className={`flex items-center gap-2 ${tone.text}`}>
-                        {tone.icon}
-                        <span className="text-xs font-bold">{item.title}</span>
+                      <div className={`flex min-w-0 items-center gap-2 ${tone.text}`}>
+                        <span className="shrink-0">{tone.icon}</span>
+                        <span className="text-[13px] font-semibold">{item.title}</span>
                       </div>
 
                       <div className="flex items-center gap-2">
-                        <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+                        <span className="num text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-500">
                           {item.confidence}% confidence
                         </span>
-                        <span className="h-1 w-12 overflow-hidden rounded-full bg-slate-800">
+                        <span className={`h-1 w-12 overflow-hidden rounded-full bg-white/[0.08] ${tone.text}`}>
                           <span
                             className="pf-bar block h-full rounded-full"
                             style={{
@@ -120,10 +126,10 @@ export default function PortfolioExplainabilityCard() {
                       </div>
                     </div>
 
-                    <p className="mt-2 text-[11px] leading-relaxed text-slate-300">{item.explanation}</p>
+                    <p className="mt-2 text-xs leading-relaxed text-slate-300">{item.explanation}</p>
 
                     {Array.isArray(item.assumptions) && item.assumptions.length > 0 && (
-                      <p className="mt-1.5 text-[10px] italic leading-relaxed text-slate-500">
+                      <p className="mt-1.5 text-[11px] italic leading-relaxed text-slate-500">
                         Assumes: {item.assumptions.join(' ')}
                       </p>
                     )}
@@ -135,10 +141,12 @@ export default function PortfolioExplainabilityCard() {
 
           {/* ---------- Stress tests ---------- */}
           {stressTests.length > 0 && (
-            <div className="border-t border-slate-800/70 pt-4">
-              <div className="mb-3 flex items-center gap-2">
-                <Zap className="h-4 w-4 text-cyan-300" />
-                <h3 className="text-sm font-bold text-slate-100">Scenario Stress Test</h3>
+            <div className="border-t border-white/[0.06] pt-5">
+              <div className="mb-3 flex flex-wrap items-center gap-x-2.5 gap-y-1">
+                <span className="icon-tile icon-tile-sm icon-tile-cyan">
+                  <Zap className="h-4 w-4" />
+                </span>
+                <h3 className="font-display text-sm font-semibold text-slate-100">Scenario Stress Test</h3>
                 <span className="text-[11px] text-slate-500">Modelled on your current mix</span>
               </div>
 
@@ -151,34 +159,36 @@ export default function PortfolioExplainabilityCard() {
                   return (
                     <div
                       key={item.scenario}
-                      className="pf-ladder-row rounded-xl border border-slate-800/70 bg-slate-950/50 p-3"
+                      className="pf-ladder-row surface-inset surface-inset-hover p-3 sm:p-3.5"
                       style={{ animationDelay: `${i * 70}ms` }}
                     >
                       <div className="flex items-center justify-between gap-3">
-                        <span className="text-xs font-bold text-slate-200">{item.scenario}</span>
+                        <span className="min-w-0 text-xs font-semibold text-slate-200">{item.scenario}</span>
                         <span
-                          className={`text-sm font-extrabold ${positive ? 'text-primary-300' : 'text-danger-300'}`}
+                          className={`num shrink-0 font-display text-sm font-semibold ${
+                            positive ? 'text-emerald-300' : 'text-rose-300'
+                          }`}
                         >
                           {positive ? '+' : ''}
                           {impact.toFixed(1)}%
                         </span>
                       </div>
 
-                      <div className="mt-2 h-1.5 rounded-full bg-slate-800/70">
+                      <div className="mt-2 h-1.5 rounded-full bg-white/[0.06]">
                         <div
                           className="pf-bar h-full"
                           style={{
                             width: `${magnitude}%`,
-                            backgroundColor: positive ? '#34d399' : '#f87171',
+                            backgroundColor: positive ? chartColors.positive : chartColors.negative,
                             animationDelay: `${180 + i * 70}ms`,
-                            boxShadow: `0 0 8px ${positive ? '#34d39966' : '#f8717166'}`,
+                            boxShadow: `0 0 10px -2px ${positive ? `${chartColors.positive}aa` : `${chartColors.negative}aa`}`,
                           }}
                         />
                       </div>
 
                       <p className="mt-2 text-[11px] text-slate-500">
                         Portfolio lands near{' '}
-                        <span className="font-semibold text-slate-300">
+                        <span className="num font-semibold text-slate-300">
                           {compactINR(item.projectedPortfolioValue)}
                         </span>{' '}
                         (₹{formatINR(item.projectedPortfolioValue)})

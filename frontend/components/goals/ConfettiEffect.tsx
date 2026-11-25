@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
+import { prefersReducedMotion } from '@/hooks/useReducedMotion'
 
 interface ConfettiProps {
   trigger: boolean
@@ -12,6 +13,13 @@ export default function ConfettiEffect({ trigger, onComplete }: ConfettiProps) {
 
   useEffect(() => {
     if (!trigger) return
+
+    // Reduced motion: skip the particle burst but still signal completion,
+    // so the trigger resets exactly as it does after the animation.
+    if (prefersReducedMotion()) {
+      if (onComplete) onComplete()
+      return
+    }
 
     const canvas = canvasRef.current
     if (!canvas) return
@@ -33,7 +41,8 @@ export default function ConfettiEffect({ trigger, onComplete }: ConfettiProps) {
       opacity: number
     }[] = []
 
-    const colors = ['#10b981', '#34d399', '#06b6d4', '#22d3ee', '#f59e0b', '#ec4899', '#8b5cf6']
+    // Obsidian Aurora palette: iris, violet, cyan, mint, pink, amber, soft iris
+    const colors = ['#8a88fb', '#a78bfa', '#22d3ee', '#34d399', '#f472b6', '#fbbf24', '#c7cdff']
 
     for (let i = 0; i < 90; i++) {
       particles.push({
@@ -102,7 +111,8 @@ export default function ConfettiEffect({ trigger, onComplete }: ConfettiProps) {
   return (
     <canvas
       ref={canvasRef}
-      className="pointer-events-none fixed inset-0 z-50 h-full w-full"
+      className="pointer-events-none fixed inset-0 z-[160] h-full w-full"
+      aria-hidden="true"
     />
   )
 }

@@ -4,6 +4,7 @@ import { useEffect, useState, useRef } from 'react'
 import { api } from '@/lib/api'
 import { Shield, Activity, Sparkles, RotateCcw } from 'lucide-react'
 import { useCountUp } from '@/hooks/useCountUp'
+import { chartColors } from '@/lib/chartTheme'
 
 interface RiskData {
   hasData?: boolean
@@ -56,13 +57,13 @@ export default function RiskAssessment() {
   const getRiskColor = (level: string) => {
     switch (level) {
       case 'Conservative':
-        return 'text-emerald-300 bg-emerald-500/15 ring-1 ring-emerald-500/30'
+        return 'badge-success'
       case 'Balanced':
-        return 'text-primary-300 bg-primary-500/15 ring-1 ring-primary-500/30'
+        return 'badge-info'
       case 'Aggressive':
-        return 'text-rose-300 bg-rose-500/15 ring-1 ring-rose-500/30'
+        return 'badge-danger'
       default:
-        return 'text-slate-300 bg-slate-800/60 ring-1 ring-slate-700'
+        return 'badge-neutral'
     }
   }
 
@@ -99,12 +100,20 @@ export default function RiskAssessment() {
 
   const needleAngle = -90 + (activeScore / 100) * 180
   const displayedStress = (activeScore * 0.18).toFixed(1)
+  const needleTipColor =
+    activeScore <= 35 ? chartColors.positiveStrong : activeScore <= 70 ? chartColors.cyan : chartColors.negativeStrong
 
   if (loading) {
     return (
-      <div className="card card-pad animate-pulse">
-        <div className="h-6 bg-slate-800 rounded w-1/3 mb-4"></div>
-        <div className="h-32 bg-slate-800 rounded-xl"></div>
+      <div className="card card-pad" aria-busy="true">
+        <div className="mb-5 flex items-center gap-3">
+          <div className="skeleton h-10 w-10 rounded-xl" />
+          <div className="flex-1 space-y-2">
+            <div className="skeleton h-4 w-1/3" />
+            <div className="skeleton h-3 w-1/2" />
+          </div>
+        </div>
+        <div className="skeleton h-40 rounded-2xl" />
       </div>
     )
   }
@@ -112,52 +121,54 @@ export default function RiskAssessment() {
   return (
     <div className="card card-pad card-spotlight group animate-fade-up">
       {/* Header */}
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center space-x-2.5">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary-500/10 border border-primary-500/20 text-primary-400 icon-morph-container">
-            <Shield className="h-5 w-5" />
-          </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <h2 className="text-base font-bold text-slate-50">Risk Assessment</h2>
+      <div className="relative mb-5 flex items-start justify-between gap-3">
+        <div className="flex min-w-0 items-center gap-3">
+          <span className="icon-tile icon-tile-brand icon-morph-container">
+            <Shield className="h-[18px] w-[18px]" />
+          </span>
+          <div className="min-w-0">
+            <div className="flex flex-wrap items-center gap-2">
+              <h2 className="card-title">Risk Assessment</h2>
               {isHovered && (
-                <span className="inline-flex items-center gap-1 rounded-md bg-sky-500/20 px-1.5 py-0.5 text-[10px] font-semibold text-sky-300 animate-fade-in">
-                  <Sparkles className="h-2.5 w-2.5" />
+                <span className="badge badge-info animate-fade-in px-2 text-[10px] leading-4">
+                  <Sparkles className="h-2.5 w-2.5" aria-hidden="true" />
                   Interactive Simulator
                 </span>
               )}
             </div>
-            <p className="text-xs text-slate-400">Stress exposure & risk appetite</p>
+            <p className="card-subtitle">Stress exposure & risk appetite</p>
           </div>
         </div>
 
-        <span
-          className={`px-3 py-1 rounded-xl text-xs font-bold transition-all duration-300 ${getRiskColor(
-            currentLevel
-          )}`}
-        >
+        <span className={`badge shrink-0 px-3 py-1 text-xs transition-colors duration-300 ${getRiskColor(currentLevel)}`}>
           {currentLevel}
         </span>
       </div>
 
-      <div className="space-y-4">
+      <div className="relative space-y-4">
         {/* Interactive Semi-Circle SVG Dial */}
         <div
           ref={dialRef}
           onMouseMove={handleDialMouseMove}
           onMouseLeave={handleDialMouseLeave}
-          className="relative flex flex-col items-center justify-center pt-2 pb-1 cursor-ew-resize select-none"
+          className="relative flex cursor-ew-resize select-none flex-col items-center justify-center pb-1 pt-2"
           title="Move cursor over dial to simulate risk scenarios"
         >
-          <div className="relative w-52 h-28 overflow-hidden flex items-end justify-center">
-            <svg className="w-52 h-52 -rotate-180 transform" viewBox="0 0 100 100">
+          {/* Soft glow behind the dial */}
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute left-1/2 top-4 h-28 w-48 -translate-x-1/2 rounded-full bg-primary-500/15 blur-3xl"
+          />
+
+          <div className="relative flex h-28 w-52 items-end justify-center overflow-hidden">
+            <svg className="h-52 w-52 -rotate-180 transform" viewBox="0 0 100 100" aria-hidden="true">
               {/* Background Arch */}
               <circle
                 cx="50"
                 cy="50"
                 r="40"
                 fill="none"
-                stroke="#1e293b"
+                stroke="rgba(255, 255, 255, 0.06)"
                 strokeWidth="11"
                 strokeDasharray="125.6 125.6"
               />
@@ -167,12 +178,12 @@ export default function RiskAssessment() {
                 cy="50"
                 r="40"
                 fill="none"
-                stroke="#10b981"
+                stroke={chartColors.positiveStrong}
                 strokeWidth="11"
                 strokeDasharray="41.8 125.6"
                 strokeDashoffset="0"
                 className={`transition-opacity duration-200 ${
-                  activeScore <= 35 ? 'opacity-100 filter drop-shadow(0 0 6px rgba(16,185,129,0.7))' : 'opacity-60'
+                  activeScore <= 35 ? 'opacity-100 drop-shadow-[0_0_6px_rgba(16,185,129,0.7)]' : 'opacity-40'
                 }`}
               />
               {/* Balanced zone (Teal/Cyan) */}
@@ -181,14 +192,14 @@ export default function RiskAssessment() {
                 cy="50"
                 r="40"
                 fill="none"
-                stroke="#06b6d4"
+                stroke={chartColors.cyan}
                 strokeWidth="11"
                 strokeDasharray="41.8 125.6"
                 strokeDashoffset="-41.8"
                 className={`transition-opacity duration-200 ${
                   activeScore > 35 && activeScore <= 70
-                    ? 'opacity-100 filter drop-shadow(0 0 6px rgba(6,182,212,0.7))'
-                    : 'opacity-60'
+                    ? 'opacity-100 drop-shadow-[0_0_6px_rgba(34,211,238,0.7)]'
+                    : 'opacity-40'
                 }`}
               />
               {/* Aggressive zone (Rose/Red) */}
@@ -197,52 +208,52 @@ export default function RiskAssessment() {
                 cy="50"
                 r="40"
                 fill="none"
-                stroke="#f43f5e"
+                stroke={chartColors.negativeStrong}
                 strokeWidth="11"
                 strokeDasharray="41.8 125.6"
                 strokeDashoffset="-83.6"
                 className={`transition-opacity duration-200 ${
-                  activeScore > 70 ? 'opacity-100 filter drop-shadow(0 0 6px rgba(244,63,94,0.7))' : 'opacity-60'
+                  activeScore > 70 ? 'opacity-100 drop-shadow-[0_0_6px_rgba(244,63,94,0.7)]' : 'opacity-40'
                 }`}
               />
             </svg>
 
             {/* Dynamic Needle Pin */}
             <div
-              className="absolute bottom-0 left-1/2 w-1.5 h-24 origin-bottom rounded-full shadow-2xl transition-transform ease-out pointer-events-none"
+              className="pointer-events-none absolute bottom-0 left-1/2 h-24 w-1.5 origin-bottom rounded-full shadow-2xl transition-transform ease-out motion-reduce:transition-none"
               style={{
                 transform: `translateX(-50%) rotate(${needleAngle}deg)`,
                 transitionDuration: isHovered ? '75ms' : '650ms',
-                background: 'linear-gradient(to top, #64748b, #f8fafc)',
+                background: 'linear-gradient(to top, #4a5170, #f7f8fc)',
               }}
             >
               {/* Needle Glowing Tip */}
               <div
-                className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1 h-3 w-3 rounded-full shadow-[0_0_12px_#34d399]"
+                className="absolute left-1/2 top-0 h-3 w-3 -translate-x-1/2 -translate-y-1 rounded-full ring-2 ring-[#090b17]"
                 style={{
-                  backgroundColor:
-                    activeScore <= 35 ? '#10b981' : activeScore <= 70 ? '#06b6d4' : '#f43f5e',
+                  backgroundColor: needleTipColor,
+                  boxShadow: `0 0 12px ${needleTipColor}`,
                 }}
               />
             </div>
 
             {/* Center Pivot Hub */}
-            <div className="absolute bottom-0 left-1/2 h-5 w-5 -translate-x-1/2 translate-y-1/2 rounded-full bg-slate-950 border-2 border-primary-400 shadow-xl z-10 flex items-center justify-center">
-              <div className="h-1.5 w-1.5 rounded-full bg-primary-400 animate-ping" />
+            <div className="absolute bottom-0 left-1/2 z-10 flex h-5 w-5 -translate-x-1/2 translate-y-1/2 items-center justify-center rounded-full border-2 border-primary-400 bg-[#090b17] shadow-[0_0_14px_rgba(138,136,251,0.6)]">
+              <div className="h-1.5 w-1.5 animate-ping rounded-full bg-primary-300" />
             </div>
           </div>
 
           {/* Interactive Score Counter */}
-          <div className="text-center mt-2.5">
-            <div className="flex items-center justify-center gap-1.5">
-              <span className="text-3xl font-extrabold text-slate-50 tracking-tight transition-all">
+          <div className="mt-3 text-center">
+            <div className="flex items-baseline justify-center gap-1.5">
+              <span className="kpi-value text-3xl sm:text-4xl">
                 {isHovered ? hoverScore : animatedScore}
               </span>
-              <span className="text-xs font-semibold text-slate-400">/ 100</span>
+              <span className="text-xs font-semibold text-slate-500">/ 100</span>
             </div>
-            <p className="text-[11px] text-slate-400 mt-0.5">
+            <p className="mt-1 text-[11px] text-slate-400">
               {isHovered ? (
-                <span className="text-primary-300 font-medium">Hovering Simulator • Release to reset</span>
+                <span className="font-medium text-primary-300">Hovering Simulator • Release to reset</span>
               ) : (
                 'Assessed Risk Tolerance Score'
               )}
@@ -253,9 +264,9 @@ export default function RiskAssessment() {
         {/* Quick Zone Jump Buttons */}
         <div className="grid grid-cols-3 gap-2 pt-1">
           {[
-            { label: 'Conservative', score: 25, color: 'hover:border-emerald-500/50 hover:bg-emerald-500/10' },
-            { label: 'Balanced', score: 55, color: 'hover:border-cyan-500/50 hover:bg-cyan-500/10' },
-            { label: 'Aggressive', score: 85, color: 'hover:border-rose-500/50 hover:bg-rose-500/10' },
+            { label: 'Conservative', score: 25, color: 'hover:border-emerald-400/45 hover:bg-emerald-500/10 hover:text-emerald-200' },
+            { label: 'Balanced', score: 55, color: 'hover:border-cyan-400/45 hover:bg-cyan-500/10 hover:text-cyan-200' },
+            { label: 'Aggressive', score: 85, color: 'hover:border-rose-400/45 hover:bg-rose-500/10 hover:text-rose-200' },
           ].map((zone, idx) => (
             <button
               key={idx}
@@ -264,7 +275,7 @@ export default function RiskAssessment() {
                 setIsHovered(true)
               }}
               onMouseLeave={handleDialMouseLeave}
-              className={`rounded-lg border border-slate-800 bg-slate-950/60 py-1.5 text-[11px] font-medium text-slate-300 transition-all ${zone.color}`}
+              className={`min-h-[2.25rem] truncate rounded-xl border border-white/[0.07] bg-white/[0.025] px-1.5 py-2 text-[11px] font-medium text-slate-300 transition-colors ${zone.color}`}
             >
               {zone.label}
             </button>
@@ -272,19 +283,21 @@ export default function RiskAssessment() {
         </div>
 
         {/* Stress Probability Dynamic Wave Bar */}
-        <div className="rounded-xl border border-slate-800/80 bg-slate-950/70 p-3">
-          <div className="flex items-center justify-between mb-1.5">
-            <span className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
-              <Activity className="h-3.5 w-3.5 text-rose-400 animate-pulse" />
-              12-Month Stress Exposure
+        <div className="surface-inset p-3.5">
+          <div className="mb-2 flex items-center justify-between gap-2">
+            <span className="flex min-w-0 items-center gap-2 text-xs font-semibold text-slate-300">
+              <span className="icon-tile icon-tile-sm icon-tile-rose h-6 w-6 rounded-md">
+                <Activity className="h-3.5 w-3.5" />
+              </span>
+              <span className="truncate">12-Month Stress Exposure</span>
             </span>
-            <span className="text-xs font-bold text-rose-400">
+            <span className="num shrink-0 text-xs font-bold text-rose-300">
               {isHovered ? displayedStress : (data?.stressProbability || 0).toFixed(1)}%
             </span>
           </div>
-          <div className="w-full bg-slate-800/80 rounded-full h-1.5 overflow-hidden">
+          <div className="progress-track h-1.5">
             <div
-              className="bg-gradient-to-r from-emerald-500 via-amber-500 to-rose-500 h-1.5 rounded-full transition-all duration-300"
+              className="h-full rounded-full bg-gradient-to-r from-emerald-400 via-amber-400 to-rose-500 transition-[width] duration-300"
               style={{
                 width: `${Math.min(
                   100,

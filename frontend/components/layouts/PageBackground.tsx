@@ -1,110 +1,85 @@
 'use client'
 
+import type { CSSProperties } from 'react'
+
+type Variant =
+  | 'aurora'
+  | 'particles'
+  | 'upward'
+  | 'grid'
+  | 'trend'
+  | 'radial'
+  | 'sparkles'
+  | 'warning'
+  | 'orbit'
+  | 'flow'
+
 interface PageBackgroundProps {
-  variant?:
-    | 'aurora'
-    | 'particles'
-    | 'upward'
-    | 'grid'
-    | 'trend'
-    | 'radial'
-    | 'sparkles'
-    | 'warning'
-    | 'orbit'
-    | 'flow'
+  variant?: Variant
 }
 
-const particleItems = Array.from({ length: 12 }, (_, index) => ({
-  left: `${6 + (index % 6) * 15}%`,
-  top: `${10 + Math.floor(index / 6) * 32}%`,
-  size: `${4 + (index % 3) * 3}px`,
-  delay: `${index * 0.8}s`,
+/** Orb colours per page so each section has its own subtle identity. */
+const ORB_TONES: Record<Variant, [string, string, string]> = {
+  aurora: ['rgba(112, 104, 244, 0.30)', 'rgba(139, 92, 246, 0.22)', 'rgba(34, 211, 238, 0.16)'],
+  particles: ['rgba(112, 104, 244, 0.26)', 'rgba(34, 211, 238, 0.18)', 'rgba(167, 139, 250, 0.16)'],
+  upward: ['rgba(52, 211, 153, 0.18)', 'rgba(112, 104, 244, 0.24)', 'rgba(34, 211, 238, 0.14)'],
+  grid: ['rgba(112, 104, 244, 0.26)', 'rgba(34, 211, 238, 0.18)', 'rgba(139, 92, 246, 0.16)'],
+  trend: ['rgba(34, 211, 238, 0.2)', 'rgba(112, 104, 244, 0.26)', 'rgba(52, 211, 153, 0.12)'],
+  radial: ['rgba(139, 92, 246, 0.26)', 'rgba(112, 104, 244, 0.22)', 'rgba(34, 211, 238, 0.14)'],
+  sparkles: ['rgba(139, 92, 246, 0.26)', 'rgba(112, 104, 244, 0.24)', 'rgba(34, 211, 238, 0.14)'],
+  warning: ['rgba(245, 158, 11, 0.16)', 'rgba(244, 63, 94, 0.16)', 'rgba(112, 104, 244, 0.18)'],
+  orbit: ['rgba(112, 104, 244, 0.24)', 'rgba(34, 211, 238, 0.14)', 'rgba(139, 92, 246, 0.16)'],
+  flow: ['rgba(112, 104, 244, 0.24)', 'rgba(52, 211, 153, 0.12)', 'rgba(34, 211, 238, 0.16)'],
+}
+
+const STARS = Array.from({ length: 14 }, (_, index) => ({
+  left: `${(index * 37) % 100}%`,
+  top: `${8 + ((index * 53) % 70)}%`,
+  delay: `${(index % 7) * 0.6}s`,
 }))
 
+const orbStyle = (color: string): CSSProperties => ({
+  background: `radial-gradient(circle, ${color}, transparent 70%)`,
+})
+
 export default function PageBackground({ variant = 'aurora' }: PageBackgroundProps) {
+  const [a, b, c] = ORB_TONES[variant] ?? ORB_TONES.aurora
+  const showStars = variant === 'sparkles' || variant === 'particles'
+  const showRings = variant === 'radial' || variant === 'orbit'
+  const showLines = variant === 'trend' || variant === 'upward'
+
   return (
     <div className={`page-background page-background-${variant}`} aria-hidden="true">
-      {variant === 'aurora' ? (
-        <>
-          <div className="page-bg-aurora-orb page-bg-aurora-orb-1" />
-          <div className="page-bg-aurora-orb page-bg-aurora-orb-2" />
-          <div className="page-bg-aurora-orb page-bg-aurora-orb-3" />
-        </>
-      ) : null}
+      <div className="page-bg-orb page-bg-orb-a" style={orbStyle(a)} />
+      <div className="page-bg-orb page-bg-orb-b" style={orbStyle(b)} />
+      <div className="page-bg-orb page-bg-orb-c" style={orbStyle(c)} />
 
-      {variant === 'particles' ? (
-        particleItems.map((particle, index) => (
+      {variant === 'grid' && <div className="page-bg-grid" />}
+
+      {showLines && (
+        <>
+          <div className="page-bg-line page-bg-line-1" />
+          <div className="page-bg-line page-bg-line-2" />
+        </>
+      )}
+
+      {showRings && (
+        <>
+          <div className="page-bg-ring page-bg-ring-1" />
+          <div className="page-bg-ring page-bg-ring-2" />
+        </>
+      )}
+
+      {showStars &&
+        STARS.map((star, index) => (
           <span
-            key={`${particle.left}-${index}`}
-            className="page-bg-particle"
-            style={{
-              left: particle.left,
-              top: particle.top,
-              width: particle.size,
-              height: particle.size,
-              animationDelay: particle.delay,
-            }}
+            key={index}
+            className="page-bg-star"
+            style={{ left: star.left, top: star.top, animationDelay: star.delay }}
           />
-        ))
-      ) : null}
+        ))}
 
-      {variant === 'upward' ? (
-        <>
-          <div className="page-bg-rise-ring page-bg-rise-ring-1" />
-          <div className="page-bg-rise-ring page-bg-rise-ring-2" />
-          <div className="page-bg-rise-ring page-bg-rise-ring-3" />
-          <div className="page-bg-rise-ring page-bg-rise-ring-4" />
-        </>
-      ) : null}
-
-      {variant === 'grid' ? <div className="page-bg-grid" /> : null}
-
-      {variant === 'trend' ? (
-        <>
-          <div className="page-bg-trend-line page-bg-trend-line-1" />
-          <div className="page-bg-trend-line page-bg-trend-line-2" />
-        </>
-      ) : null}
-
-      {variant === 'radial' ? (
-        <>
-          <div className="page-bg-radial-ring page-bg-radial-ring-1" />
-          <div className="page-bg-radial-ring page-bg-radial-ring-2" />
-          <div className="page-bg-radial-ring page-bg-radial-ring-3" />
-        </>
-      ) : null}
-
-      {variant === 'sparkles' ? (
-        <>
-          <div className="page-bg-sparkle page-bg-sparkle-1" />
-          <div className="page-bg-sparkle page-bg-sparkle-2" />
-          <div className="page-bg-sparkle page-bg-sparkle-3" />
-          <div className="page-bg-sparkle page-bg-sparkle-4" />
-        </>
-      ) : null}
-
-      {variant === 'warning' ? (
-        <>
-          <div className="page-bg-warning-blob page-bg-warning-blob-1" />
-          <div className="page-bg-warning-blob page-bg-warning-blob-2" />
-          <div className="page-bg-warning-blob page-bg-warning-blob-3" />
-        </>
-      ) : null}
-
-      {variant === 'orbit' ? (
-        <>
-          <div className="page-bg-orbit-ring page-bg-orbit-ring-1" />
-          <div className="page-bg-orbit-ring page-bg-orbit-ring-2" />
-          <div className="page-bg-orbit-core" />
-        </>
-      ) : null}
-
-      {variant === 'flow' ? (
-        <>
-          <div className="page-bg-flow-wave page-bg-flow-wave-1" />
-          <div className="page-bg-flow-wave page-bg-flow-wave-2" />
-        </>
-      ) : null}
+      {variant === 'flow' && <div className="page-bg-wave" />}
     </div>
   )
 }

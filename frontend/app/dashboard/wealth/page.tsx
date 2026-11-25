@@ -42,6 +42,8 @@ import WealthItemCard, { WealthItem, WealthCategory } from '@/components/wealth/
 import WealthModal from '@/components/wealth/WealthModal'
 import QuickAdjustModal from '@/components/wealth/QuickAdjustModal'
 import ConfettiEffect from '@/components/goals/ConfettiEffect'
+import PageHeader from '@/components/ui/PageHeader'
+import LoadingScreen from '@/components/ui/LoadingScreen'
 
 const QUICK_STARTERS: Record<
   WealthCategory,
@@ -276,14 +278,7 @@ export default function WealthPage() {
   }, [activeTab, savings, debts, assets, liabilities, searchQuery, filterHighValue, filterHighAprOnly, sortBy])
 
   if (loading || !user) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-950">
-        <div className="flex flex-col items-center gap-3">
-          <div className="animate-spin h-10 w-10 border-4 border-primary-500 border-t-transparent rounded-full" />
-          <p className="text-xs font-mono text-slate-400 tracking-wider">LOADING WEALTH SUITE...</p>
-        </div>
-      </div>
-    )
+    return <LoadingScreen label="Loading wealth suite..." />
   }
 
   return (
@@ -291,157 +286,191 @@ export default function WealthPage() {
       <PageBackground variant="flow" />
       <ConfettiEffect trigger={confettiTrigger} onComplete={() => setConfettiTrigger(false)} />
 
-      <div className="relative z-10 max-w-7xl mx-auto space-y-8 pb-16 px-2 sm:px-4 md:px-6">
+      <div className="relative z-10 space-y-6 lg:space-y-8">
         {/* ================= HERO HEADER ================= */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-5 border-b border-slate-800/80 pb-6">
-          <div className="space-y-1">
-            <div className="flex items-center gap-3">
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-500/25 via-teal-500/15 to-cyan-500/25 border border-emerald-500/40 shadow-xl shadow-emerald-500/10">
-                <PiggyBank className="h-6 w-6 text-emerald-400" />
-              </div>
-              <div>
-                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-slate-50 flex items-center gap-2.5">
-                  Savings, Debts & Wealth
-                  <span className="hidden sm:inline-flex items-center gap-1.5 rounded-full bg-emerald-500/15 px-3 py-1 text-xs font-bold text-emerald-300 border border-emerald-500/30">
-                    <Sparkles className="h-3.5 w-3.5" /> Live Matrix
-                  </span>
-                </h1>
-                <p className="text-xs sm:text-sm text-slate-400 mt-1">
-                  Manage cash buffers, optimize liability payoffs, and track compound growth
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-3">
+        <PageHeader
+          eyebrow="Live Matrix"
+          eyebrowIcon={PiggyBank}
+          eyebrowTone="brand"
+          title={
+            <>
+              Savings, Debts & <span className="text-gradient">Wealth</span>
+            </>
+          }
+          description="Manage cash buffers, optimize liability payoffs, and track compound growth"
+          actions={
             <button
               onClick={() => handleOpenAdd(activeTab)}
-              className="flex items-center gap-2 rounded-2xl bg-gradient-to-r from-emerald-400 via-primary-500 to-teal-400 px-5 py-3 text-sm font-bold text-slate-950 shadow-xl shadow-emerald-500/25 transition-all duration-300 hover:scale-105 active:scale-95"
+              className="btn-primary btn-lg w-full sm:w-auto"
             >
-              <Plus className="h-4 w-4 stroke-[3]" />
+              <Plus className="h-4 w-4 stroke-[2.6]" />
               <span>Add {getSingularLabel(activeTab)}</span>
             </button>
-          </div>
-        </div>
+          }
+        />
 
         {/* ================= SUMMARY STAT CARDS GRID ================= */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+        <div
+          className="grid grid-cols-1 gap-4 animate-fade-up sm:grid-cols-2 sm:gap-5 xl:grid-cols-4"
+          style={{ animationDelay: '80ms' }}
+        >
           {/* Total Liquid Savings */}
           <div
             onClick={() => handleTabChange('savings')}
-            className={`group cursor-pointer relative overflow-hidden rounded-3xl border p-5 sm:p-6 shadow-xl backdrop-blur-xl transition-all duration-300 stage-card-lift ${
-              activeTab === 'savings'
-                ? 'border-emerald-500/60 bg-gradient-to-br from-emerald-950/50 via-slate-900/95 to-slate-950/95 ring-2 ring-emerald-500/30 shadow-emerald-500/10'
-                : 'border-emerald-500/20 bg-slate-900/80 hover:border-emerald-500/40'
+            className={`card card-spotlight stage-card-lift group relative cursor-pointer overflow-hidden p-5 sm:p-6 ${
+              activeTab === 'savings' ? 'border-emerald-400/35 ring-1 ring-emerald-400/20' : ''
             }`}
           >
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Liquid Savings</span>
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-500/15 border border-emerald-500/30 group-hover:scale-110 transition">
-                <PiggyBank className="h-4.5 w-4.5 text-emerald-400" />
+            <div
+              aria-hidden="true"
+              className={`pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-emerald-400/80 to-transparent transition-opacity duration-300 ${
+                activeTab === 'savings' ? 'opacity-100' : 'opacity-0'
+              }`}
+            />
+            <div className="relative z-10">
+              <div className="mb-4 flex items-center justify-between gap-3">
+                <span className="eyebrow truncate">Liquid Savings</span>
+                <span className="icon-tile icon-tile-sm icon-tile-emerald">
+                  <PiggyBank className="h-4 w-4" />
+                </span>
               </div>
-            </div>
-            <p className="text-2xl sm:text-3xl font-black font-mono tracking-tight text-emerald-400">
-              ₹{formatINR(totalSavings)}
-            </p>
-            <div className="flex items-center justify-between mt-4 text-xs text-slate-400 border-t border-slate-800/90 pt-3">
-              <span>{savings.length} Active Accounts</span>
-              <span className="text-emerald-400 font-bold flex items-center gap-1">
-                <ShieldCheck className="h-3.5 w-3.5" /> Emergency Shield
-              </span>
+              <p className="kpi-value break-words text-2xl text-emerald-300 2xl:text-[1.75rem]">
+                ₹{formatINR(totalSavings)}
+              </p>
+              <div className="mt-4 flex items-center justify-between gap-2 border-t border-white/[0.06] pt-3 text-xs text-slate-400">
+                <span className="num min-w-0 truncate">{savings.length} Active Accounts</span>
+                <span className="flex shrink-0 items-center gap-1 font-semibold text-emerald-300">
+                  <ShieldCheck className="h-3.5 w-3.5" /> Emergency Shield
+                </span>
+              </div>
             </div>
           </div>
 
           {/* Total Outstanding Debts */}
           <div
             onClick={() => handleTabChange('debts')}
-            className={`group cursor-pointer relative overflow-hidden rounded-3xl border p-5 sm:p-6 shadow-xl backdrop-blur-xl transition-all duration-300 stage-card-lift ${
-              activeTab === 'debts'
-                ? 'border-rose-500/60 bg-gradient-to-br from-rose-950/50 via-slate-900/95 to-slate-950/95 ring-2 ring-rose-500/30 shadow-rose-500/10'
-                : 'border-rose-500/20 bg-slate-900/80 hover:border-rose-500/40'
+            className={`card card-spotlight stage-card-lift group relative cursor-pointer overflow-hidden p-5 sm:p-6 ${
+              activeTab === 'debts' ? 'border-rose-400/35 ring-1 ring-rose-400/20' : ''
             }`}
           >
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Debts</span>
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-rose-500/15 border border-rose-500/30 group-hover:scale-110 transition">
-                <AlertCircle className="h-4.5 w-4.5 text-rose-400" />
+            <div
+              aria-hidden="true"
+              className={`pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-rose-400/80 to-transparent transition-opacity duration-300 ${
+                activeTab === 'debts' ? 'opacity-100' : 'opacity-0'
+              }`}
+            />
+            <div className="relative z-10">
+              <div className="mb-4 flex items-center justify-between gap-3">
+                <span className="eyebrow truncate">Total Debts</span>
+                <span className="icon-tile icon-tile-sm icon-tile-rose">
+                  <AlertCircle className="h-4 w-4" />
+                </span>
               </div>
-            </div>
-            <p className="text-2xl sm:text-3xl font-black font-mono tracking-tight text-rose-400">
-              ₹{formatINR(totalDebts)}
-            </p>
-            <div className="flex items-center justify-between mt-4 text-xs text-slate-400 border-t border-slate-800/90 pt-3">
-              <span>{debts.length} Active Debts</span>
-              <span className="text-rose-400 font-bold">Avg {averageDebtApr}% APR</span>
+              <p className="kpi-value break-words text-2xl text-rose-300 2xl:text-[1.75rem]">
+                ₹{formatINR(totalDebts)}
+              </p>
+              <div className="mt-4 flex items-center justify-between gap-2 border-t border-white/[0.06] pt-3 text-xs text-slate-400">
+                <span className="num min-w-0 truncate">{debts.length} Active Debts</span>
+                <span className="num shrink-0 font-semibold text-rose-300">Avg {averageDebtApr}% APR</span>
+              </div>
             </div>
           </div>
 
           {/* Total Invested Assets */}
           <div
             onClick={() => handleTabChange('assets')}
-            className={`group cursor-pointer relative overflow-hidden rounded-3xl border p-5 sm:p-6 shadow-xl backdrop-blur-xl transition-all duration-300 stage-card-lift ${
-              activeTab === 'assets'
-                ? 'border-cyan-500/60 bg-gradient-to-br from-cyan-950/50 via-slate-900/95 to-slate-950/95 ring-2 ring-cyan-500/30 shadow-cyan-500/10'
-                : 'border-cyan-500/20 bg-slate-900/80 hover:border-cyan-500/40'
+            className={`card card-spotlight stage-card-lift group relative cursor-pointer overflow-hidden p-5 sm:p-6 ${
+              activeTab === 'assets' ? 'border-cyan-400/35 ring-1 ring-cyan-400/20' : ''
             }`}
           >
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Invested Assets</span>
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-cyan-500/15 border border-cyan-500/30 group-hover:scale-110 transition">
-                <TrendingUp className="h-4.5 w-4.5 text-cyan-400" />
+            <div
+              aria-hidden="true"
+              className={`pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-cyan-400/80 to-transparent transition-opacity duration-300 ${
+                activeTab === 'assets' ? 'opacity-100' : 'opacity-0'
+              }`}
+            />
+            <div className="relative z-10">
+              <div className="mb-4 flex items-center justify-between gap-3">
+                <span className="eyebrow truncate">Invested Assets</span>
+                <span className="icon-tile icon-tile-sm icon-tile-cyan">
+                  <TrendingUp className="h-4 w-4" />
+                </span>
               </div>
-            </div>
-            <p className="text-2xl sm:text-3xl font-black font-mono tracking-tight text-cyan-300">
-              ₹{formatINR(totalAssets)}
-            </p>
-            <div className="flex items-center justify-between mt-4 text-xs text-slate-400 border-t border-slate-800/90 pt-3">
-              <span>{assets.length} Holdings</span>
-              <span className="text-cyan-400 font-bold">Growth Engine</span>
+              <p className="kpi-value break-words text-2xl text-cyan-200 2xl:text-[1.75rem]">
+                ₹{formatINR(totalAssets)}
+              </p>
+              <div className="mt-4 flex items-center justify-between gap-2 border-t border-white/[0.06] pt-3 text-xs text-slate-400">
+                <span className="num min-w-0 truncate">{assets.length} Holdings</span>
+                <span className="shrink-0 font-semibold text-cyan-300">Growth Engine</span>
+              </div>
             </div>
           </div>
 
           {/* Net Solvency Balance */}
           <div
             onClick={() => handleTabChange('liabilities')}
-            className={`group cursor-pointer relative overflow-hidden rounded-3xl border p-5 sm:p-6 shadow-xl backdrop-blur-xl transition-all duration-300 stage-card-lift ${
-              activeTab === 'liabilities'
-                ? 'border-indigo-500/60 bg-gradient-to-br from-indigo-950/50 via-slate-900/95 to-slate-950/95 ring-2 ring-indigo-500/30 shadow-indigo-500/10'
-                : 'border-indigo-500/20 bg-slate-900/80 hover:border-indigo-500/40'
+            className={`card card-spotlight stage-card-lift group relative cursor-pointer overflow-hidden p-5 sm:p-6 ${
+              activeTab === 'liabilities' ? 'border-primary-400/40 ring-1 ring-primary-400/25' : ''
             }`}
           >
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Net Solvency</span>
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-500/15 border border-indigo-500/30 group-hover:scale-110 transition">
-                <Coins className="h-4.5 w-4.5 text-indigo-400" />
+            <div
+              aria-hidden="true"
+              className={`pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary-300/80 to-transparent transition-opacity duration-300 ${
+                activeTab === 'liabilities' ? 'opacity-100' : 'opacity-0'
+              }`}
+            />
+            <div className="relative z-10">
+              <div className="mb-4 flex items-center justify-between gap-3">
+                <span className="eyebrow truncate">Net Solvency</span>
+                <span className="icon-tile icon-tile-sm icon-tile-brand">
+                  <Coins className="h-4 w-4" />
+                </span>
               </div>
-            </div>
-            <p className={`text-2xl sm:text-3xl font-black font-mono tracking-tight ${netWorth >= 0 ? 'text-indigo-300' : 'text-rose-400'}`}>
-              ₹{formatINR(netWorth)}
-            </p>
-            <div className="flex items-center justify-between mt-4 text-xs text-slate-400 border-t border-slate-800/90 pt-3">
-              <span>Liabilities: ₹{formatINR(totalLiabilities)}</span>
-              <span className={`font-bold uppercase ${netWorth >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
-                {netWorth >= 0 ? 'Surplus' : 'Deficit'}
-              </span>
+              <p
+                className={`kpi-value break-words text-2xl 2xl:text-[1.75rem] ${
+                  netWorth >= 0 ? 'text-gradient' : 'text-rose-300'
+                }`}
+              >
+                ₹{formatINR(netWorth)}
+              </p>
+              <div className="mt-4 flex items-center justify-between gap-2 border-t border-white/[0.06] pt-3 text-xs text-slate-400">
+                <span className="num min-w-0 truncate">Liabilities: ₹{formatINR(totalLiabilities)}</span>
+                <span
+                  className={`shrink-0 font-semibold uppercase tracking-wide ${
+                    netWorth >= 0 ? 'text-emerald-300' : 'text-rose-300'
+                  }`}
+                >
+                  {netWorth >= 0 ? 'Surplus' : 'Deficit'}
+                </span>
+              </div>
             </div>
           </div>
         </div>
 
         {/* ================= STAGE 1: FINANCIAL HEALTH ACCORDION ================= */}
-        <div className="space-y-3">
-          <div className="flex items-center justify-between px-1">
+        <section className="space-y-4">
+          <div className="flex items-center gap-4">
             <button
               onClick={() => setIsHealthStageExpanded(!isHealthStageExpanded)}
-              className="flex items-center gap-2 text-sm font-bold text-slate-200 hover:text-white transition group"
+              aria-expanded={isHealthStageExpanded}
+              className="group flex min-w-0 items-center gap-3 rounded-xl text-left"
             >
-              <div className="flex h-6 w-6 items-center justify-center rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 group-hover:scale-110 transition">
-                {isHealthStageExpanded ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
-              </div>
-              <span>Financial Health & Solvency Diagnostic</span>
-              <span className="text-xs font-normal text-slate-400">
-                ({isHealthStageExpanded ? 'Click to collapse' : 'Click to expand'})
+              <span className="icon-tile icon-tile-sm icon-tile-brand">
+                {isHealthStageExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+              </span>
+              <span className="min-w-0">
+                <span className="block font-display text-[15px] font-semibold tracking-tight text-slate-100 transition-colors group-hover:text-white sm:text-base">
+                  Financial Health & Solvency Diagnostic
+                </span>
+                <span className="block text-xs text-slate-500 transition-colors group-hover:text-slate-400">
+                  {isHealthStageExpanded ? 'Click to collapse' : 'Click to expand'}
+                </span>
               </span>
             </button>
+            <div
+              aria-hidden="true"
+              className="hidden h-px flex-1 bg-gradient-to-r from-white/10 via-white/[0.04] to-transparent sm:block"
+            />
           </div>
 
           {isHealthStageExpanded && (
@@ -454,48 +483,53 @@ export default function WealthPage() {
               />
             </div>
           )}
-        </div>
+        </section>
 
         {/* ================= STAGE 2: INTERACTIVE SIMULATORS STAGE ================= */}
-        <div className="space-y-3">
-          <div className="flex flex-wrap items-center justify-between gap-3 px-1">
+        <section className="space-y-4">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <button
               onClick={() => setIsSimulatorStageExpanded(!isSimulatorStageExpanded)}
-              className="flex items-center gap-2 text-sm font-bold text-slate-200 hover:text-white transition group"
+              aria-expanded={isSimulatorStageExpanded}
+              className="group flex min-w-0 items-center gap-3 rounded-xl text-left"
             >
-              <div className="flex h-6 w-6 items-center justify-center rounded-lg bg-primary-500/10 border border-primary-500/30 text-primary-400 group-hover:scale-110 transition">
-                {isSimulatorStageExpanded ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
-              </div>
-              <span>Interactive Simulators & Payoff Engines</span>
-              <span className="text-xs font-normal text-slate-400">
-                ({isSimulatorStageExpanded ? 'Click to collapse' : 'Click to expand'})
+              <span className="icon-tile icon-tile-sm icon-tile-violet">
+                {isSimulatorStageExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+              </span>
+              <span className="min-w-0">
+                <span className="block font-display text-[15px] font-semibold tracking-tight text-slate-100 transition-colors group-hover:text-white sm:text-base">
+                  Interactive Simulators & Payoff Engines
+                </span>
+                <span className="block text-xs text-slate-500 transition-colors group-hover:text-slate-400">
+                  {isSimulatorStageExpanded ? 'Click to collapse' : 'Click to expand'}
+                </span>
               </span>
             </button>
 
             {isSimulatorStageExpanded && (
-              <div className="flex items-center gap-1.5 rounded-2xl bg-slate-900/90 p-1.5 border border-slate-700/80 shadow-lg">
-                <button
-                  onClick={() => setSimulatorMode('debt')}
-                  className={`flex items-center gap-2 rounded-xl px-3.5 py-1.5 text-xs font-bold transition-all duration-300 ${
-                    simulatorMode === 'debt'
-                      ? 'bg-gradient-to-r from-primary-500 to-emerald-400 text-slate-950 shadow-md font-black'
-                      : 'text-slate-400 hover:text-slate-200'
-                  }`}
-                >
-                  <TrendingDown className="h-3.5 w-3.5" />
-                  Debt Payoff Accelerator
-                </button>
-                <button
-                  onClick={() => setSimulatorMode('savings')}
-                  className={`flex items-center gap-2 rounded-xl px-3.5 py-1.5 text-xs font-bold transition-all duration-300 ${
-                    simulatorMode === 'savings'
-                      ? 'bg-gradient-to-r from-primary-500 to-emerald-400 text-slate-950 shadow-md font-black'
-                      : 'text-slate-400 hover:text-slate-200'
-                  }`}
-                >
-                  <TrendingUp className="h-3.5 w-3.5" />
-                  Compounding SIP Engine
-                </button>
+              <div className="scroll-thin max-w-full overflow-x-auto">
+                <div className="segmented">
+                  <button
+                    onClick={() => setSimulatorMode('debt')}
+                    aria-pressed={simulatorMode === 'debt'}
+                    className={`segmented-item px-3.5 py-2 ${
+                      simulatorMode === 'debt' ? 'segmented-item-active' : ''
+                    }`}
+                  >
+                    <TrendingDown className="h-3.5 w-3.5" />
+                    Debt Payoff Accelerator
+                  </button>
+                  <button
+                    onClick={() => setSimulatorMode('savings')}
+                    aria-pressed={simulatorMode === 'savings'}
+                    className={`segmented-item px-3.5 py-2 ${
+                      simulatorMode === 'savings' ? 'segmented-item-active' : ''
+                    }`}
+                  >
+                    <TrendingUp className="h-3.5 w-3.5" />
+                    Compounding SIP Engine
+                  </button>
+                </div>
               </div>
             )}
           </div>
@@ -509,199 +543,231 @@ export default function WealthPage() {
               )}
             </div>
           )}
-        </div>
+        </section>
 
-        {/* ================= MAIN BALANCE SHEET WORKSPACE (MODERN GLASS SUITE) ================= */}
-        <div className="relative overflow-hidden rounded-3xl border border-slate-700/80 bg-gradient-to-br from-slate-900/95 via-slate-900/85 to-slate-950/95 p-6 sm:p-8 shadow-2xl backdrop-blur-xl">
-          {/* Subtle Ambient Glow */}
-          <div className="pointer-events-none absolute -right-24 -top-24 h-64 w-64 rounded-full bg-primary-500/10 blur-3xl" />
+        {/* ================= MAIN BALANCE SHEET WORKSPACE (LEDGER BOOK) ================= */}
+        <section className="ledger-perspective">
+          <div className="ledger-book-shell anim-book-expand p-5 pl-6 sm:p-6 sm:pl-8 lg:p-8 lg:pl-10">
+            <div className="ledger-spine" aria-hidden="true" />
+            {/* Subtle Ambient Glow */}
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute -right-24 -top-24 h-64 w-64 rounded-full bg-primary-500/10 blur-3xl"
+            />
 
-          {/* Top Segmented Tabs Bar */}
-          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-5 border-b border-slate-800/90 pb-6">
-            <div className="grid grid-cols-2 sm:flex sm:items-center gap-2.5">
-              {[
-                { id: 'savings' as WealthCategory, label: 'Savings Accounts', icon: PiggyBank, count: savings.length, total: totalSavings, color: 'text-emerald-400', activeStyle: 'bg-emerald-500/15 border-emerald-500/50 text-emerald-300 ring-2 ring-emerald-500/20 shadow-lg shadow-emerald-500/5' },
-                { id: 'debts' as WealthCategory, label: 'Debts & Loans', icon: AlertCircle, count: debts.length, total: totalDebts, color: 'text-rose-400', activeStyle: 'bg-rose-500/15 border-rose-500/50 text-rose-300 ring-2 ring-rose-500/20 shadow-lg shadow-rose-500/5' },
-                { id: 'assets' as WealthCategory, label: 'Investments & Assets', icon: TrendingUp, count: assets.length, total: totalAssets, color: 'text-cyan-400', activeStyle: 'bg-cyan-500/15 border-cyan-500/50 text-cyan-300 ring-2 ring-cyan-500/20 shadow-lg shadow-cyan-500/5' },
-                { id: 'liabilities' as WealthCategory, label: 'Other Liabilities', icon: Zap, count: liabilities.length, total: totalLiabilities, color: 'text-amber-400', activeStyle: 'bg-amber-500/15 border-amber-500/50 text-amber-300 ring-2 ring-amber-500/20 shadow-lg shadow-amber-500/5' },
-              ].map((tab) => {
-                const Icon = tab.icon
-                const isActive = activeTab === tab.id
-                return (
-                  <button
-                    key={tab.id}
-                    onClick={() => handleTabChange(tab.id)}
-                    className={`group flex items-center justify-between sm:justify-start gap-2.5 rounded-2xl px-4 py-3 text-xs font-bold transition-all duration-300 border ${
-                      isActive
-                        ? `${tab.activeStyle}`
-                        : 'border-slate-800/80 bg-slate-900/60 text-slate-400 hover:border-slate-700 hover:bg-slate-800/60 hover:text-slate-200'
-                    }`}
-                  >
-                    <div className="flex items-center gap-2">
-                      <Icon className={`h-4 w-4 ${isActive ? tab.color : 'text-slate-400 group-hover:text-slate-200'}`} />
-                      <span>{tab.label}</span>
-                    </div>
-                    <span
-                      className={`rounded-full px-2 py-0.5 text-[10px] font-mono font-bold ${
-                        isActive ? 'bg-slate-900/90 text-slate-100 border border-slate-700' : 'bg-slate-800 text-slate-400'
+            {/* Top Segmented Tabs Bar */}
+            <div className="relative flex flex-col justify-between gap-5 border-b border-white/[0.06] pb-6 lg:flex-row lg:items-center">
+              <div className="grid grid-cols-2 gap-2.5 sm:flex sm:flex-wrap sm:items-center">
+                {[
+                  { id: 'savings' as WealthCategory, label: 'Savings Accounts', icon: PiggyBank, count: savings.length, total: totalSavings, color: 'text-emerald-300', activeStyle: 'border-primary-400/40 bg-primary-500/[0.14] text-white shadow-[0_10px_28px_-14px_rgba(112,104,244,0.8)]' },
+                  { id: 'debts' as WealthCategory, label: 'Debts & Loans', icon: AlertCircle, count: debts.length, total: totalDebts, color: 'text-rose-300', activeStyle: 'border-primary-400/40 bg-primary-500/[0.14] text-white shadow-[0_10px_28px_-14px_rgba(112,104,244,0.8)]' },
+                  { id: 'assets' as WealthCategory, label: 'Investments & Assets', icon: TrendingUp, count: assets.length, total: totalAssets, color: 'text-cyan-300', activeStyle: 'border-primary-400/40 bg-primary-500/[0.14] text-white shadow-[0_10px_28px_-14px_rgba(112,104,244,0.8)]' },
+                  { id: 'liabilities' as WealthCategory, label: 'Other Liabilities', icon: Zap, count: liabilities.length, total: totalLiabilities, color: 'text-amber-300', activeStyle: 'border-primary-400/40 bg-primary-500/[0.14] text-white shadow-[0_10px_28px_-14px_rgba(112,104,244,0.8)]' },
+                ].map((tab) => {
+                  const Icon = tab.icon
+                  const isActive = activeTab === tab.id
+                  return (
+                    <button
+                      key={tab.id}
+                      onClick={() => handleTabChange(tab.id)}
+                      aria-pressed={isActive}
+                      className={`bookmark-tab group flex min-h-[40px] min-w-0 items-center justify-between gap-2.5 rounded-xl border px-3.5 py-2.5 text-xs font-semibold sm:justify-start ${
+                        isActive
+                          ? `active-bookmark ${tab.activeStyle}`
+                          : 'border-white/[0.06] bg-white/[0.025] text-slate-400 hover:border-white/[0.12] hover:bg-white/[0.05] hover:text-slate-200'
                       }`}
                     >
-                      {tab.count}
-                    </span>
-                  </button>
-                )
-              })}
-            </div>
-
-            <button
-              onClick={() => handleOpenAdd(activeTab)}
-              className="flex items-center justify-center gap-2 rounded-2xl bg-slate-800/90 px-4 py-2.5 text-xs font-bold text-primary-400 border border-primary-500/30 hover:bg-primary-500/15 hover:border-primary-500/50 transition shadow-sm self-start lg:self-auto"
-            >
-              <Plus className="h-4 w-4 stroke-[2.5]" />
-              <span>Add {getSingularLabel(activeTab)}</span>
-            </button>
-          </div>
-
-          {/* Search, Sort & Quick Filter Bar */}
-          <div className="mt-6 flex flex-wrap items-center justify-between gap-3 bg-slate-950/60 p-3.5 rounded-2xl border border-slate-800/90">
-            {/* Search Input */}
-            <div className="relative flex-1 min-w-[220px]">
-              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
-              <input
-                type="text"
-                placeholder={`Search ${activeTab} by name or notes...`}
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full rounded-xl border border-slate-700/80 bg-slate-900/90 pl-10 pr-4 py-2 text-xs text-slate-100 placeholder-slate-500 focus:border-primary-500 focus:outline-none shadow-inner"
-              />
-            </div>
-
-            {/* Sort & Quick Filter Chips */}
-            <div className="flex items-center gap-2 flex-wrap">
-              <select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value as any)}
-                className="rounded-xl border border-slate-700/80 bg-slate-900/90 px-3.5 py-2 text-xs text-slate-200 focus:border-primary-500 focus:outline-none"
-              >
-                <option value="highest">Highest Amount</option>
-                <option value="lowest">Lowest Amount</option>
-                <option value="recent">Recently Added</option>
-                {activeTab === 'debts' && <option value="apr">Highest APR %</option>}
-              </select>
+                      <div className="flex min-w-0 items-center gap-2">
+                        <Icon
+                          className={`h-4 w-4 shrink-0 transition-colors ${
+                            isActive ? tab.color : 'text-slate-500 group-hover:text-slate-300'
+                          }`}
+                        />
+                        <span className="truncate">{tab.label}</span>
+                      </div>
+                      <span
+                        className={`num shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold ${
+                          isActive ? 'bg-white/10 text-white' : 'bg-white/[0.05] text-slate-400'
+                        }`}
+                      >
+                        {tab.count}
+                      </span>
+                    </button>
+                  )
+                })}
+              </div>
 
               <button
-                onClick={() => setFilterHighValue(!filterHighValue)}
-                className={`rounded-xl px-3 py-2 text-xs font-semibold border transition ${
-                  filterHighValue
-                    ? 'bg-primary-500/20 text-primary-300 border-primary-500/40 shadow-sm'
-                    : 'border-slate-700/80 bg-slate-900/80 text-slate-400 hover:text-slate-200'
-                }`}
+                onClick={() => handleOpenAdd(activeTab)}
+                className="btn-soft self-start lg:self-auto"
               >
-                ≥ ₹50,000
+                <Plus className="h-4 w-4 stroke-[2.5]" />
+                <span>Add {getSingularLabel(activeTab)}</span>
               </button>
+            </div>
 
-              {activeTab === 'debts' && (
+            {/* Search, Sort & Quick Filter Bar */}
+            <div className="surface-inset relative mt-6 flex flex-wrap items-center justify-between gap-3 p-3 sm:p-3.5">
+              {/* Search Input */}
+              <div className="relative min-w-[200px] flex-1">
+                <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
+                <input
+                  type="text"
+                  placeholder={`Search ${activeTab} by name or notes...`}
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  aria-label={`Search ${activeTab}`}
+                  className="input h-10 py-0 pl-10 text-sm sm:text-sm"
+                />
+              </div>
+
+              {/* Sort & Quick Filter Chips */}
+              <div className="flex flex-wrap items-center gap-2">
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value as any)}
+                  aria-label="Sort entries"
+                  className="input h-10 w-auto py-0 text-xs sm:text-[13px]"
+                >
+                  <option value="highest">Highest Amount</option>
+                  <option value="lowest">Lowest Amount</option>
+                  <option value="recent">Recently Added</option>
+                  {activeTab === 'debts' && <option value="apr">Highest APR %</option>}
+                </select>
+
                 <button
-                  onClick={() => setFilterHighAprOnly(!filterHighAprOnly)}
-                  className={`rounded-xl px-3 py-2 text-xs font-semibold border transition ${
-                    filterHighAprOnly
-                      ? 'bg-rose-500/20 text-rose-300 border-rose-500/40 font-bold shadow-sm'
-                      : 'border-slate-700/80 bg-slate-900/80 text-slate-400 hover:text-slate-200'
+                  onClick={() => setFilterHighValue(!filterHighValue)}
+                  aria-pressed={filterHighValue}
+                  className={`num inline-flex h-10 items-center rounded-xl border px-3.5 text-xs font-semibold transition-colors ${
+                    filterHighValue
+                      ? 'border-primary-400/45 bg-primary-500/15 text-primary-100 shadow-[0_6px_18px_-10px_rgba(112,104,244,0.8)]'
+                      : 'border-white/[0.08] bg-white/[0.03] text-slate-400 hover:border-white/[0.14] hover:text-slate-200'
                   }`}
                 >
-                  High APR (≥12%)
+                  ≥ ₹50,000
                 </button>
+
+                {activeTab === 'debts' && (
+                  <button
+                    onClick={() => setFilterHighAprOnly(!filterHighAprOnly)}
+                    aria-pressed={filterHighAprOnly}
+                    className={`num inline-flex h-10 items-center rounded-xl border px-3.5 text-xs font-semibold transition-colors ${
+                      filterHighAprOnly
+                        ? 'border-rose-400/45 bg-rose-500/15 text-rose-200 shadow-[0_6px_18px_-10px_rgba(244,63,94,0.8)]'
+                        : 'border-white/[0.08] bg-white/[0.03] text-slate-400 hover:border-white/[0.14] hover:text-slate-200'
+                    }`}
+                  >
+                    High APR (≥12%)
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* Cards Content Section */}
+            <div key={tabAnimKey} className="anim-page-shift-next relative mt-6">
+              {loadingData ? (
+                <div role="status" aria-live="polite" className="space-y-4">
+                  <div className="grid grid-cols-1 gap-4 sm:gap-5 xl:grid-cols-2">
+                    {[0, 1, 2, 3].map((slot) => (
+                      <div key={slot} className="skeleton h-40 rounded-[1.25rem]" />
+                    ))}
+                  </div>
+                  <p className="text-center text-xs text-slate-400">Syncing balance matrix...</p>
+                </div>
+              ) : activeItems.length === 0 ? (
+                /* High-Fidelity Empty State with 1-Click Starters */
+                <div className="rounded-2xl border border-dashed border-white/10 bg-white/[0.015] px-5 py-10 text-center sm:px-8 sm:py-12">
+                  <div className="relative mx-auto mb-5 w-fit">
+                    <div aria-hidden="true" className="absolute inset-0 rounded-2xl bg-primary-500/20 blur-xl" />
+                    <span
+                      className={`icon-tile icon-tile-lg relative ${
+                        activeTab === 'savings'
+                          ? 'icon-tile-emerald'
+                          : activeTab === 'debts'
+                          ? 'icon-tile-rose'
+                          : activeTab === 'assets'
+                          ? 'icon-tile-cyan'
+                          : 'icon-tile-amber'
+                      }`}
+                    >
+                      {activeTab === 'savings' ? (
+                        <PiggyBank className="h-6 w-6" />
+                      ) : activeTab === 'debts' ? (
+                        <AlertCircle className="h-6 w-6" />
+                      ) : activeTab === 'assets' ? (
+                        <TrendingUp className="h-6 w-6" />
+                      ) : (
+                        <Zap className="h-6 w-6" />
+                      )}
+                    </span>
+                  </div>
+
+                  <h4 className="text-balance break-words font-display text-lg font-semibold text-slate-50">
+                    {searchQuery
+                      ? `No ${activeTab} matching "${searchQuery}"`
+                      : `No ${activeTab === 'savings' ? 'Savings Accounts' : activeTab === 'debts' ? 'Debts or Loans' : activeTab === 'assets' ? 'Investments' : 'Liabilities'} Added Yet`}
+                  </h4>
+                  <p className="mx-auto mt-1.5 max-w-md text-sm leading-relaxed text-slate-400">
+                    {searchQuery
+                      ? 'Try adjusting your search query or removing active filters.'
+                      : 'Get started in 1-click by picking a popular preset below or create a custom entry:'}
+                  </p>
+
+                  {/* 1-Click Quick Starter Cards */}
+                  {!searchQuery && (
+                    <div className="mx-auto mt-6 grid max-w-2xl grid-cols-2 gap-3 sm:grid-cols-4">
+                      {QUICK_STARTERS[activeTab]?.map((starter) => {
+                        const Icon = starter.icon
+                        return (
+                          <button
+                            key={starter.label}
+                            onClick={() => {
+                              setActiveTab(activeTab)
+                              setEditingItem(null)
+                              setShowAddModal(true)
+                            }}
+                            className="surface-inset surface-inset-hover group flex flex-col items-center justify-center gap-2 p-3.5 text-center transition-[transform,border-color,background-color] duration-200 motion-safe:hover:-translate-y-0.5"
+                          >
+                            <span className="icon-tile icon-tile-sm">
+                              <Icon className="h-4 w-4" />
+                            </span>
+                            <span className="text-xs font-semibold text-slate-300 transition-colors group-hover:text-white">
+                              + {starter.label}
+                            </span>
+                          </button>
+                        )
+                      })}
+                    </div>
+                  )}
+
+                  <div className="mt-6">
+                    <button
+                      onClick={() => handleOpenAdd(activeTab)}
+                      className="btn-primary"
+                    >
+                      <Plus className="h-4 w-4 stroke-[2.6]" />
+                      Add Custom {getSingularLabel(activeTab)}
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 gap-4 sm:gap-5 xl:grid-cols-2">
+                  {activeItems.map((item, index) => (
+                    <WealthItemCard
+                      key={item.id}
+                      item={item}
+                      category={activeTab}
+                      index={index}
+                      onEdit={handleEdit}
+                      onDelete={handleDelete}
+                      onQuickAdjust={(it, cat) => setQuickAdjustItem({ item: it, category: cat })}
+                    />
+                  ))}
+                </div>
               )}
             </div>
           </div>
-
-          {/* Cards Content Section */}
-          <div key={tabAnimKey} className="mt-6 animate-fade-in">
-            {loadingData ? (
-              <div className="py-20 text-center">
-                <div className="animate-spin h-9 w-9 border-4 border-primary-500 border-t-transparent rounded-full mx-auto" />
-                <p className="text-xs text-slate-400 mt-3 font-mono">Syncing balance matrix...</p>
-              </div>
-            ) : activeItems.length === 0 ? (
-              /* High-Fidelity Empty State with 1-Click Starters */
-              <div className="py-12 px-6 text-center border border-dashed border-slate-800 rounded-3xl bg-slate-900/30">
-                <div className="flex h-16 w-16 items-center justify-center rounded-3xl bg-gradient-to-br from-slate-800 to-slate-900 mx-auto mb-4 border border-slate-700 shadow-xl">
-                  {activeTab === 'savings' ? (
-                    <PiggyBank className="h-8 w-8 text-emerald-400" />
-                  ) : activeTab === 'debts' ? (
-                    <AlertCircle className="h-8 w-8 text-rose-400" />
-                  ) : activeTab === 'assets' ? (
-                    <TrendingUp className="h-8 w-8 text-cyan-400" />
-                  ) : (
-                    <Zap className="h-8 w-8 text-amber-400" />
-                  )}
-                </div>
-
-                <h4 className="text-lg font-bold text-slate-100">
-                  {searchQuery
-                    ? `No ${activeTab} matching "${searchQuery}"`
-                    : `No ${activeTab === 'savings' ? 'Savings Accounts' : activeTab === 'debts' ? 'Debts or Loans' : activeTab === 'assets' ? 'Investments' : 'Liabilities'} Added Yet`}
-                </h4>
-                <p className="text-xs text-slate-400 mt-1 max-w-md mx-auto leading-relaxed">
-                  {searchQuery
-                    ? 'Try adjusting your search query or removing active filters.'
-                    : 'Get started in 1-click by picking a popular preset below or create a custom entry:'}
-                </p>
-
-                {/* 1-Click Quick Starter Cards */}
-                {!searchQuery && (
-                  <div className="mt-6 max-w-2xl mx-auto grid grid-cols-2 sm:grid-cols-4 gap-3">
-                    {QUICK_STARTERS[activeTab]?.map((starter) => {
-                      const Icon = starter.icon
-                      return (
-                        <button
-                          key={starter.label}
-                          onClick={() => {
-                            setActiveTab(activeTab)
-                            setEditingItem(null)
-                            setShowAddModal(true)
-                          }}
-                          className="group flex flex-col items-center justify-center rounded-2xl border border-slate-800/80 bg-slate-900/70 p-3.5 text-center transition hover:-translate-y-1 hover:border-primary-500/50 hover:bg-slate-850 hover:shadow-lg shadow-sm"
-                        >
-                          <div className="mb-2 flex h-9 w-9 items-center justify-center rounded-xl bg-slate-800 text-slate-300 group-hover:bg-primary-500/20 group-hover:text-primary-300 transition">
-                            <Icon className="h-4.5 w-4.5" />
-                          </div>
-                          <span className="text-xs font-semibold text-slate-200 group-hover:text-white transition">
-                            + {starter.label}
-                          </span>
-                        </button>
-                      )
-                    })}
-                  </div>
-                )}
-
-                <div className="mt-6">
-                  <button
-                    onClick={() => handleOpenAdd(activeTab)}
-                    className="inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-primary-500 to-emerald-400 px-6 py-3 text-xs font-black text-slate-950 shadow-xl shadow-primary-500/20 transition hover:scale-105 active:scale-95"
-                  >
-                    <Plus className="h-4 w-4 stroke-[3]" />
-                    Add Custom {getSingularLabel(activeTab)}
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                {activeItems.map((item, index) => (
-                  <WealthItemCard
-                    key={item.id}
-                    item={item}
-                    category={activeTab}
-                    index={index}
-                    onEdit={handleEdit}
-                    onDelete={handleDelete}
-                    onQuickAdjust={(it, cat) => setQuickAdjustItem({ item: it, category: cat })}
-                  />
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
+        </section>
       </div>
 
       {/* ================= MODALS ================= */}

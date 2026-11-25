@@ -3,6 +3,8 @@
 import { useCountUp } from '@/hooks/useCountUp'
 import { formatINR } from '@/lib/formatters'
 import { compactINR, type BlendedProfile } from '@/lib/portfolioMath'
+import { chartColors } from '@/lib/chartTheme'
+import PageHeader from '@/components/ui/PageHeader'
 import {
   Activity,
   ArrowDownRight,
@@ -41,23 +43,27 @@ interface TileProps {
 
 function MetricTile({ label, value, sub, icon, accent, tone, delay, trend }: TileProps) {
   return (
-    <div className="pf-tile pf-rise p-4" style={{ animationDelay: `${delay}ms` }}>
+    <div className="pf-tile pf-rise min-w-0 p-4 sm:p-5" style={{ animationDelay: `${delay}ms` }}>
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">{label}</p>
-          <p className={`mt-1.5 truncate text-xl font-extrabold ${tone}`}>{value}</p>
+          <p className="eyebrow truncate">{label}</p>
+          <p className={`kpi-value mt-2 truncate text-xl sm:text-2xl ${tone}`}>{value}</p>
         </div>
-        <div
-          className="icon-morph-container flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border"
-          style={{ borderColor: `${accent}40`, backgroundColor: `${accent}1a`, color: accent }}
+        <span
+          className="icon-morph-container flex h-9 w-9 shrink-0 items-center justify-center rounded-xl"
+          style={{
+            color: accent,
+            background: `radial-gradient(120% 120% at 30% 0%, rgba(255,255,255,0.1), transparent 60%), linear-gradient(145deg, ${accent}40, ${accent}10)`,
+            boxShadow: `inset 0 0 0 1px ${accent}4d, inset 0 1px 0 0 rgba(255,255,255,0.1), 0 8px 20px -10px ${accent}99`,
+          }}
         >
           {icon}
-        </div>
+        </span>
       </div>
 
-      <p className="mt-2 flex items-center gap-1 text-[11px] leading-relaxed text-slate-400">
-        {trend === 'up' && <ArrowUpRight className="h-3 w-3 shrink-0 text-primary-400" />}
-        {trend === 'down' && <ArrowDownRight className="h-3 w-3 shrink-0 text-danger-400" />}
+      <p className="mt-3 flex items-center gap-1 text-xs leading-relaxed text-slate-400">
+        {trend === 'up' && <ArrowUpRight className="h-3.5 w-3.5 shrink-0 text-emerald-400" />}
+        {trend === 'down' && <ArrowDownRight className="h-3.5 w-3.5 shrink-0 text-rose-400" />}
         <span className="truncate">{sub}</span>
       </p>
 
@@ -84,69 +90,58 @@ export default function PortfolioHero({
 
   const riskTone =
     profile.riskLevel === 'Aggressive'
-      ? 'text-amber-300'
+      ? 'badge-warning'
       : profile.riskLevel === 'Conservative'
-        ? 'text-sky-300'
-        : 'text-primary-300'
+        ? 'badge-info'
+        : 'badge-brand'
 
   const investedShare = totalValue > 0 ? Math.round((investedValue / totalValue) * 100) : 0
   const liquidShare = totalValue > 0 ? Math.round((liquidValue / totalValue) * 100) : 0
 
   return (
-    <section className="pf-hero pf-rise p-5 sm:p-7">
+    <section className="pf-hero pf-rise p-5 sm:p-7 lg:p-8">
       {/* ---------- Title row ---------- */}
-      <div className="flex flex-wrap items-start justify-between gap-4">
-        <div className="min-w-0">
-          <div className="flex items-center gap-2.5">
+      <PageHeader
+        eyebrow={
+          <>
             <span className="live-beacon">
-              <span className="relative h-2 w-2 rounded-full bg-primary-400" />
+              <span className="relative h-1.5 w-1.5 rounded-full bg-emerald-400" />
             </span>
-            <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-primary-300/90">
-              Live Portfolio Intelligence
-            </span>
-          </div>
+            Live Portfolio Intelligence
+          </>
+        }
+        title={<span className="pf-aurora-text">Portfolio Analysis</span>}
+        description="Allocation, risk and Monte Carlo projections computed from your own holdings, savings and cash flow."
+        actions={
+          <button onClick={onRefresh} disabled={refreshing} className="btn-secondary">
+            <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin text-primary-300' : ''}`} />
+            {refreshing ? 'Syncing' : 'Refresh'}
+          </button>
+        }
+      />
 
-          <h1 className="pf-aurora-text mt-2 text-3xl font-extrabold tracking-tight sm:text-4xl">
-            Portfolio Analysis
-          </h1>
-
-          <p className="mt-1.5 max-w-xl text-sm text-slate-400">
-            Allocation, risk and Monte Carlo projections computed from your own holdings, savings and cash flow.
-          </p>
-        </div>
-
-        <button
-          onClick={onRefresh}
-          disabled={refreshing}
-          className="pf-chip flex items-center gap-2 px-3.5 py-2 text-xs font-semibold text-slate-300"
-        >
-          <RefreshCw className={`h-3.5 w-3.5 ${refreshing ? 'animate-spin text-primary-300' : ''}`} />
-          {refreshing ? 'Syncing' : 'Refresh'}
-        </button>
-      </div>
+      <div className="divider mt-6 sm:mt-7" />
 
       {/* ---------- Headline value ---------- */}
-      <div className="mt-6 flex flex-wrap items-end gap-x-6 gap-y-3">
-        <div>
-          <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">
-            Total Portfolio Value
-          </p>
-          <p className="metric-counter-glow mt-1 text-4xl font-extrabold text-slate-50 sm:text-5xl">
+      <div className="mt-6 flex flex-col gap-4 sm:mt-7 lg:flex-row lg:items-end lg:justify-between">
+        <div className="min-w-0">
+          <p className="eyebrow">Total Portfolio Value</p>
+          <p className="kpi-value metric-counter-glow mt-2 break-words text-[2.25rem] leading-none sm:text-5xl">
             ₹{formatINR(animatedTotal)}
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2 pb-2">
-          <span className="chip bg-primary-500/10 text-primary-300 ring-1 ring-primary-500/30">
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="badge badge-brand px-3 py-1">
             <Layers className="h-3.5 w-3.5" />
             {holdingsCount} holding{holdingsCount === 1 ? '' : 's'}
           </span>
-          <span className={`chip bg-slate-900/80 ring-1 ring-slate-700 ${riskTone}`}>
+          <span className={`badge px-3 py-1 ${riskTone}`}>
             <ShieldCheck className="h-3.5 w-3.5" />
             {profile.riskLevel} · {(profile.volatility * 100).toFixed(1)}% vol
           </span>
           {lastUpdated && (
-            <span className="chip bg-slate-900/60 text-slate-400 ring-1 ring-slate-800">
+            <span className="badge badge-neutral px-3 py-1">
               <Activity className="h-3.5 w-3.5" />
               Synced {lastUpdated.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}
             </span>
@@ -155,14 +150,14 @@ export default function PortfolioHero({
       </div>
 
       {/* ---------- Metric tiles ---------- */}
-      <div className="mt-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 xl:grid-cols-4">
         <MetricTile
           label="Invested Assets"
           value={compactINR(investedValue)}
           sub={`${investedShare}% of portfolio in equity, debt and gold`}
           icon={<Sparkles className="h-4 w-4" />}
-          accent="#0ea5e9"
-          tone="text-sky-300"
+          accent={chartColors.brand}
+          tone="text-primary-200"
           delay={60}
         />
         <MetricTile
@@ -170,8 +165,8 @@ export default function PortfolioHero({
           value={compactINR(liquidValue)}
           sub={`${liquidShare}% held as cash, deposits and savings`}
           icon={<Wallet className="h-4 w-4" />}
-          accent="#8b5cf6"
-          tone="text-purple-300"
+          accent={chartColors.cyan}
+          tone="text-cyan-300"
           delay={120}
         />
         <MetricTile
@@ -179,8 +174,8 @@ export default function PortfolioHero({
           value={`${animatedReturn.toFixed(1)}%`}
           sub={`Blended from your mix · ${profile.diversification}% diversified`}
           icon={<ArrowUpRight className="h-4 w-4" />}
-          accent="#10b981"
-          tone="text-primary-300"
+          accent={chartColors.violet}
+          tone="text-violet-300"
           delay={180}
         />
         <MetricTile
@@ -192,8 +187,8 @@ export default function PortfolioHero({
               : 'Add transactions to compute your surplus'
           }
           icon={<Activity className="h-4 w-4" />}
-          accent={monthlySurplus >= 0 ? '#34d399' : '#f87171'}
-          tone={monthlySurplus >= 0 ? 'text-emerald-300' : 'text-danger-300'}
+          accent={monthlySurplus >= 0 ? chartColors.positive : chartColors.negative}
+          tone={monthlySurplus >= 0 ? 'text-emerald-300' : 'text-rose-300'}
           delay={240}
           trend={cashflowMonths > 0 ? (monthlySurplus >= 0 ? 'up' : 'down') : null}
         />
