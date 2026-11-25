@@ -34,6 +34,9 @@ import TransactionStatsStrip from '@/components/transactions/TransactionStatsStr
 import TransactionItemCard, { TransactionItem } from '@/components/transactions/TransactionItemCard'
 import TransactionModal from '@/components/transactions/TransactionModal'
 import ConfettiEffect from '@/components/goals/ConfettiEffect'
+import PageHeader from '@/components/ui/PageHeader'
+import EmptyState from '@/components/ui/EmptyState'
+import LoadingScreen from '@/components/ui/LoadingScreen'
 
 type FilterType = 'all' | 'income' | 'expense' | 'large'
 
@@ -164,14 +167,7 @@ export default function TransactionsPage() {
   }, [transactions, searchQuery, activeFilter, sortBy])
 
   if (loading || !user) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-950">
-        <div className="flex flex-col items-center gap-3">
-          <div className="animate-spin h-10 w-10 border-4 border-primary-500 border-t-transparent rounded-full" />
-          <p className="text-xs font-mono text-slate-400 tracking-wider">SYNCING LIVE TRANSACTIONS...</p>
-        </div>
-      </div>
-    )
+    return <LoadingScreen label="Syncing live transactions..." />
   }
 
   return (
@@ -179,38 +175,34 @@ export default function TransactionsPage() {
       <PageBackground variant="flow" />
       <ConfettiEffect trigger={confettiTrigger} onComplete={() => setConfettiTrigger(false)} />
 
-      <div className="relative z-10 max-w-7xl mx-auto space-y-8 pb-16 px-2 sm:px-4 md:px-6">
+      <div className="relative z-10 space-y-6 lg:space-y-8">
         {/* ================= HEADER ================= */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-5 border-b border-slate-800/80 pb-6">
-          <div className="space-y-1">
-            <div className="flex items-center gap-3">
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-primary-500/25 via-emerald-500/15 to-teal-500/25 border border-primary-500/40 shadow-xl shadow-primary-500/10">
-                <Wallet className="h-6 w-6 text-primary-400" />
-              </div>
-              <div>
-                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-slate-50 flex items-center gap-2.5">
-                  Transactions & Cash Flow
-                  <span className="hidden sm:inline-flex items-center gap-1.5 rounded-full bg-emerald-500/15 px-3 py-1 text-xs font-bold text-emerald-300 border border-emerald-500/30">
-                    <span className="h-2 w-2 rounded-full bg-emerald-400 animate-ping" /> Live Feed
-                  </span>
-                </h1>
-                <p className="text-xs sm:text-sm text-slate-400 mt-1">
-                  Track dynamic cash velocity, categorized debits, and income events in real-time
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <button
-              onClick={handleOpenAdd}
-              className="flex items-center gap-2 rounded-2xl bg-gradient-to-r from-primary-500 via-emerald-400 to-teal-400 px-5 py-3 text-sm font-bold text-slate-950 shadow-xl shadow-primary-500/25 transition-all duration-300 hover:scale-105 active:scale-95"
-            >
-              <Plus className="h-4 w-4 stroke-[3]" />
+        <PageHeader
+          eyebrow="Cash Flow Ledger"
+          eyebrowIcon={Wallet}
+          eyebrowTone="brand"
+          meta={
+            <span className="badge badge-success">
+              <span className="relative flex h-2 w-2" aria-hidden="true">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-60" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
+              </span>
+              Live Feed
+            </span>
+          }
+          title={
+            <>
+              Transactions & <span className="text-gradient">Cash Flow</span>
+            </>
+          }
+          description="Track dynamic cash velocity, categorized debits, and income events in real-time"
+          actions={
+            <button onClick={handleOpenAdd} className="btn-primary h-11 w-full px-5 sm:w-auto">
+              <Plus className="h-4 w-4" strokeWidth={2.5} />
               <span>Record Transaction</span>
             </button>
-          </div>
-        </div>
+          }
+        />
 
         {/* ================= STATS VELOCITY STRIP ================= */}
         <TransactionStatsStrip
@@ -222,19 +214,27 @@ export default function TransactionsPage() {
         />
 
         {/* ================= STAGE ACCORDIONS (SPENDING ANALYTICS, INTELLIGENCE, BUDGETS) ================= */}
-        <div className="space-y-4">
+        <div className="space-y-3 sm:space-y-4">
           {/* Stage 1: Spending Analytics Studio */}
-          <div className="space-y-3">
+          <div className="space-y-3 sm:space-y-4">
             <button
               onClick={() => setShowAnalyticsStage(!showAnalyticsStage)}
-              className="flex items-center gap-2 text-sm font-bold text-slate-200 hover:text-white transition group px-1"
+              aria-expanded={showAnalyticsStage}
+              className="group surface-inset surface-inset-hover flex w-full items-center gap-3 px-3.5 py-3 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-400/70 sm:px-4"
             >
-              <div className="flex h-6 w-6 items-center justify-center rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 group-hover:scale-110 transition">
-                {showAnalyticsStage ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
-              </div>
-              <span>Spending Analytics & Outflow Velocity Studio</span>
-              <span className="text-xs font-normal text-slate-400">
-                ({showAnalyticsStage ? 'Click to collapse' : 'Click to expand'})
+              <span className="icon-tile icon-tile-sm icon-tile-cyan">
+                <BarChart3 className="h-4 w-4" />
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="block text-sm font-semibold text-slate-100 transition-colors group-hover:text-white">
+                  Spending Analytics & Outflow Velocity Studio
+                </span>
+                <span className="block text-xs font-normal text-slate-500">
+                  ({showAnalyticsStage ? 'Click to collapse' : 'Click to expand'})
+                </span>
+              </span>
+              <span className="btn-icon h-8 w-8 rounded-lg">
+                {showAnalyticsStage ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
               </span>
             </button>
 
@@ -246,17 +246,25 @@ export default function TransactionsPage() {
           </div>
 
           {/* Stage 2: Neural Intelligence & Anomaly Radar */}
-          <div className="space-y-3">
+          <div className="space-y-3 sm:space-y-4">
             <button
               onClick={() => setShowIntelligenceStage(!showIntelligenceStage)}
-              className="flex items-center gap-2 text-sm font-bold text-slate-200 hover:text-white transition group px-1"
+              aria-expanded={showIntelligenceStage}
+              className="group surface-inset surface-inset-hover flex w-full items-center gap-3 px-3.5 py-3 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-400/70 sm:px-4"
             >
-              <div className="flex h-6 w-6 items-center justify-center rounded-lg bg-primary-500/10 border border-primary-500/30 text-primary-400 group-hover:scale-110 transition">
-                {showIntelligenceStage ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
-              </div>
-              <span>Neural Transaction Intelligence & Anomaly Radar</span>
-              <span className="text-xs font-normal text-slate-400">
-                ({showIntelligenceStage ? 'Click to collapse' : 'Click to expand'})
+              <span className="icon-tile icon-tile-sm icon-tile-violet">
+                <BrainCircuit className="h-4 w-4" />
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="block text-sm font-semibold text-slate-100 transition-colors group-hover:text-white">
+                  Neural Transaction Intelligence & Anomaly Radar
+                </span>
+                <span className="block text-xs font-normal text-slate-500">
+                  ({showIntelligenceStage ? 'Click to collapse' : 'Click to expand'})
+                </span>
+              </span>
+              <span className="btn-icon h-8 w-8 rounded-lg">
+                {showIntelligenceStage ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
               </span>
             </button>
 
@@ -268,17 +276,25 @@ export default function TransactionsPage() {
           </div>
 
           {/* Stage 3: Monthly Budget Guardrails */}
-          <div className="space-y-3">
+          <div className="space-y-3 sm:space-y-4">
             <button
               onClick={() => setShowBudgetsStage(!showBudgetsStage)}
-              className="flex items-center gap-2 text-sm font-bold text-slate-200 hover:text-white transition group px-1"
+              aria-expanded={showBudgetsStage}
+              className="group surface-inset surface-inset-hover flex w-full items-center gap-3 px-3.5 py-3 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-400/70 sm:px-4"
             >
-              <div className="flex h-6 w-6 items-center justify-center rounded-lg bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 group-hover:scale-110 transition">
-                {showBudgetsStage ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
-              </div>
-              <span>Monthly Budget Guardrails & Thresholds</span>
-              <span className="text-xs font-normal text-slate-400">
-                ({showBudgetsStage ? 'Click to collapse' : 'Click to expand'})
+              <span className="icon-tile icon-tile-sm">
+                <Layers className="h-4 w-4" />
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="block text-sm font-semibold text-slate-100 transition-colors group-hover:text-white">
+                  Monthly Budget Guardrails & Thresholds
+                </span>
+                <span className="block text-xs font-normal text-slate-500">
+                  ({showBudgetsStage ? 'Click to collapse' : 'Click to expand'})
+                </span>
+              </span>
+              <span className="btn-icon h-8 w-8 rounded-lg">
+                {showBudgetsStage ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
               </span>
             </button>
 
@@ -291,50 +307,59 @@ export default function TransactionsPage() {
         </div>
 
         {/* ================= MAIN LIVE TRANSACTIONS STREAM WORKSPACE ================= */}
-        <div className="relative overflow-hidden rounded-3xl border border-slate-700/80 bg-gradient-to-br from-slate-900/95 via-slate-900/85 to-slate-950/95 p-6 sm:p-8 shadow-2xl backdrop-blur-xl">
-          <div className="pointer-events-none absolute -right-24 -top-24 h-64 w-64 rounded-full bg-primary-500/10 blur-3xl" />
+        <section className="card card-pad relative overflow-hidden">
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute -right-24 -top-24 h-64 w-64 rounded-full bg-primary-500/10 blur-3xl"
+          />
 
           {/* Workspace Top Controls Header */}
-          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-slate-800/90 pb-6">
-            <div>
-              <h3 className="text-lg sm:text-xl font-black text-slate-50 flex items-center gap-2">
-                Live Transaction Stream
-                <span className="rounded-full bg-slate-800 px-2.5 py-0.5 text-xs font-mono font-bold text-slate-300 border border-slate-700">
-                  {filteredTransactions.length} Recorded
-                </span>
-              </h3>
-              <p className="text-xs text-slate-400 mt-0.5">
-                Real-time chronological timeline with automated classification
-              </p>
+          <div className="relative flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+            <div className="flex min-w-0 items-center gap-3">
+              <span className="icon-tile">
+                <Coins className="h-[18px] w-[18px]" />
+              </span>
+              <div className="min-w-0">
+                <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                  <h3 className="card-title">Live Transaction Stream</h3>
+                  <span className="badge badge-neutral num">
+                    {filteredTransactions.length} Recorded
+                  </span>
+                </div>
+                <p className="card-subtitle">
+                  Real-time chronological timeline with automated classification
+                </p>
+              </div>
             </div>
 
             {/* Quick Filter Buttons & View Mode Toggle */}
-            <div className="flex items-center gap-2.5 flex-wrap">
+            <div className="flex min-w-0 items-center gap-2">
               {/* Type Pills */}
-              <div className="flex items-center gap-1 rounded-2xl bg-slate-800/80 p-1 border border-slate-700/60">
-                {(['all', 'income', 'expense', 'large'] as const).map((filter) => (
-                  <button
-                    key={filter}
-                    onClick={() => setActiveFilter(filter)}
-                    className={`rounded-xl px-3 py-1.5 text-xs font-bold capitalize transition-all duration-300 ${
-                      activeFilter === filter
-                        ? 'bg-primary-500 text-slate-950 shadow-md font-black'
-                        : 'text-slate-400 hover:text-slate-200'
-                    }`}
-                  >
-                    {filter === 'large' ? 'Large (≥10k)' : filter}
-                  </button>
-                ))}
+              <div className="scroll-thin -mx-1 min-w-0 flex-1 overflow-x-auto px-1 py-0.5 lg:flex-none">
+                <div className="segmented" role="group" aria-label="Filter transactions by type">
+                  {(['all', 'income', 'expense', 'large'] as const).map((filter) => (
+                    <button
+                      key={filter}
+                      onClick={() => setActiveFilter(filter)}
+                      aria-pressed={activeFilter === filter}
+                      className={`segmented-item py-2 capitalize sm:py-1.5 ${
+                        activeFilter === filter ? 'segmented-item-active' : ''
+                      }`}
+                    >
+                      {filter === 'large' ? 'Large (≥10k)' : filter}
+                    </button>
+                  ))}
+                </div>
               </div>
 
               {/* View Mode Toggle */}
-              <div className="flex items-center gap-1 rounded-2xl bg-slate-800/80 p-1 border border-slate-700/60">
+              <div className="segmented shrink-0" role="group" aria-label="View mode">
                 <button
                   onClick={() => setViewMode('stream')}
-                  className={`rounded-xl p-1.5 transition ${
-                    viewMode === 'stream'
-                      ? 'bg-primary-500 text-slate-950 shadow-md'
-                      : 'text-slate-400 hover:text-white'
+                  aria-pressed={viewMode === 'stream'}
+                  aria-label="Card Stream View"
+                  className={`segmented-item px-2.5 py-2 sm:py-1.5 ${
+                    viewMode === 'stream' ? 'segmented-item-active' : ''
                   }`}
                   title="Card Stream View"
                 >
@@ -342,10 +367,10 @@ export default function TransactionsPage() {
                 </button>
                 <button
                   onClick={() => setViewMode('table')}
-                  className={`rounded-xl p-1.5 transition ${
-                    viewMode === 'table'
-                      ? 'bg-primary-500 text-slate-950 shadow-md'
-                      : 'text-slate-400 hover:text-white'
+                  aria-pressed={viewMode === 'table'}
+                  aria-label="Compact Table View"
+                  className={`segmented-item px-2.5 py-2 sm:py-1.5 ${
+                    viewMode === 'table' ? 'segmented-item-active' : ''
                   }`}
                   title="Compact Table View"
                 >
@@ -356,25 +381,27 @@ export default function TransactionsPage() {
           </div>
 
           {/* Search & Sort Bar */}
-          <div className="mt-5 flex flex-wrap items-center justify-between gap-3 bg-slate-950/60 p-3.5 rounded-2xl border border-slate-800/90">
+          <div className="relative mt-5 flex flex-col gap-2.5 sm:flex-row sm:items-center">
             {/* Search Input */}
-            <div className="relative flex-1 min-w-[220px]">
-              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
+            <div className="relative min-w-0 flex-1">
+              <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
               <input
                 type="text"
                 placeholder="Search by description or category..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full rounded-xl border border-slate-700/80 bg-slate-900/90 pl-10 pr-4 py-2 text-xs text-slate-100 placeholder-slate-500 focus:border-primary-500 focus:outline-none shadow-inner"
+                aria-label="Search transactions"
+                className="input pl-10"
               />
             </div>
 
             {/* Sort Dropdown */}
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 sm:w-52 sm:shrink-0">
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value as any)}
-                className="rounded-xl border border-slate-700/80 bg-slate-900/90 px-3.5 py-2 text-xs text-slate-200 focus:border-primary-500 focus:outline-none"
+                aria-label="Sort transactions"
+                className="input"
               >
                 <option value="newest">Newest First</option>
                 <option value="oldest">Oldest First</option>
@@ -384,35 +411,40 @@ export default function TransactionsPage() {
             </div>
           </div>
 
+          <div className="divider relative mt-5" />
+
           {/* Transactions Content Stream */}
-          <div className="mt-6">
+          <div className="relative mt-5">
             {loadingTransactions ? (
-              <div className="py-20 text-center">
-                <div className="animate-spin h-9 w-9 border-4 border-primary-500 border-t-transparent rounded-full mx-auto" />
-                <p className="text-xs text-slate-400 mt-3 font-mono">Syncing financial stream...</p>
+              <div className="space-y-2.5" role="status" aria-live="polite">
+                <div className="skeleton h-[72px]" />
+                <div className="skeleton h-[72px]" />
+                <div className="skeleton h-[72px]" />
+                <div className="skeleton h-[72px]" />
+                <p className="pt-2 text-center text-xs text-slate-500">Syncing financial stream...</p>
               </div>
             ) : filteredTransactions.length === 0 ? (
-              <div className="py-14 px-6 text-center border border-dashed border-slate-800 rounded-3xl bg-slate-900/30">
-                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-800/80 mx-auto mb-3 border border-slate-700 shadow-lg">
-                  <Wallet className="h-7 w-7 text-slate-400" />
-                </div>
-                <h4 className="text-base font-bold text-slate-200">No transactions found</h4>
-                <p className="text-xs text-slate-400 mt-1 max-w-sm mx-auto leading-relaxed">
-                  {searchQuery
-                    ? `No entries match "${searchQuery}". Clear your search query to see all events.`
-                    : 'Start logging your daily income and expense events to unlock real-time financial velocity tracking.'}
-                </p>
-                <button
-                  onClick={handleOpenAdd}
-                  className="mt-5 inline-flex items-center gap-2 rounded-2xl bg-primary-500 px-5 py-2.5 text-xs font-black text-slate-950 shadow-lg shadow-primary-500/20 transition hover:scale-105 active:scale-95"
-                >
-                  <Plus className="h-4 w-4 stroke-[3]" />
-                  Record First Transaction
-                </button>
+              <div className="rounded-2xl border border-dashed border-white/10 px-4 sm:px-6">
+                <EmptyState
+                  icon={Wallet}
+                  tone="slate"
+                  title="No transactions found"
+                  description={
+                    searchQuery
+                      ? `No entries match "${searchQuery}". Clear your search query to see all events.`
+                      : 'Start logging your daily income and expense events to unlock real-time financial velocity tracking.'
+                  }
+                  action={
+                    <button onClick={handleOpenAdd} className="btn-primary">
+                      <Plus className="h-4 w-4" strokeWidth={2.5} />
+                      Record First Transaction
+                    </button>
+                  }
+                />
               </div>
             ) : viewMode === 'stream' ? (
               /* Dual View 1: Energetic Cards Stream */
-              <div className="space-y-3">
+              <div className="space-y-2.5">
                 {filteredTransactions.map((transaction, index) => (
                   <TransactionItemCard
                     key={transaction.id}
@@ -425,55 +457,55 @@ export default function TransactionsPage() {
               </div>
             ) : (
               /* Dual View 2: Compact High-Tech Table */
-              <div className="overflow-x-auto rounded-2xl border border-slate-800">
-                <table className="w-full text-xs">
-                  <thead className="bg-slate-900/90 border-b border-slate-800 text-slate-400 uppercase font-mono text-[10px]">
+              <div className="surface-inset scroll-thin overflow-x-auto">
+                <table className="data-table">
+                  <thead>
                     <tr>
-                      <th className="px-5 py-3 text-left">Date</th>
-                      <th className="px-5 py-3 text-left">Type</th>
-                      <th className="px-5 py-3 text-left">Category</th>
-                      <th className="px-5 py-3 text-left">Description</th>
-                      <th className="px-5 py-3 text-right">Amount</th>
-                      <th className="px-5 py-3 text-right">Actions</th>
+                      <th>Date</th>
+                      <th>Type</th>
+                      <th>Category</th>
+                      <th>Description</th>
+                      <th className="!text-right">Amount</th>
+                      <th className="!text-right">Actions</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-800/60 bg-slate-900/40">
+                  <tbody>
                     {filteredTransactions.map((t) => (
-                      <tr key={t.id} className="hover:bg-slate-800/40 transition">
-                        <td className="px-5 py-3.5 text-slate-300 font-mono">
+                      <tr key={t.id}>
+                        <td className="num whitespace-nowrap !text-slate-300">
                           {new Date(t.date).toLocaleDateString('en-IN')}
                         </td>
-                        <td className="px-5 py-3.5">
+                        <td>
                           <span
-                            className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-bold uppercase ${
-                              t.type === 'income'
-                                ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/30'
-                                : 'bg-rose-500/15 text-rose-300 border border-rose-500/30'
+                            className={`badge capitalize ${
+                              t.type === 'income' ? 'badge-success' : 'badge-danger'
                             }`}
                           >
                             {t.type}
                           </span>
                         </td>
-                        <td className="px-5 py-3.5 font-semibold text-slate-200">{t.category || 'General'}</td>
-                        <td className="px-5 py-3.5 text-slate-300">{t.description || '-'}</td>
+                        <td className="whitespace-nowrap font-medium !text-slate-100">{t.category || 'General'}</td>
+                        <td className="!text-slate-300">
+                          <span className="block min-w-[8rem] max-w-[18rem] truncate">{t.description || '-'}</span>
+                        </td>
                         <td
-                          className={`px-5 py-3.5 text-right font-mono font-bold text-sm ${
-                            t.type === 'income' ? 'text-emerald-400' : 'text-slate-100'
+                          className={`num whitespace-nowrap text-right font-display font-semibold ${
+                            t.type === 'income' ? '!text-emerald-400' : '!text-slate-100'
                           }`}
                         >
                           {t.type === 'income' ? '+' : '-'}₹{Number(t.amount).toLocaleString('en-IN')}
                         </td>
-                        <td className="px-5 py-3.5 text-right">
-                          <div className="flex items-center justify-end gap-2">
+                        <td className="text-right">
+                          <div className="flex items-center justify-end gap-1">
                             <button
                               onClick={() => handleEdit(t)}
-                              className="p-1 text-slate-400 hover:text-primary-300 transition"
+                              className="btn-ghost btn-sm hover:!text-primary-200"
                             >
                               Edit
                             </button>
                             <button
                               onClick={() => handleDelete(t.id)}
-                              className="p-1 text-slate-400 hover:text-rose-400 transition"
+                              className="btn-ghost btn-sm hover:!bg-rose-500/10 hover:!text-rose-300"
                             >
                               Delete
                             </button>
@@ -486,7 +518,7 @@ export default function TransactionsPage() {
               </div>
             )}
           </div>
-        </div>
+        </section>
       </div>
 
       {/* ================= TRANSACTION MODAL ================= */}

@@ -1,7 +1,9 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
+import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
+import { AlertCircle, Clock, KeyRound, Lock, Mail, MailCheck } from "lucide-react";
 import { api } from "@/lib/api";
 import { useAuth } from "@/hooks/useAuth";
 import AuthProcessOverlay from "@/components/auth/AuthProcessOverlay";
@@ -291,108 +293,147 @@ export default function LoginForm({ onLogin }: LoginFormProps) {
 
   return (
     <>
-      <form onSubmit={handleSubmit} className="space-y-4 form-shell">
+      <form onSubmit={handleSubmit} className="w-full space-y-5">
         {error && (
-          <div className="p-3 bg-danger-500/10 border border-danger-500/20 text-danger-200 rounded-xl text-sm">
-            {error}
+          <div
+            role="alert"
+            className="flex items-start gap-2.5 rounded-xl border border-rose-500/25 bg-rose-500/10 px-3.5 py-3 text-sm leading-relaxed text-rose-200 animate-fade-in"
+          >
+            <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-rose-300" aria-hidden="true" />
+            <span className="min-w-0 break-words">{error}</span>
           </div>
         )}
 
         <div
           id="google-button"
           onClick={handleGoogleButtonClick}
-          className="flex min-w-0 justify-center rounded-xl border border-slate-700 bg-slate-950/70 p-3 transition hover:border-slate-600"
+          className="flex min-h-[44px] w-full min-w-0 items-center justify-center [color-scheme:light]"
         />
 
-        <div className="relative">
-          <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-slate-700" />
-          </div>
-          <div className="relative flex justify-center text-sm">
-            <span className="px-2 bg-slate-900 text-slate-400">
-              Or continue with email
-            </span>
-          </div>
+        <div className="flex items-center gap-3">
+          <span className="h-px flex-1 bg-gradient-to-r from-transparent to-white/[0.12]" aria-hidden="true" />
+          <span className="whitespace-nowrap text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500">
+            Or continue with email
+          </span>
+          <span className="h-px flex-1 bg-gradient-to-l from-transparent to-white/[0.12]" aria-hidden="true" />
         </div>
 
         <div>
-          <label htmlFor="email" className="block text-sm font-medium text-slate-300 mb-1">
+          <label htmlFor="email" className="label">
             Email
           </label>
-          <input
-            id="email"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            disabled={isBusy}
-            className="input"
-            placeholder="you@example.com"
-          />
+          <div className="group relative">
+            <Mail
+              className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500 transition-colors group-focus-within:text-primary-300"
+              aria-hidden="true"
+            />
+            <input
+              id="email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              disabled={isBusy}
+              className="input pl-10"
+              placeholder="you@example.com"
+            />
+          </div>
         </div>
 
         <div>
-          <label htmlFor="password" className="block text-sm font-medium text-slate-300 mb-1">
+          <label htmlFor="password" className="label">
             Password
           </label>
-          <input
-            id="password"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            disabled={isBusy}
-            className="input"
-            placeholder="********"
-          />
+          <div className="group relative">
+            <Lock
+              className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500 transition-colors group-focus-within:text-primary-300"
+              aria-hidden="true"
+            />
+            <input
+              id="password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              disabled={isBusy}
+              className="input pl-10"
+              placeholder="********"
+            />
+          </div>
 
-          <button
-            type="button"
-            onClick={() => {
-              setShowForgotPassword(true);
-              setForgotMessage("");
-              setForgotEmail("");
-            }}
-            disabled={isBusy}
-            className="text-sm text-primary-500 hover:underline mt-1"
-          >
-            Forgot password?
-          </button>
+          <div className="mt-2 flex justify-end">
+            <button
+              type="button"
+              onClick={() => {
+                setShowForgotPassword(true);
+                setForgotMessage("");
+                setForgotEmail("");
+              }}
+              disabled={isBusy}
+              className="rounded-md text-[13px] font-medium text-primary-300 transition-colors hover:text-primary-200 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              Forgot password?
+            </button>
+          </div>
         </div>
 
         <button
           type="submit"
           disabled={isBusy}
-          className="btn-primary w-full disabled:opacity-50 disabled:cursor-allowed flex items-center justify-center gap-2"
+          className="btn-primary btn-lg w-full"
         >
           {loading ? (
-            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" />
+            <span
+              className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white"
+              aria-hidden="true"
+            />
           ) : null}
           {loading ? "Authenticating..." : "Sign In"}
         </button>
       </form>
 
       {showResendVerification && (
-        <div className="mt-4 p-3 rounded-xl border border-primary-500/30 bg-primary-500/10 space-y-3">
-          <p className="text-xs text-slate-300">
-            Did not receive the verification email? Request a new one.
-          </p>
-          <input
-            type="email"
-            value={verificationEmail}
-            onChange={(e) => setVerificationEmail(e.target.value)}
-            className="input"
-            placeholder="you@example.com"
-            disabled={verificationLoading}
-          />
+        <div className="mt-5 space-y-3 rounded-2xl border border-primary-400/20 bg-primary-500/[0.08] p-4 animate-fade-up">
+          <div className="flex items-start gap-3">
+            <span className="icon-tile icon-tile-sm icon-tile-brand">
+              <MailCheck className="h-4 w-4" aria-hidden="true" />
+            </span>
+            <p className="min-w-0 pt-1.5 text-xs leading-relaxed text-slate-300">
+              Did not receive the verification email? Request a new one.
+            </p>
+          </div>
+          <div className="group relative">
+            <Mail
+              className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500 transition-colors group-focus-within:text-primary-300"
+              aria-hidden="true"
+            />
+            <input
+              type="email"
+              value={verificationEmail}
+              onChange={(e) => setVerificationEmail(e.target.value)}
+              className="input pl-10"
+              placeholder="you@example.com"
+              disabled={verificationLoading}
+              aria-label="Email address for verification"
+            />
+          </div>
           {verificationMessage && (
-            <div className="text-xs text-slate-200">{verificationMessage}</div>
+            <div
+              role="status"
+              className={`break-words rounded-xl border px-3 py-2 text-xs leading-relaxed ${
+                verificationMessage.startsWith("Success:")
+                  ? "border-emerald-500/25 bg-emerald-500/10 text-emerald-200"
+                  : "border-rose-500/25 bg-rose-500/10 text-rose-200"
+              }`}
+            >
+              {verificationMessage}
+            </div>
           )}
           <button
             type="button"
             onClick={handleResendVerification}
             disabled={verificationLoading || verificationCooldown > 0}
-            className="btn-primary w-full disabled:opacity-50 disabled:cursor-not-allowed"
+            className="btn-soft w-full"
           >
             {verificationLoading
               ? "Sending..."
@@ -403,81 +444,114 @@ export default function LoginForm({ onLogin }: LoginFormProps) {
         </div>
       )}
 
-      {showForgotPassword && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-slate-900 rounded-lg p-6 max-w-md w-full border border-slate-700">
-            <h3 className="text-lg font-semibold text-slate-50 mb-4">Forgot Password</h3>
+      {showForgotPassword &&
+        createPortal(
+          <div className="modal-backdrop">
+            <div
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="forgot-password-title"
+              className="modal-panel max-w-md overflow-y-auto p-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] animate-pop-in sm:p-6"
+            >
+              <div
+                className="pointer-events-none absolute inset-x-10 top-0 h-px bg-gradient-to-r from-transparent via-primary-300/60 to-transparent"
+                aria-hidden="true"
+              />
+              <div className="mx-auto mb-4 h-1 w-10 rounded-full bg-white/15 sm:hidden" aria-hidden="true" />
 
-            <div className="space-y-4">
-              <div>
-                <label htmlFor="forgotEmail" className="block text-sm font-medium text-slate-300 mb-1">
-                  Email Address
-                </label>
-                <input
-                  id="forgotEmail"
-                  type="email"
-                  value={forgotEmail}
-                  onChange={(e) => setForgotEmail(e.target.value)}
-                  placeholder="you@example.com"
-                  className="input"
-                  disabled={forgotLoading}
-                />
+              <div className="mb-5 flex items-start gap-3.5">
+                <span className="icon-tile icon-tile-brand">
+                  <KeyRound className="h-[18px] w-[18px]" aria-hidden="true" />
+                </span>
+                <div className="min-w-0">
+                  <h3 id="forgot-password-title" className="text-lg font-semibold text-white">
+                    Forgot Password
+                  </h3>
+                  <p className="mt-1 text-sm leading-relaxed text-slate-400">
+                    We will send you a link to reset your password.
+                  </p>
+                </div>
               </div>
 
-              <p className="text-xs text-slate-400">
-                We will send you a link to reset your password.
-              </p>
-              {forgotCooldown > 0 && (
-                <p className="text-xs text-slate-400">
-                  You can request another reset email in {forgotCooldown}s.
-                </p>
-              )}
-
-              {forgotMessage && (
-                <div
-                  className={`p-2 rounded text-sm ${
-                    forgotMessage.startsWith("Success:")
-                      ? "bg-emerald-500/10 text-emerald-200"
-                      : "bg-danger-500/10 text-danger-200"
-                  }`}
-                >
-                  {forgotMessage}
+              <div className="space-y-4">
+                <div>
+                  <label htmlFor="forgotEmail" className="label">
+                    Email Address
+                  </label>
+                  <div className="group relative">
+                    <Mail
+                      className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500 transition-colors group-focus-within:text-primary-300"
+                      aria-hidden="true"
+                    />
+                    <input
+                      id="forgotEmail"
+                      type="email"
+                      value={forgotEmail}
+                      onChange={(e) => setForgotEmail(e.target.value)}
+                      placeholder="you@example.com"
+                      className="input pl-10"
+                      disabled={forgotLoading}
+                    />
+                  </div>
                 </div>
-              )}
 
-              <div className="flex gap-2">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowForgotPassword(false);
-                    setForgotMessage("");
-                    setForgotEmail("");
-                  }}
-                  disabled={forgotLoading}
-                  className="btn-secondary flex-1 disabled:opacity-50"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="button"
-                  onClick={handleForgotPasswordClick}
-                  disabled={forgotLoading || forgotCooldown > 0}
-                  className="btn-primary flex-1 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                >
-                  {forgotLoading ? (
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" />
-                  ) : null}
-                  {forgotLoading
-                    ? "Sending..."
-                    : forgotCooldown > 0
-                      ? `Resend in ${forgotCooldown}s`
-                      : "Send Link"}
-                </button>
+                {forgotCooldown > 0 && (
+                  <p className="flex items-center gap-2 text-xs text-slate-400">
+                    <Clock className="h-3.5 w-3.5 shrink-0 text-slate-500" aria-hidden="true" />
+                    <span>You can request another reset email in {forgotCooldown}s.</span>
+                  </p>
+                )}
+
+                {forgotMessage && (
+                  <div
+                    role="status"
+                    className={`break-words rounded-xl border px-3.5 py-2.5 text-sm leading-relaxed ${
+                      forgotMessage.startsWith("Success:")
+                        ? "border-emerald-500/25 bg-emerald-500/10 text-emerald-200"
+                        : "border-rose-500/25 bg-rose-500/10 text-rose-200"
+                    }`}
+                  >
+                    {forgotMessage}
+                  </div>
+                )}
+
+                <div className="flex flex-col-reverse gap-2.5 pt-1 sm:flex-row">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowForgotPassword(false);
+                      setForgotMessage("");
+                      setForgotEmail("");
+                    }}
+                    disabled={forgotLoading}
+                    className="btn-secondary flex-1"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleForgotPasswordClick}
+                    disabled={forgotLoading || forgotCooldown > 0}
+                    className="btn-primary flex-1"
+                  >
+                    {forgotLoading ? (
+                      <span
+                        className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white"
+                        aria-hidden="true"
+                      />
+                    ) : null}
+                    {forgotLoading
+                      ? "Sending..."
+                      : forgotCooldown > 0
+                        ? `Resend in ${forgotCooldown}s`
+                        : "Send Link"}
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
-        </div>
-      )}
+          </div>,
+          document.body,
+        )}
     </>
   );
 }

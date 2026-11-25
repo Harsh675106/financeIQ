@@ -28,6 +28,10 @@ import GoalStorylineMap from '@/components/goals/GoalStorylineMap'
 import GoalStoryCard from '@/components/goals/GoalStoryCard'
 import GoalSimulatorModal from '@/components/goals/GoalSimulatorModal'
 import ConfettiEffect from '@/components/goals/ConfettiEffect'
+import PageHeader from '@/components/ui/PageHeader'
+import SectionHeader from '@/components/ui/SectionHeader'
+import EmptyState from '@/components/ui/EmptyState'
+import LoadingScreen from '@/components/ui/LoadingScreen'
 
 interface Goal {
   id: number
@@ -239,12 +243,7 @@ export default function GoalsPage() {
   }, [goals, activeFilter])
 
   if (loading || !user) {
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-slate-950">
-        <div className="h-12 w-12 rounded-full border-4 border-slate-800 border-t-primary-500 animate-spin" />
-        <p className="mt-4 text-slate-400 text-sm animate-pulse">Initializing Financial Odyssey...</p>
-      </div>
-    )
+    return <LoadingScreen label="Initializing Financial Odyssey..." />
   }
 
   return (
@@ -257,28 +256,24 @@ export default function GoalsPage() {
         onComplete={() => setConfettiTrigger(false)}
       />
 
-      <div className="relative z-10 space-y-7 pb-12">
+      <div className="relative z-10 space-y-6 pb-4 lg:space-y-8">
         {/* ================= HERO HEADER ================= */}
-        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between animate-fade-up">
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-0.5 text-xs font-semibold text-emerald-300">
-                <Sparkles className="h-3.5 w-3.5 animate-pulse" />
-                Odyssey Command Center
-              </span>
-              <span className="text-xs text-slate-400">
-                {telemetry.activeCount} In Flight • {telemetry.completedCount} Conquered
-              </span>
-            </div>
-            <h1 className="mt-1.5 text-3xl font-extrabold tracking-tight text-slate-50 sm:text-4xl flex items-center gap-3">
-              Financial Goals Odyssey
-            </h1>
-            <p className="mt-1 text-sm text-slate-400 max-w-xl">
-              Turn abstract aspirations into tangible milestones through storyline progression, velocity forecasts, and discipline.
-            </p>
-          </div>
-
-          <div className="flex items-center gap-3">
+        <PageHeader
+          eyebrow="Odyssey Command Center"
+          eyebrowIcon={Sparkles}
+          eyebrowTone="brand"
+          meta={
+            <span className="badge badge-neutral num">
+              {telemetry.activeCount} In Flight • {telemetry.completedCount} Conquered
+            </span>
+          }
+          title={
+            <>
+              Financial Goals <span className="text-gradient">Odyssey</span>
+            </>
+          }
+          description="Turn abstract aspirations into tangible milestones through storyline progression, velocity forecasts, and discipline."
+          actions={
             <button
               onClick={() => {
                 setEditingGoal(null)
@@ -290,117 +285,147 @@ export default function GoalsPage() {
                 })
                 setShowModal(true)
               }}
-              className="rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-500 px-5 py-2.5 text-sm font-bold text-slate-950 shadow-[0_0_20px_rgba(16,185,129,0.35)] transition-all hover:brightness-110 hover:shadow-[0_0_25px_rgba(16,185,129,0.5)] flex items-center gap-2"
+              className="btn-primary h-11 w-full px-5 sm:w-auto"
             >
-              <Plus className="h-4 w-4 stroke-[3]" />
+              <Plus className="h-4 w-4" strokeWidth={2.5} />
               New Goal Quest
             </button>
-          </div>
-        </div>
+          }
+        />
 
         {/* ================= TELEMETRY HERO METRICS ================= */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 animate-fade-up [animation-delay:100ms]">
+        <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4 lg:gap-6">
           {/* Card 1: Active Goals Capital (or Total Conquered if none active) */}
-          <div className="story-glass-card rounded-3xl p-4 sm:p-5">
-            <div className="flex items-center justify-between text-slate-400 text-xs">
-              <span>{telemetry.activeCount > 0 ? 'Active Quests Capital' : 'Conquered Vault'}</span>
-              <Coins className="h-4 w-4 text-emerald-400" />
+          <div className="card card-spotlight p-4 animate-fade-up sm:p-5" style={{ animationDelay: '60ms' }}>
+            <div className="relative flex h-full flex-col">
+              <div className="flex items-start justify-between gap-2">
+                <span className="min-w-0 text-xs font-medium leading-snug text-slate-400">
+                  {telemetry.activeCount > 0 ? 'Active Quests Capital' : 'Conquered Vault'}
+                </span>
+                <span className="icon-tile icon-tile-sm icon-tile-brand">
+                  <Coins className="h-4 w-4" />
+                </span>
+              </div>
+              <div className="kpi-value mt-3 break-words text-lg sm:text-2xl">
+                ₹{(telemetry.activeCount > 0 ? telemetry.activeSaved : telemetry.conqueredSaved).toLocaleString('en-IN')}
+              </div>
+              <span className="num mt-1 text-[11px] text-slate-500">
+                of ₹{(telemetry.activeCount > 0 ? telemetry.activeTarget : telemetry.conqueredTarget).toLocaleString('en-IN')} Target
+              </span>
             </div>
-            <div className="mt-2 text-xl sm:text-2xl font-black text-slate-50">
-              ₹{(telemetry.activeCount > 0 ? telemetry.activeSaved : telemetry.conqueredSaved).toLocaleString('en-IN')}
-            </div>
-            <span className="text-[11px] text-slate-400 font-mono">
-              of ₹{(telemetry.activeCount > 0 ? telemetry.activeTarget : telemetry.conqueredTarget).toLocaleString('en-IN')} Target
-            </span>
           </div>
 
           {/* Card 2: Active Quests Victory Index */}
-          <div className="story-glass-card rounded-3xl p-4 sm:p-5">
-            <div className="flex items-center justify-between text-slate-400 text-xs">
-              <span>{telemetry.activeCount > 0 ? 'Active Quests Index' : 'All Quests Conquered'}</span>
-              <Trophy className="h-4 w-4 text-yellow-400" />
-            </div>
-            <div className="mt-2 text-xl sm:text-2xl font-black text-yellow-300">
-              {telemetry.activeCount > 0 ? `${telemetry.activeProgress.toFixed(1)}%` : '100%'}
-            </div>
-            <div className="mt-1.5 w-full bg-slate-900 rounded-full h-1.5 overflow-hidden">
+          <div className="card card-spotlight p-4 animate-fade-up sm:p-5" style={{ animationDelay: '120ms' }}>
+            <div className="relative flex h-full flex-col">
+              <div className="flex items-start justify-between gap-2">
+                <span className="min-w-0 text-xs font-medium leading-snug text-slate-400">
+                  {telemetry.activeCount > 0 ? 'Active Quests Index' : 'All Quests Conquered'}
+                </span>
+                <span className="icon-tile icon-tile-sm icon-tile-violet">
+                  <Trophy className="h-4 w-4" />
+                </span>
+              </div>
               <div
-                className="h-full bg-gradient-to-r from-yellow-400 to-amber-400 transition-all duration-1000"
-                style={{ width: `${Math.min(100, telemetry.activeCount > 0 ? telemetry.activeProgress : 100)}%` }}
-              />
+                className={`kpi-value mt-3 text-lg sm:text-2xl ${
+                  telemetry.activeCount > 0 ? 'text-gradient' : 'text-gradient-emerald'
+                }`}
+              >
+                {telemetry.activeCount > 0 ? `${telemetry.activeProgress.toFixed(1)}%` : '100%'}
+              </div>
+              <div className="progress-track mt-2.5 h-1.5">
+                <div
+                  className={
+                    telemetry.activeCount > 0
+                      ? 'progress-fill'
+                      : 'progress-fill bg-gradient-to-r from-emerald-400 to-teal-300 shadow-[0_0_12px_-2px_rgba(52,211,153,0.7)]'
+                  }
+                  style={{ width: `${Math.min(100, telemetry.activeCount > 0 ? telemetry.activeProgress : 100)}%` }}
+                />
+              </div>
             </div>
           </div>
 
           {/* Card 3: Monthly Fuel (Active in-flight goals only) */}
-          <div className="story-glass-card rounded-3xl p-4 sm:p-5">
-            <div className="flex items-center justify-between text-slate-400 text-xs">
-              <span>Active Monthly Fuel</span>
-              <Zap className="h-4 w-4 text-cyan-400" />
+          <div className="card card-spotlight p-4 animate-fade-up sm:p-5" style={{ animationDelay: '180ms' }}>
+            <div className="relative flex h-full flex-col">
+              <div className="flex items-start justify-between gap-2">
+                <span className="min-w-0 text-xs font-medium leading-snug text-slate-400">Active Monthly Fuel</span>
+                <span className="icon-tile icon-tile-sm icon-tile-cyan">
+                  <Zap className="h-4 w-4" />
+                </span>
+              </div>
+              <div className="kpi-value mt-3 break-words text-lg sm:text-2xl">
+                ₹{telemetry.activeMonthly.toLocaleString('en-IN')}
+              </div>
+              <span className="mt-1 text-[11px] text-slate-500">
+                {telemetry.activeCount > 0 ? 'Committed for active quests' : 'All goals reached'}
+              </span>
             </div>
-            <div className="mt-2 text-xl sm:text-2xl font-black text-cyan-300">
-              ₹{telemetry.activeMonthly.toLocaleString('en-IN')}
-            </div>
-            <span className="text-[11px] text-slate-400 font-mono">
-              {telemetry.activeCount > 0 ? 'Committed for active quests' : 'All goals reached'}
-            </span>
           </div>
 
           {/* Card 4: Conquered Vault & Mastered Goals */}
-          <div className="story-glass-card rounded-3xl p-4 sm:p-5">
-            <div className="flex items-center justify-between text-slate-400 text-xs">
-              <span>Conquered Treasury</span>
-              <CheckCircle2 className="h-4 w-4 text-emerald-400" />
+          <div className="card card-spotlight p-4 animate-fade-up sm:p-5" style={{ animationDelay: '240ms' }}>
+            <div className="relative flex h-full flex-col">
+              <div className="flex items-start justify-between gap-2">
+                <span className="min-w-0 text-xs font-medium leading-snug text-slate-400">Conquered Treasury</span>
+                <span className="icon-tile icon-tile-sm icon-tile-emerald">
+                  <CheckCircle2 className="h-4 w-4" />
+                </span>
+              </div>
+              <div className="kpi-value mt-3 break-words text-lg text-emerald-300 sm:text-2xl">
+                ₹{telemetry.conqueredSaved.toLocaleString('en-IN')}
+              </div>
+              <span className="num mt-1 text-[11px] text-emerald-300/80">
+                {telemetry.completedCount} Mastered • {telemetry.activeCount} In Flight
+              </span>
             </div>
-            <div className="mt-2 text-xl sm:text-2xl font-black text-emerald-300">
-              ₹{telemetry.conqueredSaved.toLocaleString('en-IN')}
-            </div>
-            <span className="text-[11px] text-emerald-400/90 font-mono">
-              {telemetry.completedCount} Mastered • {telemetry.activeCount} In Flight
-            </span>
           </div>
         </div>
 
         {/* ================= VIEW SELECTOR & FILTERS ================= */}
         {goals.length > 0 && (
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             {/* Filter Tabs */}
-            <div className="flex items-center gap-1.5 bg-slate-950/80 border border-slate-800/90 p-1 rounded-2xl">
-              {[
-                { id: 'all', label: 'All Quests', count: goals.length },
-                { id: 'active', label: 'In Flight', count: telemetry.activeCount },
-                { id: 'completed', label: 'Conquered', count: telemetry.completedCount },
-                { id: 'urgent', label: 'Due Soon' },
-              ].map((tab) => (
-                <button
-                  key={tab.id}
-                  type="button"
-                  onClick={() => setActiveFilter(tab.id as FilterTab)}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
-                    activeFilter === tab.id
-                      ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 shadow-sm'
-                      : 'text-slate-400 hover:text-slate-200'
-                  }`}
-                >
-                  <span>{tab.label}</span>
-                  {tab.count !== undefined && (
-                    <span className="rounded-full bg-slate-800 px-1.5 py-0.2 text-[10px] font-mono text-slate-400">
-                      {tab.count}
-                    </span>
-                  )}
-                </button>
-              ))}
+            <div className="scroll-thin -mx-1 max-w-full overflow-x-auto px-1 pb-1 sm:pb-0">
+              <div className="segmented" role="group" aria-label="Filter goals">
+                {[
+                  { id: 'all', label: 'All Quests', count: goals.length },
+                  { id: 'active', label: 'In Flight', count: telemetry.activeCount },
+                  { id: 'completed', label: 'Conquered', count: telemetry.completedCount },
+                  { id: 'urgent', label: 'Due Soon' },
+                ].map((tab) => (
+                  <button
+                    key={tab.id}
+                    type="button"
+                    onClick={() => setActiveFilter(tab.id as FilterTab)}
+                    aria-pressed={activeFilter === tab.id}
+                    className={`segmented-item py-2 sm:py-1.5 ${
+                      activeFilter === tab.id ? 'segmented-item-active' : ''
+                    }`}
+                  >
+                    <span>{tab.label}</span>
+                    {tab.count !== undefined && (
+                      <span
+                        className={`num rounded-full px-1.5 text-[10px] leading-4 ${
+                          activeFilter === tab.id ? 'bg-white/15 text-white' : 'bg-white/[0.06] text-slate-400'
+                        }`}
+                      >
+                        {tab.count}
+                      </span>
+                    )}
+                  </button>
+                ))}
+              </div>
             </div>
 
             {/* View Mode Toggle (Storyline vs Grid) */}
-            <div className="flex items-center gap-1 bg-slate-950/80 border border-slate-800/90 p-1 rounded-2xl self-start sm:self-auto">
+            <div className="segmented self-start sm:self-auto" role="group" aria-label="View mode">
               <button
                 type="button"
                 onClick={() => setViewMode('storyline')}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
-                  viewMode === 'storyline'
-                    ? 'bg-gradient-to-r from-emerald-600/30 to-teal-500/30 text-emerald-300 border border-emerald-500/40 shadow-sm'
-                    : 'text-slate-400 hover:text-slate-200'
-                }`}
+                aria-pressed={viewMode === 'storyline'}
+                className={`segmented-item py-2 sm:py-1.5 ${viewMode === 'storyline' ? 'segmented-item-active' : ''}`}
               >
                 <Compass className="h-3.5 w-3.5" />
                 <span>Storyline Map</span>
@@ -409,11 +434,8 @@ export default function GoalsPage() {
               <button
                 type="button"
                 onClick={() => setViewMode('grid')}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
-                  viewMode === 'grid'
-                    ? 'bg-gradient-to-r from-emerald-600/30 to-teal-500/30 text-emerald-300 border border-emerald-500/40 shadow-sm'
-                    : 'text-slate-400 hover:text-slate-200'
-                }`}
+                aria-pressed={viewMode === 'grid'}
+                className={`segmented-item py-2 sm:py-1.5 ${viewMode === 'grid' ? 'segmented-item-active' : ''}`}
               >
                 <Layers className="h-3.5 w-3.5" />
                 <span>Card Grid</span>
@@ -424,29 +446,33 @@ export default function GoalsPage() {
 
         {/* ================= EMPTY STATE ================= */}
         {loadingGoals ? (
-          <div className="story-glass-card rounded-3xl p-12 text-center">
-            <div className="h-12 w-12 rounded-full border-4 border-slate-800 border-t-emerald-500 animate-spin mx-auto mb-4" />
-            <p className="text-slate-400 text-sm">Consulting the Financial Star Chart...</p>
+          <div className="card card-pad flex flex-col items-center justify-center py-14 text-center" role="status">
+            <div className="relative mb-4 h-12 w-12">
+              <div className="absolute inset-0 rounded-full border-2 border-white/10" />
+              <div className="absolute inset-0 animate-spin rounded-full border-2 border-transparent border-r-cyan-400/70 border-t-primary-400" />
+            </div>
+            <p className="text-sm text-slate-400">Consulting the Financial Star Chart...</p>
           </div>
         ) : goals.length === 0 ? (
-          <div className="story-glass-card rounded-3xl p-12 text-center animate-fade-up max-w-xl mx-auto">
-            <div className="relative mx-auto mb-5 flex h-20 w-20 items-center justify-center rounded-3xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 shadow-[0_0_30px_rgba(16,185,129,0.2)]">
-              <Compass className="h-10 w-10 animate-spin [animation-duration:20s]" />
-            </div>
-            <h2 className="text-2xl font-black text-slate-100">No Financial Quests Declared Yet</h2>
-            <p className="mt-2 text-sm text-slate-400 leading-relaxed">
-              Every grand wealth empire begins with an intention. Declare your first financial goal quest—whether buying a home, planning a vacation, or building a safety fund.
-            </p>
-            <button
-              onClick={() => {
-                setEditingGoal(null)
-                setShowModal(true)
-              }}
-              className="mt-6 inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 px-6 py-3 text-sm font-bold text-slate-950 shadow-[0_0_20px_rgba(16,185,129,0.4)] transition-all hover:brightness-110"
-            >
-              <Plus className="h-4 w-4 stroke-[3]" />
-              Start Your First Quest
-            </button>
+          <div className="card card-pad mx-auto max-w-xl animate-fade-up">
+            <EmptyState
+              icon={Compass}
+              tone="brand"
+              title="No Financial Quests Declared Yet"
+              description="Every grand wealth empire begins with an intention. Declare your first financial goal quest—whether buying a home, planning a vacation, or building a safety fund."
+              action={
+                <button
+                  onClick={() => {
+                    setEditingGoal(null)
+                    setShowModal(true)
+                  }}
+                  className="btn-primary btn-lg"
+                >
+                  <Plus className="h-4 w-4" strokeWidth={2.5} />
+                  Start Your First Quest
+                </button>
+              }
+            />
           </div>
         ) : (
           <>
@@ -462,21 +488,23 @@ export default function GoalsPage() {
             )}
 
             {/* ================= GOAL CARDS SECTION ================= */}
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <h3 className="text-lg font-bold text-slate-100 flex items-center gap-2">
-                  <Flame className="h-4 w-4 text-emerald-400" />
-                  {activeFilter === 'all'
+            <section className="space-y-4 sm:space-y-5">
+              <SectionHeader
+                icon={Flame}
+                tone="violet"
+                as="h3"
+                title={
+                  activeFilter === 'all'
                     ? `All Financial Quests (${filteredGoals.length})`
                     : activeFilter === 'active'
                     ? `In-Flight Goals (${filteredGoals.length})`
                     : activeFilter === 'completed'
                     ? `Conquered Goals (${filteredGoals.length})`
-                    : `Urgent Quests (${filteredGoals.length})`}
-                </h3>
-              </div>
+                    : `Urgent Quests (${filteredGoals.length})`
+                }
+              />
 
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+              <div className="grid grid-cols-1 gap-4 sm:gap-6 md:grid-cols-2 xl:grid-cols-3">
                 {filteredGoals.map((goal) => (
                   <GoalStoryCard
                     key={goal.id}
@@ -491,213 +519,235 @@ export default function GoalsPage() {
                   />
                 ))}
               </div>
-            </div>
+            </section>
 
             {/* ================= AI PROJECTIONS MATRIX ================= */}
-            <div className="mt-8">
+            <div>
               <GoalProjections refreshKey={goalRefreshKey} />
             </div>
           </>
         )}
+      </div>
 
-        {/* ================= CREATE / EDIT MODAL ================= */}
-        {showModal && (
-          <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-md flex items-center justify-center z-50 p-4 animate-fade-in">
-            <div className="story-glass-card w-full max-w-lg rounded-3xl p-6 sm:p-7 shadow-2xl border border-emerald-500/30 animate-pop-in">
-              <div className="flex items-center justify-between pb-4 border-b border-slate-800">
-                <div className="flex items-center gap-2.5">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                    <Target className="h-5 w-5" />
-                  </div>
-                  <div>
-                    <h2 className="text-xl font-bold text-slate-100">
-                      {editingGoal ? 'Refine Goal Quest' : 'Declare New Goal Quest'}
-                    </h2>
-                    <p className="text-xs text-slate-400">Set your coordinates, target summit, and monthly fuel.</p>
-                  </div>
-                </div>
-                <button
-                  onClick={() => setShowModal(false)}
-                  className="rounded-xl p-1.5 text-slate-400 hover:bg-slate-800 hover:text-slate-100"
-                >
-                  <X className="h-5 w-5" />
-                </button>
-              </div>
+      {/* Modals live outside the z-10 content layer so they cover the app shell. */}
 
-              <form onSubmit={handleSubmit} className="mt-5 space-y-4">
-                <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-                    Goal Quest Title
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="e.g. Dream House Downpayment, Himalayan Expedition, Tesla Model 3"
-                    required
-                    value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    className="w-full rounded-2xl border border-slate-700/80 bg-slate-900/90 px-4 py-3 text-sm text-slate-100 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
-                  />
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-                      Target Capital Summit (₹)
-                    </label>
-                    <input
-                      type="number"
-                      placeholder="e.g. 500000"
-                      required
-                      min="1"
-                      value={formData.target_amount}
-                      onChange={(e) => setFormData({ ...formData, target_amount: e.target.value })}
-                      className="w-full rounded-2xl border border-slate-700/80 bg-slate-900/90 px-4 py-3 text-sm text-slate-100 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-                      Monthly Fuel Deposit (₹)
-                    </label>
-                    <input
-                      type="number"
-                      placeholder="e.g. 10000"
-                      min="0"
-                      value={formData.monthly_contribution}
-                      onChange={(e) => setFormData({ ...formData, monthly_contribution: e.target.value })}
-                      className="w-full rounded-2xl border border-slate-700/80 bg-slate-900/90 px-4 py-3 text-sm text-slate-100 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-                    Target Conquest Date (Optional)
-                  </label>
-                  <input
-                    type="date"
-                    value={formData.target_date}
-                    onChange={(e) => setFormData({ ...formData, target_date: e.target.value })}
-                    className="w-full rounded-2xl border border-slate-700/80 bg-slate-900/90 px-4 py-3 text-sm text-slate-100 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
-                  />
-                </div>
-
-                <div className="pt-3 flex gap-3">
-                  <button
-                    type="submit"
-                    className="flex-1 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 px-4 py-3 text-sm font-bold text-slate-950 shadow-[0_0_20px_rgba(16,185,129,0.35)] transition-all hover:brightness-110"
-                  >
-                    {editingGoal ? 'Save Modifications' : 'Launch Goal Quest'}
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => setShowModal(false)}
-                    className="rounded-2xl border border-slate-800 bg-slate-900 px-4 py-3 text-sm font-semibold text-slate-400 hover:text-slate-200"
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        )}
-
-        {/* ================= CONTRIBUTE CUSTOM MODAL ================= */}
-        {showContributeModal && contributingGoal && (
-          <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-md flex items-center justify-center z-50 p-4 animate-fade-in">
-            <div className="story-glass-card w-full max-w-md rounded-3xl p-6 sm:p-7 shadow-2xl border border-emerald-500/30 animate-pop-in">
-              <div className="flex items-center justify-between pb-4 border-b border-slate-800">
-                <div className="flex items-center gap-2.5">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                    <Coins className="h-5 w-5" />
-                  </div>
-                  <div>
-                    <h2 className="text-xl font-bold text-slate-100">Add Capital Deposit</h2>
-                    <p className="text-xs text-slate-400 font-semibold text-emerald-300">
-                      {contributingGoal.name}
-                    </p>
-                  </div>
-                </div>
-                <button
-                  onClick={() => setShowContributeModal(false)}
-                  className="rounded-xl p-1.5 text-slate-400 hover:bg-slate-800 hover:text-slate-100"
-                >
-                  <X className="h-5 w-5" />
-                </button>
-              </div>
-
-              <div className="my-4 rounded-2xl border border-slate-800 bg-slate-900/60 p-3.5 flex justify-between items-center text-xs">
-                <span className="text-slate-400">Current Progress</span>
-                <span className="font-mono font-bold text-slate-200">
-                  ₹{contributingGoal.current_amount.toLocaleString('en-IN')} / ₹{contributingGoal.target_amount.toLocaleString('en-IN')} (
-                  {((contributingGoal.current_amount / contributingGoal.target_amount) * 100).toFixed(0)}%)
+      {/* ================= CREATE / EDIT MODAL ================= */}
+      {showModal && (
+        <div className="modal-backdrop animate-fade-in">
+          <div
+            className="modal-panel max-w-lg overflow-y-auto p-5 animate-pop-in sm:p-6"
+            role="dialog"
+            aria-modal="true"
+            aria-label={editingGoal ? 'Refine Goal Quest' : 'Declare New Goal Quest'}
+          >
+            <div
+              className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary-400/60 to-transparent"
+              aria-hidden="true"
+            />
+            <div className="flex items-start justify-between gap-4 border-b border-white/[0.06] pb-4">
+              <div className="flex min-w-0 items-center gap-3">
+                <span className="icon-tile icon-tile-brand">
+                  <Target className="h-5 w-5" />
                 </span>
+                <div className="min-w-0">
+                  <h2 className="font-display text-lg font-semibold tracking-tight text-white">
+                    {editingGoal ? 'Refine Goal Quest' : 'Declare New Goal Quest'}
+                  </h2>
+                  <p className="mt-0.5 text-xs text-slate-400">Set your coordinates, target summit, and monthly fuel.</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowModal(false)}
+                className="btn-icon"
+                aria-label="Close"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSubmit} className="mt-5 space-y-4">
+              <div>
+                <label className="label">
+                  Goal Quest Title
+                </label>
+                <input
+                  type="text"
+                  placeholder="e.g. Dream House Downpayment, Himalayan Expedition, Tesla Model 3"
+                  required
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  className="input"
+                />
               </div>
 
-              {/* Quick preset chips */}
-              <div className="flex gap-2 mb-4">
-                {[500, 1000, 2500, 5000].map((preset) => (
-                  <button
-                    key={preset}
-                    type="button"
-                    onClick={() => setContributionAmount(preset.toString())}
-                    className="flex-1 rounded-xl border border-slate-800 bg-slate-900 py-1.5 text-xs font-semibold text-slate-300 hover:border-emerald-500/40 hover:bg-emerald-500/10 hover:text-emerald-200 transition-all"
-                  >
-                    +₹{preset.toLocaleString('en-IN')}
-                  </button>
-                ))}
-              </div>
-
-              <form onSubmit={handleContribute} className="space-y-4">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-                    Deposit Amount (₹)
+                  <label className="label">
+                    Target Capital Summit (₹)
                   </label>
                   <input
                     type="number"
-                    step="0.01"
-                    min="1"
-                    placeholder="Enter amount"
+                    placeholder="e.g. 500000"
                     required
-                    value={contributionAmount}
-                    onChange={(e) => setContributionAmount(e.target.value)}
-                    className="w-full rounded-2xl border border-slate-700/80 bg-slate-900/90 px-4 py-3 text-sm text-slate-100 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
-                    autoFocus
+                    min="1"
+                    value={formData.target_amount}
+                    onChange={(e) => setFormData({ ...formData, target_amount: e.target.value })}
+                    className="input num"
                   />
                 </div>
 
-                <div className="pt-2 flex gap-3">
-                  <button
-                    type="submit"
-                    className="flex-1 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 px-4 py-3 text-sm font-bold text-slate-950 shadow-[0_0_20px_rgba(16,185,129,0.35)] transition-all hover:brightness-110"
-                  >
-                    Confirm Deposit
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => setShowContributeModal(false)}
-                    className="rounded-2xl border border-slate-800 bg-slate-900 px-4 py-3 text-sm font-semibold text-slate-400 hover:text-slate-200"
-                  >
-                    Cancel
-                  </button>
+                <div>
+                  <label className="label">
+                    Monthly Fuel Deposit (₹)
+                  </label>
+                  <input
+                    type="number"
+                    placeholder="e.g. 10000"
+                    min="0"
+                    value={formData.monthly_contribution}
+                    onChange={(e) => setFormData({ ...formData, monthly_contribution: e.target.value })}
+                    className="input num"
+                  />
                 </div>
-              </form>
-            </div>
-          </div>
-        )}
+              </div>
 
-        {/* ================= STORYLINE SPEEDUP SIMULATOR MODAL ================= */}
-        {simulatorGoal && (
-          <GoalSimulatorModal
-            goal={simulatorGoal}
-            isOpen={!!simulatorGoal}
-            onClose={() => setSimulatorGoal(null)}
-            onContributeQuick={(g, amt) => handleQuickContribute(g, amt)}
-          />
-        )}
-      </div>
+              <div>
+                <label className="label">
+                  Target Conquest Date (Optional)
+                </label>
+                <input
+                  type="date"
+                  value={formData.target_date}
+                  onChange={(e) => setFormData({ ...formData, target_date: e.target.value })}
+                  className="input"
+                />
+              </div>
+
+              <div className="flex gap-3 pt-3">
+                <button
+                  type="submit"
+                  className="btn-primary h-11 flex-1"
+                >
+                  {editingGoal ? 'Save Modifications' : 'Launch Goal Quest'}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setShowModal(false)}
+                  className="btn-secondary h-11"
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ================= CONTRIBUTE CUSTOM MODAL ================= */}
+      {showContributeModal && contributingGoal && (
+        <div className="modal-backdrop animate-fade-in">
+          <div
+            className="modal-panel max-w-md overflow-y-auto p-5 animate-pop-in sm:p-6"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Add Capital Deposit"
+          >
+            <div
+              className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary-400/60 to-transparent"
+              aria-hidden="true"
+            />
+            <div className="flex items-start justify-between gap-4 border-b border-white/[0.06] pb-4">
+              <div className="flex min-w-0 items-center gap-3">
+                <span className="icon-tile icon-tile-brand">
+                  <Coins className="h-5 w-5" />
+                </span>
+                <div className="min-w-0">
+                  <h2 className="font-display text-lg font-semibold tracking-tight text-white">Add Capital Deposit</h2>
+                  <p className="mt-0.5 truncate text-xs font-semibold text-primary-200">
+                    {contributingGoal.name}
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowContributeModal(false)}
+                className="btn-icon"
+                aria-label="Close"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+
+            <div className="surface-inset my-4 flex items-center justify-between gap-3 p-3.5 text-xs">
+              <span className="shrink-0 text-slate-400">Current Progress</span>
+              <span className="num text-right font-semibold text-slate-100">
+                ₹{contributingGoal.current_amount.toLocaleString('en-IN')} / ₹{contributingGoal.target_amount.toLocaleString('en-IN')} (
+                {((contributingGoal.current_amount / contributingGoal.target_amount) * 100).toFixed(0)}%)
+              </span>
+            </div>
+
+            {/* Quick preset chips */}
+            <div className="mb-4 grid grid-cols-4 gap-2">
+              {[500, 1000, 2500, 5000].map((preset) => (
+                <button
+                  key={preset}
+                  type="button"
+                  onClick={() => setContributionAmount(preset.toString())}
+                  className="btn-secondary btn-sm num h-9 px-1.5"
+                >
+                  +₹{preset.toLocaleString('en-IN')}
+                </button>
+              ))}
+            </div>
+
+            <form onSubmit={handleContribute} className="space-y-4">
+              <div>
+                <label className="label">
+                  Deposit Amount (₹)
+                </label>
+                <input
+                  type="number"
+                  step="0.01"
+                  min="1"
+                  placeholder="Enter amount"
+                  required
+                  value={contributionAmount}
+                  onChange={(e) => setContributionAmount(e.target.value)}
+                  className="input num"
+                  autoFocus
+                />
+              </div>
+
+              <div className="flex gap-3 pt-2">
+                <button
+                  type="submit"
+                  className="btn-primary h-11 flex-1"
+                >
+                  Confirm Deposit
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setShowContributeModal(false)}
+                  className="btn-secondary h-11"
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ================= STORYLINE SPEEDUP SIMULATOR MODAL ================= */}
+      {simulatorGoal && (
+        <GoalSimulatorModal
+          goal={simulatorGoal}
+          isOpen={!!simulatorGoal}
+          onClose={() => setSimulatorGoal(null)}
+          onContributeQuick={(g, amt) => handleQuickContribute(g, amt)}
+        />
+      )}
     </DashboardLayout>
   )
 }

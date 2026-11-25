@@ -1,7 +1,17 @@
 "use client";
 
 import { useState } from "react";
-import { Mail, CheckCircle, Eye, EyeOff } from "lucide-react";
+import {
+  Mail,
+  CheckCircle,
+  Eye,
+  EyeOff,
+  AlertCircle,
+  ArrowLeft,
+  Lock,
+  ShieldCheck,
+  User,
+} from "lucide-react";
 import AuthProcessOverlay from "@/components/auth/AuthProcessOverlay";
 
 interface RegisterFormProps {
@@ -80,19 +90,27 @@ export default function RegisterForm({ onRegister }: RegisterFormProps) {
 
   if (registrationSuccess) {
     return (
-      <div className="text-center py-6">
-        <Mail className="h-12 w-12 text-primary-400 mx-auto mb-4" />
-        <h3 className="text-lg font-semibold text-slate-50 mb-2">
+      <div className="py-4 text-center animate-fade-up" role="status" aria-live="polite">
+        <div className="relative mx-auto mb-5 w-fit">
+          <span className="icon-tile icon-tile-lg icon-tile-brand h-14 w-14 rounded-2xl">
+            <Mail className="h-6 w-6" aria-hidden="true" />
+          </span>
+          <span className="absolute -bottom-1.5 -right-1.5 flex h-6 w-6 items-center justify-center rounded-full bg-emerald-500 text-white shadow-[0_0_0_3px_rgba(12,14,28,1),0_6px_16px_-4px_rgba(16,185,129,0.7)]">
+            <CheckCircle className="h-3.5 w-3.5" strokeWidth={2.6} aria-hidden="true" />
+          </span>
+        </div>
+        <h3 className="text-xl font-semibold tracking-tight text-white">
           Account Created!
         </h3>
-        <p className="text-sm text-slate-400 mb-4">
+        <p className="mx-auto mt-2 max-w-xs text-sm leading-relaxed text-slate-400">
           We&apos;ve sent a verification email to your inbox. Please verify your
           email to get started.
         </p>
         <button
           onClick={() => setRegistrationSuccess(false)}
-          className="text-xs text-primary-400 hover:text-primary-300 transition"
+          className="btn-ghost btn-sm mt-5 text-primary-300"
         >
+          <ArrowLeft className="h-3.5 w-3.5" aria-hidden="true" />
           Back to Sign Up
         </button>
       </div>
@@ -109,66 +127,77 @@ export default function RegisterForm({ onRegister }: RegisterFormProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 form-shell">
+    <form onSubmit={handleSubmit} className="w-full space-y-4">
       {error && (
-        <div className="p-3 bg-danger-500/10 border border-danger-500/20 text-danger-200 rounded-xl text-sm">
-          {error}
+        <div
+          role="alert"
+          className="flex items-start gap-2.5 rounded-xl border border-rose-500/25 bg-rose-500/10 px-3.5 py-3 text-sm leading-relaxed text-rose-200 animate-fade-in"
+        >
+          <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-rose-300" aria-hidden="true" />
+          <span className="min-w-0 break-words">{error}</span>
         </div>
       )}
 
       <div>
-        <label
-          htmlFor="name"
-          className="block text-sm font-medium text-slate-300 mb-1"
-        >
+        <label htmlFor="name" className="label">
           Full Name
         </label>
-        <input
-          id="name"
-          type="text"
-          disabled={loading}
-          value={name}
-          onChange={(e) => {
-            setName(e.target.value);
-            setError("");
-          }}
-          required
-          className="input"
-          placeholder="John Doe"
-        />
+        <div className="group relative">
+          <User
+            className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500 transition-colors group-focus-within:text-primary-300"
+            aria-hidden="true"
+          />
+          <input
+            id="name"
+            type="text"
+            disabled={loading}
+            value={name}
+            onChange={(e) => {
+              setName(e.target.value);
+              setError("");
+            }}
+            required
+            className="input pl-10"
+            placeholder="John Doe"
+          />
+        </div>
       </div>
 
       <div>
-        <label
-          htmlFor="email"
-          className="block text-sm font-medium text-slate-300 mb-1"
-        >
+        <label htmlFor="email" className="label">
           Email
         </label>
-        <input
-          id="email"
-          type="email"
-          disabled={loading}
-          value={email}
-          onChange={(e) => {
-            setEmail(e.target.value);
-            setError("");
-          }}
-          required
-          className="input"
-          placeholder="you@example.com"
-        />
+        <div className="group relative">
+          <Mail
+            className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500 transition-colors group-focus-within:text-primary-300"
+            aria-hidden="true"
+          />
+          <input
+            id="email"
+            type="email"
+            disabled={loading}
+            value={email}
+            onChange={(e) => {
+              setEmail(e.target.value);
+              setError("");
+            }}
+            required
+            className="input pl-10"
+            placeholder="you@example.com"
+          />
+        </div>
       </div>
 
       <div>
-        <label
-          htmlFor="password"
-          className="block text-sm font-medium text-slate-300 mb-1"
-        >
+        <label htmlFor="password" className="label">
           Password
         </label>
 
-        <div className="relative">
+        <div className="group relative">
+          <Lock
+            className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500 transition-colors group-focus-within:text-primary-300"
+            aria-hidden="true"
+          />
           <input
             id="password"
             type={showPassword ? "text" : "password"}
@@ -179,7 +208,7 @@ export default function RegisterForm({ onRegister }: RegisterFormProps) {
               setError("");
             }}
             required
-            className="input pr-10"
+            className="input pl-10 pr-12"
             placeholder="••••••••"
           />
 
@@ -187,7 +216,8 @@ export default function RegisterForm({ onRegister }: RegisterFormProps) {
             type="button"
             disabled={loading}
             onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200"
+            aria-label={showPassword ? "Hide password" : "Show password"}
+            className="absolute inset-y-0 right-1.5 my-auto flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-white/[0.06] hover:text-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-400/70"
           >
             {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
           </button>
@@ -195,14 +225,15 @@ export default function RegisterForm({ onRegister }: RegisterFormProps) {
       </div>
 
       <div>
-        <label
-          htmlFor="confirmPassword"
-          className="block text-sm font-medium text-slate-300 mb-1"
-        >
+        <label htmlFor="confirmPassword" className="label">
           Confirm Password
         </label>
 
-        <div className="relative">
+        <div className="group relative">
+          <ShieldCheck
+            className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500 transition-colors group-focus-within:text-primary-300"
+            aria-hidden="true"
+          />
           <input
             id="confirmPassword"
             type={showConfirmPassword ? "text" : "password"}
@@ -213,7 +244,7 @@ export default function RegisterForm({ onRegister }: RegisterFormProps) {
               setError("");
             }}
             required
-            className="input pr-10"
+            className="input pl-10 pr-12"
             placeholder="••••••••"
           />
 
@@ -221,20 +252,23 @@ export default function RegisterForm({ onRegister }: RegisterFormProps) {
             type="button"
             disabled={loading}
             onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200"
+            aria-label={showConfirmPassword ? "Hide password" : "Show password"}
+            className="absolute inset-y-0 right-1.5 my-auto flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-white/[0.06] hover:text-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-400/70"
           >
             {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
           </button>
         </div>
       </div>
 
-      <button
-        type="submit"
-        disabled={loading}
-        className="btn-primary w-full disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-      >
-        Sign Up
-      </button>
+      <div className="pt-2">
+        <button
+          type="submit"
+          disabled={loading}
+          className="btn-primary btn-lg w-full"
+        >
+          Sign Up
+        </button>
+      </div>
     </form>
   );
 }

@@ -3,6 +3,7 @@
 import { useEffect, useState, useRef } from 'react'
 import { api } from '@/lib/api'
 import { useCountUp } from '@/hooks/useCountUp'
+import EmptyState from '@/components/ui/EmptyState'
 import {
   TrendingUp,
   TrendingDown,
@@ -49,7 +50,7 @@ function MetricCard({
   trendLabel,
   trendType = 'positive',
   delay = 0,
-  accentGlow = 'rgba(16, 185, 129, 0.15)',
+  accentGlow = 'rgba(112, 104, 244, 0.18)',
 }: {
   title: string
   value: number
@@ -82,47 +83,46 @@ function MetricCard({
       className="card card-pad card-spotlight group cursor-pointer animate-fade-up"
       style={{ animationDelay: `${delay}ms` }}
     >
-      <div className="flex items-center justify-between mb-3">
-        <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">
-          {title}
-        </span>
-        <div
-          className={`flex h-10 w-10 items-center justify-center rounded-xl ${iconBg} icon-morph-container shadow-sm`}
-        >
-          <Icon className={`h-5 w-5 ${iconColor} transition-all duration-300 group-hover:scale-110`} />
-        </div>
-      </div>
+      {/* Ambient accent glow */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute -right-12 -top-12 h-32 w-32 rounded-full opacity-70 blur-3xl transition-opacity duration-300 group-hover:opacity-100"
+        style={{ background: accentGlow }}
+      />
 
-      <div className="flex items-baseline space-x-1.5">
-        <span className="text-3xl font-extrabold tracking-tight text-slate-50 counter-pulse">
+      <div className="relative">
+        <div className="mb-4 flex items-start justify-between gap-3">
+          <span className="eyebrow pt-1">{title}</span>
+          <span className={`icon-tile ${iconBg} icon-morph-container`}>
+            <Icon className={`h-[18px] w-[18px] ${iconColor}`} />
+          </span>
+        </div>
+
+        <p className="kpi-value counter-pulse text-2xl [overflow-wrap:anywhere] sm:text-3xl xl:text-2xl 2xl:text-3xl">
           {prefix}
           {animatedValue.toLocaleString('en-IN')}
           {suffix}
-        </span>
-      </div>
+        </p>
 
-      {trendLabel && (
-        <div className="mt-3 flex items-center gap-1.5">
-          {trendType === 'positive' && (
-            <span className="inline-flex items-center gap-0.5 rounded-md bg-emerald-500/10 px-1.5 py-0.5 text-[11px] font-semibold text-emerald-400 ring-1 ring-emerald-500/20">
-              <ArrowUpRight className="h-3 w-3" />
-              {trendLabel}
-            </span>
-          )}
-          {trendType === 'negative' && (
-            <span className="inline-flex items-center gap-0.5 rounded-md bg-rose-500/10 px-1.5 py-0.5 text-[11px] font-semibold text-rose-400 ring-1 ring-rose-500/20">
-              <ArrowDownRight className="h-3 w-3" />
-              {trendLabel}
-            </span>
-          )}
-          {trendType === 'neutral' && (
-            <span className="inline-flex items-center gap-0.5 rounded-md bg-slate-800/80 px-1.5 py-0.5 text-[11px] font-semibold text-slate-400">
-              {trendLabel}
-            </span>
-          )}
-          <span className="text-[11px] text-slate-500">vs target</span>
-        </div>
-      )}
+        {trendLabel && (
+          <div className="mt-3 flex flex-wrap items-center gap-2">
+            {trendType === 'positive' && (
+              <span className="badge badge-success">
+                <ArrowUpRight className="h-3 w-3" aria-hidden="true" />
+                {trendLabel}
+              </span>
+            )}
+            {trendType === 'negative' && (
+              <span className="badge badge-danger">
+                <ArrowDownRight className="h-3 w-3" aria-hidden="true" />
+                {trendLabel}
+              </span>
+            )}
+            {trendType === 'neutral' && <span className="badge badge-neutral">{trendLabel}</span>}
+            <span className="text-[11px] text-slate-500">vs target</span>
+          </div>
+        )}
+      </div>
     </div>
   )
 }
@@ -171,11 +171,15 @@ export default function FinancialOverview() {
 
   if (loading) {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 xl:grid-cols-4" aria-busy="true">
         {[...Array(4)].map((_, i) => (
-          <div key={i} className="card card-pad animate-pulse">
-            <div className="h-4 bg-slate-800 rounded w-1/2 mb-4"></div>
-            <div className="h-8 bg-slate-800 rounded w-3/4"></div>
+          <div key={i} className="card card-pad">
+            <div className="mb-5 flex items-center justify-between">
+              <div className="skeleton h-3 w-1/2" />
+              <div className="skeleton h-10 w-10 rounded-xl" />
+            </div>
+            <div className="skeleton h-8 w-3/4" />
+            <div className="skeleton mt-4 h-5 w-1/3 rounded-full" />
           </div>
         ))}
       </div>
@@ -184,21 +188,22 @@ export default function FinancialOverview() {
 
   if (!data?.hasData) {
     return (
-      <div className="card card-pad text-center py-12 card-spotlight">
-        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-primary-500/10 text-primary-400 mb-4 animate-bounce-subtle">
-          <TrendingUp className="h-8 w-8" />
-        </div>
-        <h3 className="text-xl font-bold text-slate-50 mb-2">No Financial Records Yet</h3>
-        <p className="text-slate-400 max-w-md mx-auto mb-6 text-sm">
-          Add your first transaction, wealth asset, or income stream to power real-time AI analytics.
-        </p>
-        <button
-          onClick={() => (window.location.href = '/dashboard/transactions')}
-          className="btn-primary inline-flex items-center gap-2 px-6 py-2.5 shadow-lg shadow-primary-500/20 hover:scale-105 transition-all"
-        >
-          <Sparkles className="h-4 w-4" />
-          Add First Transaction
-        </button>
+      <div className="card card-pad card-spotlight">
+        <EmptyState
+          icon={TrendingUp}
+          tone="brand"
+          title="No Financial Records Yet"
+          description="Add your first transaction, wealth asset, or income stream to power real-time AI analytics."
+          action={
+            <button
+              onClick={() => (window.location.href = '/dashboard/transactions')}
+              className="btn-primary btn-lg"
+            >
+              <Sparkles className="h-4 w-4" />
+              Add First Transaction
+            </button>
+          }
+        />
       </div>
     )
   }
@@ -208,13 +213,6 @@ export default function FinancialOverview() {
     if (score >= 60) return 'text-primary-300'
     if (score >= 40) return 'text-amber-400'
     return 'text-rose-400'
-  }
-
-  const getHealthScoreBg = (score: number) => {
-    if (score >= 80) return 'stroke-emerald-400'
-    if (score >= 60) return 'stroke-emerald-500'
-    if (score >= 40) return 'stroke-amber-400'
-    return 'stroke-rose-400'
   }
 
   const getHealthScoreLabel = (score: number) => {
@@ -234,60 +232,89 @@ export default function FinancialOverview() {
   const strokeDashoffset = circumference - (animatedHealthScore / 100) * circumference
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* 4 Main KPI Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 xl:grid-cols-4">
         {/* Card 1: Interactive Health Score with SVG Circular Gauge */}
         <div className="card card-pad card-spotlight group cursor-pointer animate-fade-up stagger-1">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">
-              Health Score
-            </span>
-            <span className="flex h-2 w-2 relative">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-            </span>
-          </div>
+          {/* Aurora ambient glow */}
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute -left-10 -top-16 h-40 w-40 rounded-full bg-primary-500/25 blur-3xl"
+          />
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute -bottom-16 -right-10 h-36 w-36 rounded-full bg-cyan-400/10 blur-3xl"
+          />
 
-          <div className="flex items-center justify-between">
-            <div>
-              <div className="flex items-baseline space-x-1.5">
-                <span className={`text-4xl font-extrabold tracking-tight ${getHealthScoreColor(data.healthScore)}`}>
-                  {animatedHealthScore}
-                </span>
-                <span className="text-xs font-semibold text-slate-500">/100</span>
-              </div>
-              <p className={`text-xs font-medium mt-1 ${getHealthScoreColor(data.healthScore)}`}>
-                {getHealthScoreLabel(data.healthScore)}
-              </p>
+          <div className="relative">
+            <div className="mb-3 flex items-center justify-between">
+              <span className="eyebrow">Health Score</span>
+              <span className="relative flex h-2 w-2" aria-hidden="true">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75"></span>
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400"></span>
+              </span>
             </div>
 
-            {/* Circular Mini Gauge */}
-            <div className="relative flex items-center justify-center">
-              <svg className="w-16 h-16 -rotate-90 transform" viewBox="0 0 70 70">
-                <circle
-                  cx="35"
-                  cy="35"
-                  r={radius}
-                  className="stroke-slate-800"
-                  strokeWidth="6"
-                  fill="transparent"
+            <div className="flex items-center justify-between gap-3">
+              <div className="min-w-0">
+                <div className="flex items-baseline gap-1.5">
+                  <span
+                    className={`kpi-value text-4xl sm:text-[2.75rem] xl:text-4xl 2xl:text-[2.75rem] ${getHealthScoreColor(
+                      data.healthScore
+                    )}`}
+                  >
+                    {animatedHealthScore}
+                  </span>
+                  <span className="text-xs font-semibold text-slate-500">/100</span>
+                </div>
+                <p className={`mt-1.5 text-xs font-medium ${getHealthScoreColor(data.healthScore)}`}>
+                  {getHealthScoreLabel(data.healthScore)}
+                </p>
+              </div>
+
+              {/* Circular Mini Gauge — brand aurora gradient */}
+              <div className="relative flex shrink-0 items-center justify-center">
+                <div aria-hidden="true" className="absolute inset-2 rounded-full bg-primary-500/20 blur-xl" />
+                <svg
+                  className="relative h-20 w-20 -rotate-90 transform drop-shadow-[0_0_10px_rgba(138,136,251,0.45)]"
+                  viewBox="0 0 70 70"
+                  aria-hidden="true"
+                >
+                  <defs>
+                    <linearGradient id="fi-health-gauge-aurora" x1="0" y1="0" x2="1" y2="1">
+                      <stop offset="0%" stopColor="#8a88fb" />
+                      <stop offset="45%" stopColor="#a78bfa" />
+                      <stop offset="100%" stopColor="#22d3ee" />
+                    </linearGradient>
+                  </defs>
+                  <circle
+                    cx="35"
+                    cy="35"
+                    r={radius}
+                    className="stroke-white/[0.07]"
+                    strokeWidth="6"
+                    fill="transparent"
+                  />
+                  <circle
+                    cx="35"
+                    cy="35"
+                    r={radius}
+                    className="gauge-progress-circle"
+                    stroke="url(#fi-health-gauge-aurora)"
+                    strokeWidth="6"
+                    strokeDasharray={circumference}
+                    strokeDashoffset={strokeDashoffset}
+                    strokeLinecap="round"
+                    fill="transparent"
+                  />
+                </svg>
+                <ShieldCheck
+                  className={`absolute h-6 w-6 ${getHealthScoreColor(
+                    data.healthScore
+                  )} transition-transform duration-300 motion-safe:group-hover:scale-110`}
                 />
-                <circle
-                  cx="35"
-                  cy="35"
-                  r={radius}
-                  className={`gauge-progress-circle ${getHealthScoreBg(data.healthScore)}`}
-                  strokeWidth="6"
-                  strokeDasharray={circumference}
-                  strokeDashoffset={strokeDashoffset}
-                  strokeLinecap="round"
-                  fill="transparent"
-                />
-              </svg>
-              <ShieldCheck
-                className={`absolute h-6 w-6 ${getHealthScoreColor(data.healthScore)} transition-transform group-hover:scale-125 duration-300`}
-              />
+              </div>
             </div>
           </div>
         </div>
@@ -298,11 +325,12 @@ export default function FinancialOverview() {
           value={data.totalIncome}
           prefix="₹"
           icon={TrendingUp}
-          iconColor="text-emerald-400"
-          iconBg="bg-emerald-500/10 border border-emerald-500/20"
+          iconColor="text-emerald-300"
+          iconBg="icon-tile-emerald"
           trendLabel="+8.2%"
           trendType="positive"
           delay={50}
+          accentGlow="rgba(16, 185, 129, 0.16)"
         />
 
         {/* Card 3: Expenses */}
@@ -311,11 +339,12 @@ export default function FinancialOverview() {
           value={data.totalExpenses}
           prefix="₹"
           icon={TrendingDown}
-          iconColor="text-rose-400"
-          iconBg="bg-rose-500/10 border border-rose-500/20"
+          iconColor="text-rose-300"
+          iconBg="icon-tile-rose"
           trendLabel="-3.5%"
           trendType="positive"
           delay={100}
+          accentGlow="rgba(244, 63, 94, 0.14)"
         />
 
         {/* Card 4: Net Savings */}
@@ -324,59 +353,63 @@ export default function FinancialOverview() {
           value={data.savings}
           prefix="₹"
           icon={Percent}
-          iconColor="text-primary-300"
-          iconBg="bg-primary-500/10 border border-primary-500/20"
+          iconColor="text-primary-200"
+          iconBg="icon-tile-brand"
           trendLabel={`${savingsRate}% Rate`}
           trendType="positive"
           delay={150}
+          accentGlow="rgba(112, 104, 244, 0.2)"
         />
       </div>
 
       {/* Diagnostics & Sub-Scores Breakdown Accordion */}
       {data?.healthBreakdown && (
-        <div className="card border border-slate-800/80 bg-slate-900/60 backdrop-blur-xl overflow-hidden animate-fade-up">
+        <div className="card overflow-hidden animate-fade-up">
           <button
             onClick={() => setShowDiagnostics(!showDiagnostics)}
-            className="w-full flex items-center justify-between p-4 px-6 hover:bg-slate-800/40 transition-colors text-left"
+            aria-expanded={showDiagnostics}
+            className="flex w-full items-center justify-between gap-3 px-5 py-4 text-left transition-colors hover:bg-white/[0.03] sm:px-6"
           >
-            <div className="flex items-center gap-2.5">
-              <div className="flex h-6 w-6 items-center justify-center rounded-md bg-primary-500/10 text-primary-400">
-                <Sparkles className="h-3.5 w-3.5" />
+            <div className="flex min-w-0 items-center gap-3">
+              <span className="icon-tile icon-tile-sm icon-tile-brand">
+                <Sparkles className="h-4 w-4" />
+              </span>
+              <div className="min-w-0 sm:flex sm:items-baseline sm:gap-2">
+                <span className="block font-display text-sm font-semibold tracking-tight text-slate-100 sm:inline">
+                  Financial Health Diagnostics Breakdown
+                </span>
+                <span className="hidden text-xs text-slate-500 sm:inline">(5 Core Analytical Pillars)</span>
               </div>
-              <span className="text-sm font-semibold text-slate-200">
-                Financial Health Diagnostics Breakdown
-              </span>
-              <span className="text-xs text-slate-500 hidden sm:inline">
-                (5 Core Analytical Pillars)
-              </span>
             </div>
-            <div className="flex items-center gap-2 text-slate-400">
-              <span className="text-xs font-medium">{showDiagnostics ? 'Collapse' : 'Expand'}</span>
-              {showDiagnostics ? (
-                <ChevronUp className="h-4 w-4 transition-transform duration-200" />
-              ) : (
-                <ChevronDown className="h-4 w-4 transition-transform duration-200" />
-              )}
+            <div className="flex shrink-0 items-center gap-2 text-slate-400">
+              <span className="hidden text-xs font-medium sm:inline">{showDiagnostics ? 'Collapse' : 'Expand'}</span>
+              <span className="btn-icon h-8 w-8">
+                {showDiagnostics ? (
+                  <ChevronUp className="h-4 w-4 transition-transform duration-200" />
+                ) : (
+                  <ChevronDown className="h-4 w-4 transition-transform duration-200" />
+                )}
+              </span>
             </div>
           </button>
 
           {showDiagnostics && (
-            <div className="p-6 pt-2 border-t border-slate-800/60 animate-fade-up">
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+            <div className="border-t border-white/[0.06] p-5 animate-fade-up sm:p-6">
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3 xl:grid-cols-5">
                 {[
                   {
                     label: 'Savings Rate',
                     value: data.healthBreakdown.savingsScore,
                     unit: '%',
                     help: 'Target: >20% income saved',
-                    color: 'from-primary-500 to-emerald-400',
+                    color: 'bg-gradient-to-r from-primary-400 via-violet-400 to-cyan-400',
                   },
                   {
                     label: 'Emergency Fund',
                     value: data.healthBreakdown.emergencyScore,
                     unit: '%',
                     help: 'Target: 6 months reserve',
-                    color: 'from-primary-500 to-emerald-400',
+                    color: 'bg-gradient-to-r from-primary-400 via-violet-400 to-cyan-400',
                   },
                   {
                     label: 'Debt Burden',
@@ -392,8 +425,8 @@ export default function FinancialOverview() {
                         : `₹${data.debt.total.toLocaleString('en-IN')} total debt`,
                     color:
                       (data.healthBreakdown.debtImpact || 0) > 40
-                        ? 'from-rose-500 to-red-500'
-                        : 'from-emerald-500 to-teal-400',
+                        ? 'bg-gradient-to-r from-rose-500 to-pink-400'
+                        : 'bg-gradient-to-r from-emerald-400 to-teal-300',
                     isDebt: true,
                   },
                   {
@@ -401,14 +434,14 @@ export default function FinancialOverview() {
                     value: data.healthBreakdown.goalScore,
                     unit: '%',
                     help: 'Timeline progress score',
-                    color: 'from-primary-500 to-emerald-400',
+                    color: 'bg-gradient-to-r from-primary-400 via-violet-400 to-cyan-400',
                   },
                   {
                     label: 'Asset Diversification',
                     value: data.healthBreakdown.diversificationScore,
                     unit: '%',
                     help: 'Cross-asset distribution',
-                    color: 'from-primary-500 to-emerald-400',
+                    color: 'bg-gradient-to-r from-primary-400 via-violet-400 to-cyan-400',
                   },
                 ].map((item, idx) => {
                   const hasValue = item.value !== null && item.value !== undefined
@@ -417,14 +450,14 @@ export default function FinancialOverview() {
                   return (
                     <div
                       key={idx}
-                      className="group rounded-xl border border-slate-800/80 bg-slate-950/60 p-3.5 transition-all duration-300 hover:border-primary-500/40 hover:bg-slate-900/80 hover:-translate-y-0.5"
+                      className="group surface-inset surface-inset-hover p-3.5 transition-transform duration-300 motion-safe:hover:-translate-y-0.5"
                     >
-                      <div className="flex items-center justify-between mb-1.5">
-                        <span className="text-xs font-medium text-slate-400 group-hover:text-slate-200 transition-colors">
+                      <div className="mb-2 flex items-center justify-between gap-2">
+                        <span className="min-w-0 truncate text-xs font-medium text-slate-400 transition-colors group-hover:text-slate-200">
                           {item.label}
                         </span>
                         <span
-                          className={`text-xs font-bold ${
+                          className={`num text-xs font-bold ${
                             scoreVal === null
                               ? 'text-slate-500'
                               : item.isDebt && scoreVal === 0
@@ -437,9 +470,9 @@ export default function FinancialOverview() {
                       </div>
 
                       {/* Animated Progress Bar */}
-                      <div className="w-full bg-slate-800/80 rounded-full h-1.5 overflow-hidden">
+                      <div className="progress-track h-1.5">
                         <div
-                          className={`bg-gradient-to-r ${item.color} h-1.5 rounded-full transition-all duration-700 ease-out`}
+                          className={`${item.color} h-full rounded-full transition-[width] duration-700 ease-out`}
                           style={{
                             width: `${
                               scoreVal === null ? 0 : Math.min(100, Math.max(0, scoreVal))
@@ -448,7 +481,7 @@ export default function FinancialOverview() {
                         />
                       </div>
 
-                      <p className="mt-2 text-[10px] text-slate-500 leading-tight">
+                      <p className="mt-2 text-[11px] leading-tight text-slate-500">
                         {item.help}
                       </p>
                     </div>

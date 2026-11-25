@@ -4,7 +4,10 @@ import { useState } from 'react'
 import { Cell, Pie, PieChart, ResponsiveContainer } from 'recharts'
 import { ArrowDownRight, ArrowUpRight, Check, PieChart as PieIcon, Scale, Target } from 'lucide-react'
 import { useCountUp } from '@/hooks/useCountUp'
+import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { formatINR } from '@/lib/formatters'
+import { chartColors, chartPalette } from '@/lib/chartTheme'
+import EmptyState from '@/components/ui/EmptyState'
 import { ASSET_CLASS_MODEL, compactINR, type AssetBucket, type BlendedProfile } from '@/lib/portfolioMath'
 
 export interface BucketRow {
@@ -33,36 +36,44 @@ interface Props {
   band?: number
 }
 
+/** Display colours for each asset class, drawn from the shared categorical chart palette. */
+const BUCKET_COLORS: Record<AssetBucket, string> = {
+  equity: chartPalette[0],
+  debt: chartPalette[1],
+  gold: chartPalette[4],
+  liquid: chartPalette[2],
+}
+
+const colorOf = (row: BucketRow) => BUCKET_COLORS[row.bucket] ?? row.color
+
 export default function AllocationStudio({ rows, totalValue, profile, suggestions, band = 5 }: Props) {
   const [active, setActive] = useState<AssetBucket | null>(null)
   const animatedTotal = useCountUp(totalValue, { duration: 1100 })
+  const reduceMotion = useReducedMotion()
 
   const funded = rows.filter((r) => r.value > 0)
   const chartData = funded.length > 0 ? funded : []
 
   if (totalValue <= 0) {
     return (
-      <div className="pf-panel pf-rise p-6">
-        <div className="flex items-center gap-2.5">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl border border-primary-500/20 bg-primary-500/10 text-primary-400">
-            <PieIcon className="h-5 w-5" />
-          </div>
-          <div>
-            <h2 className="text-base font-bold text-slate-50">Allocation Studio</h2>
-            <p className="text-xs text-slate-400">Asset class distribution vs target</p>
+      <div className="pf-panel pf-rise p-5 sm:p-6">
+        <div className="flex min-w-0 items-center gap-3">
+          <span className="icon-tile icon-tile-brand">
+            <PieIcon className="h-[18px] w-[18px]" />
+          </span>
+          <div className="min-w-0">
+            <h2 className="card-title truncate">Allocation Studio</h2>
+            <p className="card-subtitle">Asset class distribution vs target</p>
           </div>
         </div>
 
-        <div className="mt-8 flex flex-col items-center justify-center py-10 text-center">
-          <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-800/60">
-            <PieIcon className="h-6 w-6 text-slate-500" />
-          </div>
-          <p className="text-sm font-semibold text-slate-300">No holdings yet</p>
-          <p className="mt-1 max-w-xs text-xs text-slate-500">
-            Add assets and savings on the Wealth page and your live allocation, risk profile and projections will
-            build themselves here.
-          </p>
-        </div>
+        <EmptyState
+          icon={PieIcon}
+          tone="slate"
+          title="No holdings yet"
+          description="Add assets and savings on the Wealth page and your live allocation, risk profile and projections will build themselves here."
+          className="mt-4"
+        />
       </div>
     )
   }
@@ -70,26 +81,30 @@ export default function AllocationStudio({ rows, totalValue, profile, suggestion
   return (
     <div className="pf-panel pf-sheen pf-rise p-5 sm:p-6" style={{ animationDelay: '80ms' }}>
       {/* ---------- Header ---------- */}
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center gap-2.5">
-          <div className="pf-orbit icon-morph-container flex h-9 w-9 items-center justify-center rounded-xl border border-primary-500/20 bg-primary-500/10 text-primary-400">
-            <PieIcon className="h-5 w-5" />
-          </div>
-          <div>
-            <h2 className="text-base font-bold text-slate-50">Allocation Studio</h2>
-            <p className="text-xs text-slate-400">Live distribution vs your target mix</p>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex min-w-0 items-center gap-3">
+          <span className="pf-orbit icon-tile icon-tile-brand icon-morph-container">
+            <PieIcon className="h-[18px] w-[18px]" />
+          </span>
+          <div className="min-w-0">
+            <h2 className="card-title truncate">Allocation Studio</h2>
+            <p className="card-subtitle">Live distribution vs your target mix</p>
           </div>
         </div>
 
-        <span className="chip bg-primary-500/10 text-primary-300 ring-1 ring-primary-500/30">
+        <span className="badge badge-brand self-start px-3 py-1 sm:self-auto">
           <Scale className="h-3.5 w-3.5" />
           {profile.diversification}% diversified
         </span>
       </div>
 
-      <div className="mt-5 grid gap-6 lg:grid-cols-[minmax(0,240px)_minmax(0,1fr)]">
+      <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,240px)_minmax(0,1fr)]">
         {/* ---------- Donut ---------- */}
-        <div className="relative mx-auto flex h-56 w-full max-w-[240px] items-center justify-center">
+        <div className="relative mx-auto flex h-56 w-full max-w-[240px] items-center justify-center sm:h-60">
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-6 rounded-full bg-primary-500/10 blur-2xl"
+          />
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
               <Pie
@@ -99,10 +114,11 @@ export default function AllocationStudio({ rows, totalValue, profile, suggestion
                 innerRadius={64}
                 outerRadius={92}
                 paddingAngle={3}
+                cornerRadius={4}
                 dataKey="value"
                 startAngle={90}
                 endAngle={-270}
-                isAnimationActive
+                isAnimationActive={!reduceMotion}
                 animationDuration={900}
                 animationBegin={120}
                 onMouseEnter={(_: any, index: number) => setActive(chartData[index]?.bucket ?? null)}
@@ -111,15 +127,15 @@ export default function AllocationStudio({ rows, totalValue, profile, suggestion
                 {chartData.map((row) => (
                   <Cell
                     key={row.bucket}
-                    fill={row.color}
-                    stroke="#020617"
+                    fill={colorOf(row)}
+                    stroke={chartColors.surface}
                     strokeWidth={2}
-                    className="cursor-pointer transition-all duration-300"
+                    className="cursor-pointer transition-[opacity,transform,filter] duration-300"
                     style={{
                       opacity: active && active !== row.bucket ? 0.35 : 1,
-                      transform: active === row.bucket ? 'scale(1.04)' : 'scale(1)',
+                      transform: !reduceMotion && active === row.bucket ? 'scale(1.04)' : 'scale(1)',
                       transformOrigin: 'center',
-                      filter: active === row.bucket ? `drop-shadow(0 0 10px ${row.color}aa)` : 'none',
+                      filter: active === row.bucket ? `drop-shadow(0 0 10px ${colorOf(row)}aa)` : 'none',
                     }}
                   />
                 ))}
@@ -134,63 +150,66 @@ export default function AllocationStudio({ rows, totalValue, profile, suggestion
                 const row = rows.find((r) => r.bucket === active)!
                 return (
                   <div className="pf-donut-center px-6">
-                    <p className="text-[10px] font-bold uppercase tracking-wider" style={{ color: row.color }}>
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.14em]" style={{ color: colorOf(row) }}>
                       {ASSET_CLASS_MODEL[row.bucket].short}
                     </p>
-                    <p className="mt-0.5 text-lg font-extrabold text-slate-50">{row.currentPct.toFixed(1)}%</p>
-                    <p className="text-[11px] font-semibold text-slate-400">₹{formatINR(row.value)}</p>
+                    <p className="kpi-value mt-0.5 text-xl">{row.currentPct.toFixed(1)}%</p>
+                    <p className="num text-[11px] font-medium text-slate-400">₹{formatINR(row.value)}</p>
                   </div>
                 )
               })()
             ) : (
               <div className="pf-donut-center px-6">
-                <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Total Value</p>
-                <p className="mt-0.5 text-lg font-extrabold text-slate-50">₹{formatINR(animatedTotal)}</p>
-                <p className="text-[11px] font-semibold text-slate-500">{funded.length} asset classes</p>
+                <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-500">Total Value</p>
+                <p className="kpi-value mt-0.5 text-lg">₹{formatINR(animatedTotal)}</p>
+                <p className="text-[11px] font-medium text-slate-500">{funded.length} asset classes</p>
               </div>
             )}
           </div>
         </div>
 
         {/* ---------- Drift bars ---------- */}
-        <div className="space-y-3.5">
+        <div className="min-w-0 space-y-3">
           {rows.map((row, i) => {
             const offBand = Math.abs(row.drift) > band
             const width = Math.min(100, Math.max(row.currentPct, 0))
             const targetLeft = Math.min(100, Math.max(row.targetPct, 0))
+            const color = colorOf(row)
 
             return (
               <div
                 key={row.bucket}
                 onMouseEnter={() => setActive(row.bucket)}
                 onMouseLeave={() => setActive(null)}
-                className={`rounded-xl border p-3 transition-all duration-200 ${
-                  active === row.bucket
-                    ? 'border-primary-500/40 bg-slate-900/80'
-                    : 'border-slate-800/70 bg-slate-950/50 hover:bg-slate-900/60'
+                className={`surface-inset surface-inset-hover p-3 sm:p-3.5 ${
+                  active === row.bucket ? 'border-primary-400/40 bg-white/[0.05]' : ''
                 }`}
               >
                 <div className="flex items-center justify-between gap-3">
                   <div className="flex min-w-0 items-center gap-2">
-                    <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ backgroundColor: row.color }} />
-                    <span className="truncate text-xs font-bold text-slate-200">{row.label}</span>
+                    <span
+                      className="h-2.5 w-2.5 shrink-0 rounded-full"
+                      style={{ backgroundColor: color, boxShadow: `0 0 8px ${color}99` }}
+                    />
+                    <span className="truncate text-xs font-semibold text-slate-200 sm:text-[13px]">{row.label}</span>
                   </div>
 
-                  <div className="flex shrink-0 items-center gap-2">
-                    <span className="text-xs font-bold text-slate-100">{row.currentPct.toFixed(1)}%</span>
-                    <span className="text-[11px] text-slate-500">/ {row.targetPct.toFixed(0)}%</span>
+                  <div className="flex shrink-0 items-baseline gap-1.5">
+                    <span className="num text-sm font-semibold text-white">{row.currentPct.toFixed(1)}%</span>
+                    <span className="num text-[11px] text-slate-500">/ {row.targetPct.toFixed(0)}%</span>
                   </div>
                 </div>
 
                 {/* Track: filled = current, marker = target */}
-                <div className="relative mt-2.5 h-2 rounded-full bg-slate-800/80">
+                <div className="relative mt-2.5 h-2 rounded-full bg-white/[0.06] shadow-[inset_0_1px_1px_rgba(0,0,0,0.3)]">
                   <div
                     className={`pf-bar h-full ${offBand ? 'pf-bar-flow' : ''}`}
                     style={{
                       width: `${width}%`,
-                      backgroundColor: row.color,
+                      backgroundImage: `linear-gradient(90deg, ${color}99, ${color})`,
+                      backgroundColor: color,
                       animationDelay: `${160 + i * 90}ms`,
-                      boxShadow: `0 0 10px ${row.color}66`,
+                      boxShadow: `0 0 12px -2px ${color}aa`,
                     }}
                   />
                   <span
@@ -201,12 +220,12 @@ export default function AllocationStudio({ rows, totalValue, profile, suggestion
                 </div>
 
                 <div className="mt-2 flex items-center justify-between gap-2">
-                  <span className="text-[11px] font-semibold text-slate-400">₹{formatINR(row.value)}</span>
+                  <span className="num truncate text-[11px] font-medium text-slate-400">₹{formatINR(row.value)}</span>
 
                   <span
-                    className={`inline-flex items-center gap-1 text-[11px] font-bold ${
+                    className={`inline-flex shrink-0 items-center gap-1 text-[11px] font-semibold ${
                       !offBand
-                        ? 'text-slate-500'
+                        ? 'text-emerald-300/80'
                         : row.drift > 0
                           ? 'text-amber-300'
                           : 'text-sky-300'
@@ -234,17 +253,21 @@ export default function AllocationStudio({ rows, totalValue, profile, suggestion
       </div>
 
       {/* ---------- Rebalancing actions ---------- */}
-      <div className="mt-5 border-t border-slate-800/70 pt-4">
-        <div className="mb-3 flex items-center gap-2">
-          <Target className="h-4 w-4 text-primary-300" />
-          <h3 className="text-sm font-bold text-slate-100">Rebalancing Actions</h3>
+      <div className="mt-6 border-t border-white/[0.06] pt-5">
+        <div className="mb-3 flex flex-wrap items-center gap-x-2.5 gap-y-1">
+          <span className="icon-tile icon-tile-sm icon-tile-brand">
+            <Target className="h-4 w-4" />
+          </span>
+          <h3 className="font-display text-sm font-semibold text-slate-100">Rebalancing Actions</h3>
           <span className="text-[11px] text-slate-500">± {band} pp tolerance band</span>
         </div>
 
         {suggestions.length === 0 ? (
-          <div className="flex items-center gap-2.5 rounded-xl border border-primary-500/20 bg-primary-500/5 p-3">
-            <Check className="h-4 w-4 shrink-0 text-primary-400" />
-            <p className="text-xs text-slate-300">
+          <div className="flex items-center gap-3 rounded-[0.875rem] border border-emerald-400/20 bg-emerald-500/[0.06] p-3">
+            <span className="icon-tile icon-tile-sm icon-tile-emerald">
+              <Check className="h-4 w-4" />
+            </span>
+            <p className="text-xs leading-relaxed text-slate-300">
               Every asset class sits inside the ±{band} pp band — no trades needed right now.
             </p>
           </div>
@@ -256,19 +279,15 @@ export default function AllocationStudio({ rows, totalValue, profile, suggestion
               return (
                 <div
                   key={`${s.action}-${s.bucket}-${i}`}
-                  className="pf-ladder-row flex items-center justify-between gap-3 rounded-xl border border-slate-800/70 bg-slate-950/60 p-3"
+                  className="pf-ladder-row surface-inset surface-inset-hover flex items-center justify-between gap-3 p-3"
                   style={{ animationDelay: `${i * 80}ms` }}
                 >
                   <div className="flex min-w-0 items-center gap-2.5">
-                    <span
-                      className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg ${
-                        isSell ? 'bg-amber-500/15 text-amber-300' : 'bg-primary-500/15 text-primary-300'
-                      }`}
-                    >
+                    <span className={`icon-tile icon-tile-sm ${isSell ? 'icon-tile-amber' : 'icon-tile-brand'}`}>
                       {isSell ? <ArrowDownRight className="h-3.5 w-3.5" /> : <ArrowUpRight className="h-3.5 w-3.5" />}
                     </span>
                     <div className="min-w-0">
-                      <p className="text-xs font-bold capitalize text-slate-100">
+                      <p className="text-xs font-semibold capitalize text-slate-100">
                         {s.action} {meta?.short ?? s.bucket}
                       </p>
                       <p className="truncate text-[11px] text-slate-500">
@@ -277,7 +296,11 @@ export default function AllocationStudio({ rows, totalValue, profile, suggestion
                     </div>
                   </div>
 
-                  <span className={`shrink-0 text-sm font-extrabold ${isSell ? 'text-amber-300' : 'text-primary-300'}`}>
+                  <span
+                    className={`num shrink-0 font-display text-sm font-semibold ${
+                      isSell ? 'text-amber-300' : 'text-primary-200'
+                    }`}
+                  >
                     {compactINR(s.amount)}
                   </span>
                 </div>

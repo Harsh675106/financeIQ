@@ -5,27 +5,67 @@ import { usePathname, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useAuth } from '@/hooks/useAuth'
 import {
-  AlertCircle,
-  BarChart3,
-  BrainCircuit,
-  Globe2,
+  ArrowLeftRight,
+  CandlestickChart,
+  ChevronLeft,
+  ChevronRight,
   LayoutDashboard,
+  LineChart,
   LogOut,
   Menu,
+  PieChart,
   PiggyBank,
+  RefreshCw,
   Settings,
+  ShieldAlert,
+  Sparkles,
   Target,
   TrendingUp,
   X,
-  ChevronLeft,
-  ChevronRight,
-  RefreshCw,
-  Sparkles,
   Zap,
 } from 'lucide-react'
 
 interface DashboardLayoutProps {
   children: ReactNode
+}
+
+type NavGroup = 'Overview' | 'Money' | 'Invest' | 'Intelligence' | 'Account'
+
+interface NavItem {
+  href: string
+  icon: typeof LayoutDashboard
+  label: string
+  group: NavGroup
+  badge?: string
+  highlight?: boolean
+}
+
+const NAV_GROUPS: NavGroup[] = ['Overview', 'Money', 'Invest', 'Intelligence', 'Account']
+
+const navItems: NavItem[] = [
+  { href: '/dashboard', icon: LayoutDashboard, label: 'Dashboard', badge: 'Live', group: 'Overview' },
+  { href: '/dashboard/transactions', icon: ArrowLeftRight, label: 'Transactions', group: 'Money' },
+  { href: '/dashboard/goals', icon: Target, label: 'Goals', group: 'Money' },
+  { href: '/dashboard/wealth', icon: PiggyBank, label: 'Savings & Debts', group: 'Money' },
+  { href: '/dashboard/portfolio', icon: PieChart, label: 'Portfolio', group: 'Invest' },
+  { href: '/dashboard/markets', icon: CandlestickChart, label: 'Markets', group: 'Invest' },
+  { href: '/dashboard/analysis', icon: LineChart, label: 'Analysis', group: 'Invest' },
+  { href: '/dashboard/chat', icon: Sparkles, label: 'AI Chat', highlight: true, group: 'Intelligence' },
+  { href: '/dashboard/alerts', icon: ShieldAlert, label: 'Risk Alerts', group: 'Intelligence' },
+  { href: '/dashboard/settings', icon: Settings, label: 'Settings', group: 'Account' },
+]
+
+function isItemActive(pathname: string, href: string) {
+  return pathname === href || (href !== '/dashboard' && pathname.startsWith(href))
+}
+
+function BrandMark({ size = 'md' }: { size?: 'sm' | 'md' }) {
+  const box = size === 'sm' ? 'h-8 w-8 rounded-lg' : 'h-9 w-9 rounded-xl'
+  return (
+    <span className={`brand-mark ${box}`}>
+      <TrendingUp className={size === 'sm' ? 'h-4 w-4' : 'h-[18px] w-[18px]'} strokeWidth={2.4} />
+    </span>
+  )
 }
 
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
@@ -55,6 +95,16 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     }
   }, [sidebarOpen])
 
+  // Close the mobile drawer with Escape.
+  useEffect(() => {
+    if (!sidebarOpen) return
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setSidebarOpen(false)
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [sidebarOpen])
+
   const handleLogout = () => {
     logout()
     router.push('/')
@@ -70,74 +120,89 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     }, 700)
   }
 
-  const navItems = [
-    { href: '/dashboard', icon: LayoutDashboard, label: 'Dashboard', badge: 'Live' },
-    { href: '/dashboard/transactions', icon: BarChart3, label: 'Transactions' },
-    { href: '/dashboard/goals', icon: Target, label: 'Goals' },
-    { href: '/dashboard/wealth', icon: PiggyBank, label: 'Savings & Debts' },
-    { href: '/dashboard/portfolio', icon: TrendingUp, label: 'Portfolio' },
-    { href: '/dashboard/analysis', icon: BrainCircuit, label: 'Analysis' },
-    { href: '/dashboard/markets', icon: Globe2, label: 'Markets' },
-    { href: '/dashboard/chat', icon: BrainCircuit, label: 'AI Chat', highlight: true },
-    { href: '/dashboard/alerts', icon: AlertCircle, label: 'Risk Alerts' },
-    { href: '/dashboard/settings', icon: Settings, label: 'Settings' },
-  ]
+  const activeItem = navItems.find((item) => isItemActive(pathname, item.href)) ?? navItems[0]
+  const ActiveIcon = activeItem.icon
+  const userInitial = (user?.name || user?.email || 'U')[0].toUpperCase()
 
   const renderNav = (closeOnClick?: boolean, collapsed = false) => (
-    <nav className="min-h-0 flex-1 space-y-1.5 overflow-y-auto overscroll-contain px-3 py-4">
-      {navItems.map((item) => {
-        const Icon = item.icon
-        const isActive =
-          pathname === item.href ||
-          (item.href !== '/dashboard' && pathname.startsWith(item.href))
+    <nav
+      aria-label="Primary"
+      className={`relative min-h-0 flex-1 px-3 py-3 ${
+        collapsed ? 'overflow-visible' : 'overflow-y-auto overscroll-contain scroll-thin'
+      }`}
+    >
+      {NAV_GROUPS.map((group) => {
+        const items = navItems.filter((item) => item.group === group)
+        if (items.length === 0) return null
 
         return (
-          <div key={item.href} className="relative group">
-            <Link
-              href={item.href}
-              onClick={closeOnClick ? () => setSidebarOpen(false) : undefined}
-              className={`sidebar-nav-link flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200 ${
-                collapsed ? 'justify-center px-2' : ''
-              } ${
-                isActive
-                  ? 'bg-primary-500/15 text-primary-300 ring-1 ring-primary-500/30 shadow-[0_0_15px_rgba(16,185,129,0.15)]'
-                  : 'text-slate-300 hover:bg-slate-800/60 hover:text-slate-50 hover:translate-x-0.5'
-              }`}
-            >
-              <div className="relative">
-                <Icon
-                  className={`h-5 w-5 transition-transform duration-300 group-hover:scale-110 ${
-                    isActive ? 'text-primary-400' : 'text-slate-400 group-hover:text-slate-200'
-                  }`}
-                />
-                {item.highlight && (
-                  <span className="absolute -top-1 -right-1 flex h-2 w-2">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-2 w-2 bg-sky-500"></span>
-                  </span>
-                )}
-              </div>
-
-              {!collapsed && (
-                <div className="flex flex-1 items-center justify-between overflow-hidden">
-                  <span className="truncate">{item.label}</span>
-                  {item.badge && (
-                    <span className="ml-auto inline-flex items-center rounded-md bg-primary-500/20 px-1.5 py-0.5 text-[10px] font-semibold text-primary-300 ring-1 ring-inset ring-primary-500/30">
-                      {item.badge}
-                    </span>
-                  )}
-                </div>
-              )}
-            </Link>
-
-            {/* Collapsed Tooltip Flyout */}
-            {collapsed && (
-              <div className="pointer-events-none absolute left-full top-1/2 ml-3 -translate-y-1/2 z-50 opacity-0 group-hover:opacity-100 transition-all duration-200 group-hover:translate-x-1">
-                <div className="rounded-lg bg-slate-900 px-2.5 py-1.5 text-xs font-semibold text-slate-100 shadow-xl border border-slate-800 whitespace-nowrap">
-                  {item.label}
-                </div>
-              </div>
+          <div key={group} className="mb-3 last:mb-0">
+            {collapsed ? (
+              <div className="mx-auto mb-2 h-px w-6 bg-white/[0.07]" aria-hidden="true" />
+            ) : (
+              <p className="eyebrow mb-1.5 px-3 text-[10px] text-slate-500">{group}</p>
             )}
+
+            <ul className="space-y-1">
+              {items.map((item) => {
+                const Icon = item.icon
+                const isActive = isItemActive(pathname, item.href)
+
+                return (
+                  <li key={item.href} className="group relative">
+                    <Link
+                      href={item.href}
+                      onClick={closeOnClick ? () => setSidebarOpen(false) : undefined}
+                      aria-current={isActive ? 'page' : undefined}
+                      aria-label={collapsed ? item.label : undefined}
+                      className={`sidebar-nav-link flex items-center gap-3 rounded-xl text-sm font-medium transition-colors duration-200 ${
+                        collapsed ? 'h-11 justify-center px-0' : 'px-3 py-2.5'
+                      } ${
+                        isActive
+                          ? 'nav-active'
+                          : 'text-slate-400 hover:bg-white/[0.04] hover:text-slate-100'
+                      }`}
+                    >
+                      {isActive && <span className="nav-active-indicator" aria-hidden="true" />}
+                      <span className="relative flex shrink-0">
+                        <Icon
+                          className={`h-[18px] w-[18px] transition-colors duration-200 ${
+                            isActive ? 'text-primary-300' : 'text-slate-500 group-hover:text-slate-200'
+                          }`}
+                        />
+                        {item.highlight && (
+                          <span className="absolute -right-1 -top-1 flex h-2 w-2">
+                            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-violet-400 opacity-75" />
+                            <span className="relative inline-flex h-2 w-2 rounded-full bg-violet-400" />
+                          </span>
+                        )}
+                      </span>
+
+                      {!collapsed && (
+                        <span className="flex min-w-0 flex-1 items-center justify-between gap-2">
+                          <span className="truncate">{item.label}</span>
+                          {item.badge && (
+                            <span className="badge badge-success px-2 py-0 text-[10px] leading-[18px]">
+                              <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+                              {item.badge}
+                            </span>
+                          )}
+                        </span>
+                      )}
+                    </Link>
+
+                    {/* Collapsed tooltip flyout */}
+                    {collapsed && (
+                      <div className="pointer-events-none absolute left-full top-1/2 z-50 ml-3 -translate-y-1/2 opacity-0 transition-opacity duration-200 group-hover:opacity-100 group-focus-within:opacity-100">
+                        <div className="glass-strong whitespace-nowrap rounded-lg px-2.5 py-1.5 text-xs font-semibold text-slate-100">
+                          {item.label}
+                        </div>
+                      </div>
+                    )}
+                  </li>
+                )
+              })}
+            </ul>
           </div>
         )
       })}
@@ -146,54 +211,72 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 
   const renderUserSection = (collapsed = false, mobile = false) => (
     <div
-      className={`shrink-0 border-t border-slate-800/80 p-3 ${collapsed ? 'px-2' : 'px-4'}`}
+      className={`relative shrink-0 border-t border-white/[0.06] p-3 ${collapsed ? 'px-2' : ''}`}
       style={mobile ? { paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom))' } : undefined}
     >
       {!collapsed ? (
-        <div className="mb-2 px-1">
-          <div className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-tr from-primary-600 to-primary-400 text-xs font-bold text-white shadow-md">
-              {(user?.name || user?.email || 'U')[0].toUpperCase()}
-            </div>
-            <div className="overflow-hidden">
-              <p className="truncate text-xs font-semibold text-slate-50">
-                {user?.name || user?.email}
-              </p>
-              <p className="truncate text-[11px] text-slate-400">
-                {user?.email}
-              </p>
-            </div>
+        <div className="flex items-center gap-3 rounded-xl px-2 py-1.5">
+          <span className="avatar-ring flex h-9 w-9 shrink-0 items-center justify-center rounded-full font-display text-sm font-semibold text-white">
+            {userInitial}
+          </span>
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-[13px] font-semibold text-slate-100">{user?.name || user?.email}</p>
+            <p className="truncate text-[11px] text-slate-500">{user?.email}</p>
           </div>
+          <button
+            onClick={handleLogout}
+            className="btn-icon h-8 w-8 rounded-lg hover:!border-rose-400/30 hover:!bg-rose-500/10 hover:!text-rose-300"
+            title="Sign Out"
+            aria-label="Sign out"
+          >
+            <LogOut className="h-4 w-4" />
+          </button>
         </div>
       ) : (
-        <div className="mb-2 flex justify-center">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-tr from-primary-600 to-primary-400 text-xs font-bold text-white shadow-md">
-            {(user?.name || user?.email || 'U')[0].toUpperCase()}
-          </div>
+        <div className="flex flex-col items-center gap-2">
+          <span className="avatar-ring flex h-9 w-9 items-center justify-center rounded-full font-display text-sm font-semibold text-white">
+            {userInitial}
+          </span>
+          <button
+            onClick={handleLogout}
+            className="btn-icon h-8 w-8 rounded-lg hover:!border-rose-400/30 hover:!bg-rose-500/10 hover:!text-rose-300"
+            title="Sign Out"
+            aria-label="Sign out"
+          >
+            <LogOut className="h-4 w-4" />
+          </button>
         </div>
       )}
+    </div>
+  )
 
-      <button
-        onClick={handleLogout}
-        className={`btn-ghost flex w-full items-center rounded-xl text-xs font-medium text-slate-300 hover:text-danger-400 ${
-          collapsed ? 'justify-center p-2.5' : 'justify-start gap-2 px-3 py-2'
-        }`}
-        title="Sign Out"
-      >
-        <LogOut className="h-4 w-4" />
-        {!collapsed && <span>Sign Out</span>}
-      </button>
+  const renderAiStatus = () => (
+    <div className="relative mx-3 mb-3 overflow-hidden rounded-2xl border border-primary-400/15 bg-gradient-to-br from-primary-500/[0.14] via-violet-500/[0.08] to-cyan-500/[0.06] p-3.5">
+      <div className="pointer-events-none absolute -right-6 -top-8 h-20 w-20 rounded-full bg-primary-500/30 blur-2xl" />
+      <div className="relative flex items-center gap-2">
+        <span className="relative flex h-2 w-2">
+          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-60" />
+          <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
+        </span>
+        <span className="text-xs font-semibold text-slate-100">AI Financial Brain</span>
+      </div>
+      <p className="relative mt-1 text-[11px] leading-snug text-slate-400">
+        Real-time portfolio intelligence active
+      </p>
     </div>
   )
 
   return (
-    <div className="relative min-h-screen overflow-x-hidden bg-transparent text-slate-100 lg:flex lg:h-screen lg:overflow-hidden">
+    <div className="relative min-h-screen text-slate-100 lg:flex">
       {/* Toast Notification */}
       {syncToast && (
-        <div className="fixed bottom-6 right-6 z-[200] animate-pop-in rounded-xl border border-primary-500/30 bg-slate-900/95 px-4 py-3 text-xs font-medium text-slate-100 shadow-2xl backdrop-blur-xl flex items-center gap-2.5">
-          <div className="flex h-5 w-5 items-center justify-center rounded-full bg-primary-500/20 text-primary-400">
+        <div
+          role="status"
+          className="glass-strong fixed bottom-6 right-4 z-[200] flex items-center gap-2.5 rounded-2xl px-4 py-3 text-xs font-medium text-slate-100 animate-pop-in sm:right-6"
+        >
+          <span className="icon-tile icon-tile-sm icon-tile-emerald h-6 w-6 rounded-md">
             <Zap className="h-3.5 w-3.5" />
-          </div>
+          </span>
           <span>Dashboard synced with live market metrics</span>
         </div>
       )}
@@ -202,153 +285,147 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       {sidebarOpen && (
         <>
           <div
-            className="fixed inset-0 z-[100] bg-slate-900/60 backdrop-blur-sm lg:hidden transition-opacity"
+            className="fixed inset-0 z-[100] bg-[#03040a]/70 backdrop-blur-sm animate-fade-in lg:hidden"
             onClick={() => setSidebarOpen(false)}
+            aria-hidden="true"
           />
-          <aside className="sidebar-ambient fixed inset-y-0 left-0 z-[110] flex h-[100dvh] max-h-[100dvh] min-h-0 w-64 max-w-[85vw] flex-col border-r border-slate-800/80 bg-slate-950/95 shadow-2xl backdrop-blur-2xl lg:hidden animate-slide-in-left">
-            <div className="flex shrink-0 items-center justify-between border-b border-slate-800/70 px-4 py-4">
+          <aside
+            role="dialog"
+            aria-modal="true"
+            aria-label="Navigation"
+            className="sidebar-panel fixed inset-y-0 left-0 z-[110] flex h-[100dvh] max-h-[100dvh] min-h-0 w-[18rem] max-w-[86vw] flex-col rounded-r-3xl animate-slide-in-left lg:hidden"
+          >
+            <div className="sidebar-ambient" aria-hidden="true" />
+            <div className="relative flex shrink-0 items-center justify-between px-4 py-4">
               <div className="flex items-center gap-2.5">
-                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary-500/10 border border-primary-500/20 text-primary-400">
-                  <TrendingUp className="h-5 w-5" />
-                </div>
-                <span className="text-lg font-bold tracking-tight text-slate-50">
-                  FinanceIQ
-                </span>
+                <BrandMark />
+                <span className="font-display text-lg font-semibold tracking-tight text-white">FinanceIQ</span>
               </div>
               <button
                 onClick={() => setSidebarOpen(false)}
-                className="rounded-full p-2 text-slate-300 hover:bg-slate-800/60 transition-colors"
+                className="btn-icon"
               >
                 <span className="sr-only">Close navigation</span>
                 <X className="h-5 w-5" />
               </button>
             </div>
             {renderNav(true)}
+            {renderAiStatus()}
             {renderUserSection(false, true)}
           </aside>
         </>
       )}
 
-      {/* Desktop Sticky Sidebar with Dynamic Width Transition */}
+      {/* Desktop floating sidebar */}
       <aside
-        className={`sidebar-ambient relative z-[120] hidden h-screen shrink-0 flex-col border-r border-slate-800/80 bg-slate-950/90 shadow-sm backdrop-blur-2xl transition-all duration-300 ease-in-out lg:flex lg:sticky lg:top-0 lg:self-start ${
-          isCollapsed ? 'w-20' : 'w-64'
+        className={`sticky top-0 z-[60] hidden h-screen shrink-0 p-3 pr-0 transition-[width] duration-300 ease-out-expo lg:block ${
+          isCollapsed ? 'w-[5.75rem]' : 'w-[17.5rem]'
         }`}
       >
-        {/* Brand Header */}
-        <div className={`flex items-center border-b border-slate-800/70 py-4 transition-all duration-300 ${
-          isCollapsed ? 'justify-center px-2' : 'justify-between px-5'
-        }`}>
-          <div className="flex items-center gap-2.5">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-primary-500/20 to-primary-700/10 border border-primary-500/30 text-primary-400 shadow-[0_0_15px_rgba(16,185,129,0.2)]">
-              <TrendingUp className="h-5 w-5" />
-            </div>
-            {!isCollapsed && (
-              <span className="text-xl font-bold tracking-tight text-slate-50">
-                FinanceIQ
-              </span>
-            )}
+        <div className="sidebar-panel relative flex h-full flex-col rounded-[1.75rem]">
+          <div className="sidebar-ambient" aria-hidden="true" />
+
+          {/* Brand Header */}
+          <div
+            className={`relative flex items-center py-4 ${
+              isCollapsed ? 'flex-col gap-3 px-2' : 'justify-between px-5'
+            }`}
+          >
+            <Link href="/dashboard" className="flex items-center gap-2.5" aria-label="FinanceIQ dashboard">
+              <BrandMark />
+              {!isCollapsed && (
+                <span className="font-display text-lg font-semibold tracking-tight text-white">
+                  Finance<span className="text-gradient">IQ</span>
+                </span>
+              )}
+            </Link>
+
+            <button
+              onClick={() => setIsCollapsed(!isCollapsed)}
+              className="btn-icon h-7 w-7 rounded-lg"
+              title={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+              aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+            >
+              {isCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
+            </button>
           </div>
 
-          {!isCollapsed && (
-            <button
-              onClick={() => setIsCollapsed(true)}
-              className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-800/80 hover:text-slate-100 transition-all hover:scale-105"
-              title="Collapse sidebar"
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </button>
-          )}
+          {/* Navigation */}
+          {renderNav(false, isCollapsed)}
+
+          {/* AI status (expanded only) */}
+          {!isCollapsed && renderAiStatus()}
+
+          {/* User profile section */}
+          {renderUserSection(isCollapsed)}
         </div>
-
-        {/* Collapsed Expand Toggle */}
-        {isCollapsed && (
-          <div className="flex justify-center pt-2 pb-1">
-            <button
-              onClick={() => setIsCollapsed(false)}
-              className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-800/80 hover:text-slate-100 transition-all hover:scale-105"
-              title="Expand sidebar"
-            >
-              <ChevronRight className="h-4 w-4" />
-            </button>
-          </div>
-        )}
-
-        {/* Navigation */}
-        {renderNav(false, isCollapsed)}
-
-        {/* Bottom AI Status badge if expanded */}
-        {!isCollapsed && (
-          <div className="mx-3 mb-2 rounded-xl border border-slate-800/80 bg-slate-900/60 p-3 backdrop-blur-md">
-            <div className="flex items-center gap-2">
-              <Sparkles className="h-4 w-4 text-primary-400 animate-pulse" />
-              <span className="text-xs font-semibold text-slate-200">AI Financial Brain</span>
-            </div>
-            <p className="mt-1 text-[11px] text-slate-400 leading-tight">
-              Real-time portfolio intelligence active
-            </p>
-          </div>
-        )}
-
-        {/* User profile section */}
-        {renderUserSection(isCollapsed)}
       </aside>
 
       {/* Main Content Area */}
-      <div className="relative z-0 flex-1 min-w-0 overflow-x-hidden lg:overflow-y-auto">
+      <div className="relative flex min-w-0 flex-1 flex-col">
         {/* Top Navbar */}
-        <header className="fixed inset-x-0 top-0 z-[80] border-b border-slate-800/80 bg-slate-950/75 backdrop-blur-2xl lg:top-0 lg:z-50 transition-all">
-          <div className="container-app flex h-16 items-center justify-between gap-3 px-4 sm:px-6 lg:px-8">
-            <div className="flex w-full items-center justify-between">
-              {/* Mobile trigger */}
-              <div className="flex items-center gap-3">
-                <button
-                  type="button"
-                  className="fixed left-3 top-3 z-[90] inline-flex h-11 w-11 items-center justify-center rounded-xl border border-slate-700/70 bg-slate-950/95 p-2 text-slate-200 shadow-[0_8px_30px_rgba(2,6,23,0.45)] backdrop-blur-xl hover:bg-slate-800/80 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 lg:hidden"
-                  onClick={() => setSidebarOpen(true)}
-                >
-                  <span className="sr-only">Open navigation</span>
-                  <Menu className="h-5 w-5" />
-                </button>
-              </div>
+        <header className="app-header sticky top-0 z-50">
+          <div className="container-app flex h-16 items-center justify-between gap-3">
+            {/* Left: mobile trigger + brand / desktop page context */}
+            <div className="flex min-w-0 items-center gap-3">
+              <button
+                type="button"
+                className="btn-icon h-10 w-10 lg:hidden"
+                onClick={() => setSidebarOpen(true)}
+              >
+                <span className="sr-only">Open navigation</span>
+                <Menu className="h-5 w-5" />
+              </button>
 
-              {/* Right Side Header Controls */}
-              <div className="flex items-center gap-3">
-                {/* Instant Sync Action Button */}
-                <button
-                  onClick={handleSyncNow}
-                  disabled={isSyncing}
-                  className="group relative flex items-center gap-2 rounded-xl border border-slate-700/70 bg-slate-900/80 px-3 py-1.5 text-xs font-medium text-slate-200 shadow-sm backdrop-blur-xl transition-all duration-200 hover:border-primary-500/40 hover:bg-slate-800 hover:text-white"
-                  title="Instant Metrics Refresh"
-                >
-                  <RefreshCw
-                    className={`h-3.5 w-3.5 text-primary-400 transition-transform duration-700 ${
-                      isSyncing ? 'animate-spin' : 'group-hover:rotate-180'
-                    }`}
-                  />
-                  <span className="hidden sm:inline">
-                    {isSyncing ? 'Processing...' : 'Instant Sync'}
-                  </span>
-                </button>
+              <Link href="/dashboard" className="flex items-center gap-2 lg:hidden" aria-label="FinanceIQ dashboard">
+                <BrandMark size="sm" />
+                <span className="font-display text-base font-semibold tracking-tight text-white max-[359px]:hidden">
+                  FinanceIQ
+                </span>
+              </Link>
 
-                {/* Quick Chat Shortcut Pill */}
-                <Link
-                  href="/dashboard/chat"
-                  className="flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-primary-600/90 to-primary-500/90 px-3 py-1.5 text-xs font-semibold text-white shadow-[0_0_20px_rgba(16,185,129,0.25)] transition-all hover:shadow-[0_0_25px_rgba(16,185,129,0.4)] hover:scale-105"
-                >
-                  <BrainCircuit className="h-3.5 w-3.5" />
-                  <span>Ask Copilot</span>
-                </Link>
+              <div className="hidden min-w-0 items-center gap-3 lg:flex">
+                <span className="icon-tile icon-tile-sm">
+                  <ActiveIcon className="h-4 w-4" />
+                </span>
+                <div className="min-w-0 leading-tight">
+                  <p className="text-[11px] font-medium text-slate-500">
+                    Workspace <span className="mx-1 text-slate-600">/</span>
+                    <span className="text-slate-400">{activeItem.group}</span>
+                  </p>
+                  <p className="truncate font-display text-sm font-semibold text-slate-100">{activeItem.label}</p>
+                </div>
               </div>
+            </div>
+
+            {/* Right Side Header Controls */}
+            <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+              <button
+                onClick={handleSyncNow}
+                disabled={isSyncing}
+                className="btn-secondary group h-10 gap-2 px-3 text-xs sm:px-3.5"
+                title="Instant Metrics Refresh"
+              >
+                <RefreshCw
+                  className={`h-3.5 w-3.5 text-primary-300 transition-transform duration-700 ${
+                    isSyncing ? 'animate-spin' : 'motion-safe:group-hover:rotate-180'
+                  }`}
+                />
+                <span className="hidden sm:inline">{isSyncing ? 'Processing...' : 'Instant Sync'}</span>
+                <span className="sr-only sm:hidden">{isSyncing ? 'Processing' : 'Instant Sync'}</span>
+              </button>
+
+              <Link href="/dashboard/chat" className="btn-primary h-10 gap-1.5 px-3.5 text-xs">
+                <Sparkles className="h-3.5 w-3.5" />
+                <span>Ask Copilot</span>
+              </Link>
             </div>
           </div>
         </header>
 
         {/* Main Body */}
-        <main className="min-h-[calc(100dvh-4rem)] pb-12 pt-20 sm:pt-24 lg:min-h-0 lg:pt-24">
-          <div className="container-app">
-            {children}
-          </div>
+        <main className="relative flex-1 pb-10 pt-6">
+          <div className="container-app">{children}</div>
         </main>
       </div>
     </div>

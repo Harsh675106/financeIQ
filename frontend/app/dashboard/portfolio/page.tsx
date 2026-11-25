@@ -13,6 +13,7 @@ import AllocationStudio, {
 import ProjectionLab, { type ProjectionForm } from '@/components/portfolio/ProjectionLab'
 import ProjectionResults from '@/components/portfolio/ProjectionResults'
 import PortfolioExplainabilityCard from '@/components/portfolio/PortfolioExplainabilityCard'
+import LoadingScreen from '@/components/ui/LoadingScreen'
 import { AlertTriangle, Sparkles } from 'lucide-react'
 import { api } from '@/lib/api'
 import { safeNumber } from '@/lib/formatters'
@@ -247,22 +248,19 @@ export default function PortfolioPage() {
 
   /* ================= LOADING STATES ================= */
   if (loading || !user) {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-primary-500" />
-      </div>
-    )
+    return <LoadingScreen label="Loading your portfolio..." />
   }
 
   if (loadingData) {
     return (
       <DashboardLayout>
         <PageBackground variant="grid" />
-        <div className="relative z-10 space-y-5">
-          <div className="pf-skeleton h-56 w-full" />
-          <div className="grid gap-5 xl:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)]">
-            <div className="pf-skeleton h-96 w-full" />
-            <div className="pf-skeleton h-96 w-full" />
+        <div className="relative z-10 space-y-6 lg:space-y-8" role="status" aria-live="polite">
+          <span className="sr-only">Loading your portfolio...</span>
+          <div className="pf-skeleton h-[22rem] w-full rounded-[1.5rem] sm:h-80" />
+          <div className="grid gap-4 sm:gap-6 xl:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)]">
+            <div className="pf-skeleton h-96 w-full rounded-[1.25rem]" />
+            <div className="pf-skeleton h-96 w-full rounded-[1.25rem]" />
           </div>
         </div>
       </DashboardLayout>
@@ -274,11 +272,16 @@ export default function PortfolioPage() {
     <DashboardLayout>
       <PageBackground variant="grid" />
 
-      <div className="relative z-10 space-y-5 pb-4">
+      <div className="relative z-10 space-y-6 lg:space-y-8">
         {loadError && (
-          <div className="pf-rise flex items-center gap-2.5 rounded-xl border border-amber-500/30 bg-amber-500/10 p-3">
-            <AlertTriangle className="h-4 w-4 shrink-0 text-amber-300" />
-            <p className="text-xs text-amber-100">{loadError}</p>
+          <div
+            role="alert"
+            className="pf-rise flex items-center gap-3 rounded-2xl border border-amber-400/25 bg-amber-500/[0.08] px-4 py-3 backdrop-blur-xl"
+          >
+            <span className="icon-tile icon-tile-sm icon-tile-amber">
+              <AlertTriangle className="h-4 w-4" />
+            </span>
+            <p className="text-sm text-amber-100">{loadError}</p>
           </div>
         )}
 
@@ -297,7 +300,7 @@ export default function PortfolioPage() {
         />
 
         {/* ---------- Allocation + projection inputs ---------- */}
-        <div className="grid gap-5 xl:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)]">
+        <div className="grid gap-4 sm:gap-6 xl:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)]">
           <AllocationStudio
             rows={bucketRows}
             totalValue={totalValue}
@@ -321,9 +324,14 @@ export default function PortfolioPage() {
         </div>
 
         {simError && (
-          <div className="pf-rise flex items-center gap-2.5 rounded-xl border border-danger-500/30 bg-danger-500/10 p-3">
-            <AlertTriangle className="h-4 w-4 shrink-0 text-danger-300" />
-            <p className="text-xs text-danger-100">{simError}</p>
+          <div
+            role="alert"
+            className="pf-rise flex items-center gap-3 rounded-2xl border border-rose-400/25 bg-rose-500/[0.08] px-4 py-3 backdrop-blur-xl"
+          >
+            <span className="icon-tile icon-tile-sm icon-tile-rose">
+              <AlertTriangle className="h-4 w-4" />
+            </span>
+            <p className="text-sm text-rose-100">{simError}</p>
           </div>
         )}
 
@@ -331,12 +339,15 @@ export default function PortfolioPage() {
         {simulation && simulationParams ? (
           <ProjectionResults sim={simulation} params={simulationParams} />
         ) : (
-          <div className="pf-panel pf-rise flex flex-col items-center justify-center p-10 text-center">
-            <div className="pf-orbit mb-3 flex h-12 w-12 items-center justify-center rounded-2xl border border-primary-500/20 bg-primary-500/10 text-primary-400">
-              <Sparkles className="h-6 w-6" />
+          <div className="pf-panel pf-rise flex flex-col items-center justify-center px-6 py-12 text-center sm:py-14">
+            <div className="relative mb-4">
+              <div aria-hidden="true" className="absolute inset-0 rounded-2xl bg-primary-500/25 blur-xl" />
+              <span className="pf-orbit icon-tile icon-tile-lg icon-tile-brand relative">
+                <Sparkles className="h-6 w-6" />
+              </span>
             </div>
-            <p className="text-sm font-bold text-slate-200">Run a projection to see your outcome range</p>
-            <p className="mt-1 max-w-md text-xs text-slate-500">
+            <p className="font-display text-base font-semibold text-slate-50">Run a projection to see your outcome range</p>
+            <p className="mt-1.5 max-w-md text-sm leading-relaxed text-slate-400">
               The Projection Lab is already seeded with your portfolio value, your average monthly surplus and the
               return your current asset mix implies. Hit Run Simulation to model 10,000 possible futures.
             </p>

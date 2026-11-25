@@ -1,0 +1,20 @@
+'use client'
+
+import { useEffect, useState, type ReactNode } from 'react'
+import { createPortal } from 'react-dom'
+
+/**
+ * Renders children into document.body so fixed overlays (modals, sheets)
+ * escape parent stacking contexts, transforms and backdrop-filters.
+ * React events still bubble through the component tree as before.
+ */
+export default function Portal({ children }: { children: ReactNode }) {
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  if (!mounted) return null
+  return createPortal(children, document.body)
+}

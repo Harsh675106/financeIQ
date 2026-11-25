@@ -4,6 +4,7 @@ import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/hooks/useAuth'
 import LandingPage from '@/components/pages/LandingPage'
+import LoadingScreen from '@/components/ui/LoadingScreen'
 
 export default function Home() {
   const { user, loading, initialized } = useAuth()
@@ -18,11 +19,7 @@ export default function Home() {
   }, [user, loading, initialized, router])
 
   if (!initialized || loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-950">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500"></div>
-      </div>
-    )
+    return <LoadingScreen label="Loading FinanceIQ..." />
   }
 
   return <LandingPage />

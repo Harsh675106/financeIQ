@@ -7,6 +7,8 @@ import DashboardLayout from '@/components/layouts/DashboardLayout'
 import PageBackground from '@/components/layouts/PageBackground'
 import { SlidersHorizontal } from 'lucide-react'
 import ProfileForm from '@/components/settings/ProfileForm'
+import PageHeader from '@/components/ui/PageHeader'
+import LoadingScreen from '@/components/ui/LoadingScreen'
 
 export default function SettingsPage() {
   const { user, loading } = useAuth()
@@ -19,23 +21,24 @@ export default function SettingsPage() {
   }, [user, loading, router])
 
   if (loading || !user) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
-      </div>
-    )
+    return <LoadingScreen label="Loading settings..." />
   }
 
   return (
     <DashboardLayout>
       <PageBackground variant="orbit" />
-      <div className="relative z-10 space-y-6">
-        <div className="flex items-center space-x-2">
-          <SlidersHorizontal className="h-7 w-7 text-primary-300" />
-          <h1 className="text-3xl font-bold text-slate-50">Settings</h1>
-        </div>
+      <div className="relative z-10 space-y-6 lg:space-y-8">
+        <PageHeader
+          eyebrow="Preferences"
+          eyebrowIcon={SlidersHorizontal}
+          eyebrowTone="neutral"
+          title="Settings"
+          description="Tune your financial profile and target allocation."
+        />
 
-        <ProfileForm />
+        <div className="max-w-4xl">
+          <ProfileForm />
+        </div>
       </div>
     </DashboardLayout>
   )

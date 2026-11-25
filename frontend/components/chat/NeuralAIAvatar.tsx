@@ -37,56 +37,64 @@ export default function NeuralAIAvatar({
       name: 'AURA 2.0 • Wealth Strategist',
       role: 'Macro Capital & Portfolio Allocation',
       icon: TrendingUp,
-      accent: 'text-emerald-400',
-      badgeBg: 'bg-emerald-500/15 border-emerald-500/30 text-emerald-300',
-      glow: 'rgba(16, 185, 129, 0.7)',
+      accent: 'text-primary-300',
+      badgeBg: 'badge-brand',
+      glow: 'rgba(112, 104, 244, 0.65)',
     },
     risk: {
       name: 'AURA 2.0 • Risk Guardian',
       role: 'Stress Testing & Capital Protection',
       icon: Shield,
-      accent: 'text-cyan-400',
-      badgeBg: 'bg-cyan-500/15 border-cyan-500/30 text-cyan-300',
-      glow: 'rgba(6, 182, 212, 0.7)',
+      accent: 'text-cyan-300',
+      badgeBg: 'badge-info',
+      glow: 'rgba(34, 211, 238, 0.55)',
     },
     growth: {
       name: 'AURA 2.0 • Growth Scout',
       role: 'Alpha Velocity & Savings Accelerators',
       icon: Zap,
-      accent: 'text-teal-400',
-      badgeBg: 'bg-teal-500/15 border-teal-500/30 text-teal-300',
-      glow: 'rgba(20, 184, 166, 0.7)',
+      accent: 'text-violet-300',
+      badgeBg: 'badge-ai',
+      glow: 'rgba(167, 139, 250, 0.65)',
     },
   }
 
   const currentPersona = personaConfig[persona]
 
   return (
-    <div className="relative overflow-hidden rounded-3xl cyber-glass-panel p-5 animate-fade-up">
-      {/* Background Holographic Scanline */}
-      <div className="pointer-events-none absolute inset-0 opacity-10 bg-[linear-gradient(to_bottom,transparent_50%,rgba(52,211,153,0.3)_51%)] bg-[length:100%_4px]" />
+    <div className="cyber-glass-panel relative overflow-hidden rounded-[1.25rem] p-4 animate-fade-up sm:p-5">
+      {/* Decorative layer: holographic scanlines + persona-tinted aurora */}
+      <div className="pointer-events-none absolute inset-0" aria-hidden="true">
+        <div className="absolute inset-0 bg-[linear-gradient(to_bottom,transparent_50%,rgba(138,136,251,0.35)_51%)] bg-[length:100%_4px] opacity-[0.06]" />
+        <div
+          className="absolute -left-14 -top-20 h-56 w-56 rounded-full opacity-40 blur-3xl"
+          style={{ background: `radial-gradient(circle, ${currentPersona.glow}, transparent 70%)` }}
+        />
+        <div className="absolute -bottom-24 right-6 h-48 w-48 rounded-full bg-cyan-400/10 blur-3xl" />
+        <div className="absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-primary-300/50 to-transparent" />
+      </div>
 
-      <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
+      <div className="relative z-10 flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between xl:gap-6">
         {/* Left: 3D Holographic Quantum Core Avatar */}
-        <div className="flex items-center gap-5">
-          <div className="relative flex h-24 w-24 shrink-0 items-center justify-center">
+        <div className="flex min-w-0 items-center gap-4 sm:gap-5">
+          <div className="relative flex h-[4.5rem] w-[4.5rem] shrink-0 items-center justify-center sm:h-24 sm:w-24">
             {/* Outer Orbit Ring 1 */}
             <div
-              className={`absolute inset-0 rounded-full border border-emerald-400/40 ${
+              className={`absolute inset-0 rounded-full border border-primary-300/35 ${
                 status === 'thinking'
                   ? 'animate-spin [animation-duration:2.5s]'
                   : status === 'speaking'
                   ? 'animate-spin [animation-duration:5s]'
                   : 'neural-avatar-orbit-1'
               }`}
-              style={{ boxShadow: `0 0 20px ${currentPersona.glow}` }}
+              style={{ boxShadow: `0 0 24px -6px ${currentPersona.glow}` }}
             >
-              <div className="absolute top-0 left-1/2 -translate-x-1/2 h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399]" />
+              <div className="absolute left-1/2 top-0 h-2 w-2 -translate-x-1/2 rounded-full bg-primary-200 shadow-[0_0_10px_#8a88fb]" />
             </div>
 
             {/* Inner Orbit Ring 2 */}
             <div
-              className={`absolute inset-2 rounded-full border border-cyan-400/40 ${
+              className={`absolute inset-2 rounded-full border border-dashed border-cyan-300/30 ${
                 status === 'thinking'
                   ? 'animate-spin [animation-duration:1.8s] [animation-direction:reverse]'
                   : status === 'speaking'
@@ -94,89 +102,92 @@ export default function NeuralAIAvatar({
                   : 'neural-avatar-orbit-2'
               }`}
             >
-              <div className="absolute bottom-0 right-1/2 translate-x-1/2 h-1.5 w-1.5 rounded-full bg-cyan-400 shadow-[0_0_8px_#22d3ee]" />
+              <div className="absolute bottom-0 right-1/2 h-1.5 w-1.5 translate-x-1/2 rounded-full bg-cyan-300 shadow-[0_0_8px_#22d3ee]" />
             </div>
 
             {/* Glowing Quantum Core Sphere */}
             <div
-              className="relative flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-tr from-slate-950 via-emerald-950 to-teal-900 border-2 border-emerald-400/80 shadow-2xl neural-avatar-core transition-transform duration-500"
+              className="neural-avatar-core relative flex h-11 w-11 items-center justify-center rounded-full border border-primary-200/50 bg-[radial-gradient(circle_at_32%_26%,rgba(199,205,255,0.85)_0%,rgba(112,104,244,0.85)_30%,rgba(76,52,170,0.9)_62%,#0b0c1d_100%)] transition-transform duration-500 sm:h-14 sm:w-14"
               style={{
-                boxShadow: `0 0 25px ${currentPersona.glow}, inset 0 0 15px rgba(52, 211, 153, 0.4)`,
+                boxShadow: `0 0 26px ${currentPersona.glow}, inset 0 0 16px rgba(169, 172, 255, 0.45)`,
               }}
             >
               <BrainCircuit
-                className={`h-7 w-7 ${
+                className={`h-5 w-5 sm:h-7 sm:w-7 ${
                   status === 'thinking'
-                    ? 'text-cyan-300 animate-pulse'
+                    ? 'text-cyan-100 animate-pulse'
                     : status === 'speaking'
-                    ? 'text-emerald-300 scale-110 animate-bounce-subtle'
-                    : 'text-primary-300'
-                } transition-all duration-300`}
+                    ? 'text-white motion-safe:scale-110 animate-bounce-subtle'
+                    : 'text-primary-50'
+                } drop-shadow-[0_0_6px_rgba(255,255,255,0.45)] transition-[color,transform] duration-300`}
               />
 
               {/* Ping Ring for Live State */}
-              <span className="absolute -top-1 -right-1 flex h-3.5 w-3.5">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-emerald-500 border border-slate-900"></span>
+              <span className="absolute -right-0.5 -top-0.5 flex h-3 w-3 sm:h-3.5 sm:w-3.5">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-60"></span>
+                <span className="relative inline-flex h-full w-full rounded-full border-2 border-[#0b0c1d] bg-emerald-400"></span>
               </span>
             </div>
           </div>
 
           {/* Persona Identity & Telemetry Details */}
-          <div>
-            <div className="flex items-center gap-2">
-              <span className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-bold ${currentPersona.badgeBg}`}>
-                <Radio className="h-3 w-3 animate-pulse" />
-                {status === 'thinking'
-                  ? 'NEURAL COMPUTE ACTIVE'
-                  : status === 'speaking'
-                  ? 'VOICE SPEECH STREAMING'
-                  : 'NEURAL CORE SYNCHRONIZED'}
+          <div className="min-w-0">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className={`badge min-w-0 max-w-full ${currentPersona.badgeBg}`}>
+                <Radio className="h-3 w-3 shrink-0" />
+                <span className="truncate">
+                  {status === 'thinking'
+                    ? 'NEURAL COMPUTE ACTIVE'
+                    : status === 'speaking'
+                    ? 'VOICE SPEECH STREAMING'
+                    : 'NEURAL CORE SYNCHRONIZED'}
+                </span>
               </span>
-              <span className="hidden sm:inline-flex items-center gap-1 rounded-md bg-slate-900/90 px-2 py-0.5 text-[11px] font-mono text-slate-400 border border-slate-800">
-                <Cpu className="h-3 w-3 text-emerald-400" />
+              <span className="badge badge-neutral num hidden font-mono sm:inline-flex">
+                <Cpu className="h-3 w-3 text-cyan-300" />
                 {confidenceScore}% ACCURACY
               </span>
             </div>
 
-            <h1 className="mt-1.5 text-xl font-black tracking-tight text-slate-50 flex items-center gap-2">
+            <h1 className="text-balance mt-2 font-display text-lg font-semibold leading-tight tracking-tight text-white sm:text-xl">
               {currentPersona.name}
             </h1>
-            <p className="text-xs text-slate-400 leading-tight">
+            <p className="mt-1 text-xs leading-snug text-slate-400">
               {currentPersona.role} • Real-time AI Financial Synthesis
             </p>
           </div>
         </div>
 
         {/* Right: Audio Waveform Equalizer & Interactive Persona Switcher */}
-        <div className="flex flex-wrap items-center gap-3">
+        <div className="flex flex-wrap items-center gap-2.5 sm:gap-3">
           {/* Futuristic Audio Equalizer Waveform & Master Speech Toggle */}
-          <div className="flex items-center gap-2 rounded-2xl border border-slate-800/90 bg-slate-950/80 px-3.5 py-2 shadow-inner">
+          <div className="surface-inset flex h-10 items-center gap-2.5 rounded-xl px-3">
             <button
               onClick={onToggleAudio}
-              className="flex items-center gap-1.5 text-slate-300 hover:text-slate-50 transition-colors"
+              className="flex items-center gap-1.5 rounded-md text-slate-300 transition-colors hover:text-white"
               title={audioEnabled ? 'Mute AI Auto Voice Response' : 'Enable AI Voice Response'}
+              aria-pressed={audioEnabled}
             >
               {audioEnabled ? (
                 <>
-                  <Volume2 className="h-4 w-4 text-emerald-400 animate-pulse" />
-                  <span className="text-[11px] font-semibold text-emerald-300 hidden sm:inline">Voice ON</span>
+                  <Volume2 className="h-4 w-4 text-violet-300" />
+                  <span className="hidden text-[11px] font-semibold text-violet-200 sm:inline">Voice ON</span>
                 </>
               ) : (
                 <>
                   <VolumeX className="h-4 w-4 text-slate-500" />
-                  <span className="text-[11px] font-semibold text-slate-500 hidden sm:inline">Voice Muted</span>
+                  <span className="hidden text-[11px] font-semibold text-slate-500 sm:inline">Voice Muted</span>
                 </>
               )}
             </button>
 
-            <div className="flex items-end gap-1 h-6 pl-1 border-l border-slate-800">
+            <div className="flex h-7 items-end gap-[3px] border-l border-white/10 pl-2.5" aria-hidden="true">
               {[...Array(8)].map((_, i) => (
                 <div
                   key={i}
-                  className={`w-1 rounded-full bg-gradient-to-t from-emerald-500 to-cyan-400 transition-all ${
+                  className={`w-1 rounded-full bg-gradient-to-t from-primary-500 via-violet-400 to-cyan-300 transition-[height,opacity] duration-300 ${
                     status === 'speaking'
-                      ? 'cyber-eq-bar'
+                      ? 'cyber-eq-bar h-3.5'
                       : status === 'thinking' && audioEnabled
                       ? 'h-3 opacity-60 animate-pulse'
                       : 'h-1.5 opacity-30'
@@ -190,18 +201,15 @@ export default function NeuralAIAvatar({
           </div>
 
           {/* Persona Switcher Buttons */}
-          <div className="flex items-center rounded-2xl border border-slate-800/90 bg-slate-950/80 p-1 shadow-inner">
+          <div className="segmented" role="group" aria-label="AI persona">
             {(['wealth', 'risk', 'growth'] as PersonaMode[]).map((p) => {
               const active = persona === p
               return (
                 <button
                   key={p}
                   onClick={() => onPersonaChange(p)}
-                  className={`rounded-xl px-3 py-1.5 text-xs font-semibold capitalize transition-all duration-200 ${
-                    active
-                      ? 'bg-gradient-to-r from-primary-600 to-emerald-500 text-white shadow-[0_0_15px_rgba(16,185,129,0.4)] scale-105'
-                      : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/60'
-                  }`}
+                  aria-pressed={active}
+                  className={`segmented-item px-3 capitalize ${active ? 'segmented-item-active' : ''}`}
                 >
                   {p}
                 </button>

@@ -56,36 +56,32 @@ export default function AnimatedStatCard({
     }
   }
 
-  const trendColor = trend && trend > 0 ? 'text-success-400' : trend && trend < 0 ? 'text-danger-400' : 'text-slate-400'
+  const trendColor = trend && trend > 0 ? 'badge-success' : trend && trend < 0 ? 'badge-danger' : 'badge-neutral'
   const trendIcon = trend && trend > 0 ? '↑' : trend && trend < 0 ? '↓' : '→'
 
   return (
     <div
-      className="card card-interactive animate-fade-up space-y-4"
+      className="card card-pad card-interactive hover-lift animate-fade-up space-y-4"
       style={{ animationDelay: `${delay}ms` }}
     >
-      <div className="flex items-start justify-between">
-        <div className="flex-1">
-          <p className="text-sm text-slate-400 font-medium">{title}</p>
-          <h3 className="text-2xl font-bold text-slate-50 mt-2 counter-pulse">
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0 flex-1">
+          <p className="eyebrow">{title}</p>
+          <h3 className="kpi-value mt-2 text-2xl [overflow-wrap:anywhere] sm:text-3xl">
             {typeof value === 'number' ? formatValue(displayValue) : value}
           </h3>
           {trend !== undefined && (
-            <p className={`text-xs mt-2 font-semibold ${trendColor} flex items-center gap-1`}>
-              <span>{trendIcon}</span>
+            <p className={`badge ${trendColor} mt-2.5`}>
+              <span aria-hidden="true">{trendIcon}</span>
               <span>{Math.abs(trend)}% from last month</span>
             </p>
           )}
         </div>
-        <div className="p-3 bg-primary-500/10 rounded-lg text-primary-400 animate-glow-pulse">
-          {icon}
-        </div>
+        <div className="icon-tile">{icon}</div>
       </div>
       {badge && (
-        <div className="flex items-center gap-2 pt-2 border-t border-slate-800">
-          <span className="badge-bounce inline-flex px-2 py-1 text-xs font-semibold rounded-lg bg-primary-500/20 text-primary-300">
-            {badge}
-          </span>
+        <div className="flex items-center gap-2 border-t border-white/[0.06] pt-3">
+          <span className="badge badge-brand">{badge}</span>
         </div>
       )}
     </div>

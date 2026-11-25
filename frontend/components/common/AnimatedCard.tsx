@@ -25,7 +25,7 @@ export default function AnimatedCard({
     'none': '',
   }[animation]
 
-  const interactiveClass = interactive ? 'card-interactive' : 'card-hover'
+  const interactiveClass = interactive ? 'card-interactive hover-lift' : 'card-hover'
   const delayStyle = delay > 0 ? { animationDelay: `${delay}ms` } : {}
 
   return (

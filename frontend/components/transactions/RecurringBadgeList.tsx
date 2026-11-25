@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from 'react'
 import { api } from '@/lib/api'
+import { Repeat } from 'lucide-react'
+import SectionHeader from '@/components/ui/SectionHeader'
 
 export default function RecurringBadgeList() {
   const [items, setItems] = useState<any[]>([])
@@ -23,13 +25,22 @@ export default function RecurringBadgeList() {
 
   return (
     <div className="card card-pad card-hover">
-      <h3 className="text-lg font-semibold mb-4 text-slate-50">Recurring Transactions</h3>
-      {loading ? <div className="h-10 bg-slate-800/60 rounded-xl animate-pulse"/> : (
+      <SectionHeader as="h3" icon={Repeat} tone="cyan" title="Recurring Transactions" className="mb-4" />
+      {loading ? (
+        <div className="flex flex-wrap gap-2">
+          <div className="skeleton h-7 w-36 rounded-full" />
+          <div className="skeleton h-7 w-28 rounded-full" />
+          <div className="skeleton h-7 w-32 rounded-full" />
+        </div>
+      ) : (
         <div className="flex flex-wrap gap-2">
           {items.length === 0 ? (
             <span className="text-sm text-slate-400">No recurring detected</span>
           ) : items.map((x, i) => (
-            <span key={i} className="px-3 py-1 rounded-full text-xs bg-primary-500/10 text-primary-200 border border-primary-500/20">
+            <span
+              key={i}
+              className={`badge num px-3 py-1 text-xs ${x.type === 'income' ? 'badge-success' : 'badge-danger'}`}
+            >
               {x.type === 'income' ? '+' : '-'}₹{Number(x.amount).toLocaleString('en-IN')} · next {x.nextDate}
             </span>
           ))}

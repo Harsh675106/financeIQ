@@ -13,6 +13,8 @@ import InsightsCard from '@/components/dashboard/InsightsCard'
 import NetWorthTrend from '@/components/dashboard/NetWorthTrend'
 import AlertsRecommendations from '@/components/dashboard/AlertsRecommendations'
 import PageBackground from '@/components/layouts/PageBackground'
+import PageHeader from '@/components/ui/PageHeader'
+import LoadingScreen from '@/components/ui/LoadingScreen'
 import { Sparkles, Calendar, Sun, Sunrise, Sunset, Moon } from 'lucide-react'
 
 export default function DashboardPage() {
@@ -27,15 +29,7 @@ export default function DashboardPage() {
   }, [user, loading, initialized, router])
 
   if (!initialized || loading || !user) {
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-slate-950">
-        <div className="relative">
-          <div className="h-16 w-16 rounded-full border-4 border-slate-800"></div>
-          <div className="absolute top-0 h-16 w-16 rounded-full border-t-4 border-primary-500 animate-spin"></div>
-        </div>
-        <p className="mt-4 text-slate-400 text-sm animate-pulse">Loading your Financial Workspace...</p>
-      </div>
-    )
+    return <LoadingScreen label="Loading your Financial Workspace..." />
   }
 
   const TimeIcon =
@@ -50,56 +44,59 @@ export default function DashboardPage() {
   return (
     <DashboardLayout>
       <PageBackground variant="aurora" />
-      <div className="relative z-10 space-y-6">
+      <div className="relative z-10 space-y-6 lg:space-y-8">
         {/* Dynamic Interactive Header */}
-        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between animate-fade-up">
-          <div>
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-primary-500/10 border border-primary-500/20 px-2.5 py-0.5 text-xs font-semibold text-primary-300">
-                <Sparkles className="h-3.5 w-3.5 animate-pulse" />
-                Intelligence Hub
-              </span>
-              <span className="text-xs text-slate-400 flex items-center gap-1 bg-slate-900/60 border border-slate-800/80 px-2.5 py-0.5 rounded-full">
-                <Calendar className="h-3 w-3 text-slate-400" />
+        <PageHeader
+          eyebrow="Intelligence Hub"
+          eyebrowIcon={Sparkles}
+          eyebrowTone="brand"
+          meta={
+            <>
+              <span className="badge badge-neutral">
+                <Calendar className="h-3 w-3 text-slate-400" aria-hidden="true" />
                 {formattedDate}
               </span>
-              <span className="text-xs text-emerald-400/90 flex items-center gap-1 bg-emerald-950/40 border border-emerald-500/20 px-2.5 py-0.5 rounded-full">
-                <TimeIcon className="h-3 w-3 text-emerald-400" />
+              <span className="badge badge-info num">
+                <TimeIcon className="h-3 w-3" aria-hidden="true" />
                 <span>{formattedTime} IST</span>
               </span>
-            </div>
-            <h1 className="mt-2 text-3xl font-extrabold tracking-tight text-slate-50 sm:text-4xl">
+            </>
+          }
+          title={
+            <>
               {greeting},{' '}
-              <span className="bg-gradient-to-r from-primary-300 to-emerald-400 bg-clip-text text-transparent">
-                {user.name || user.email?.split('@')[0]}
-              </span>
-            </h1>
-            <p className="mt-1 text-sm text-slate-400">
-              {subtext}
-            </p>
-          </div>
-        </div>
+              <span className="text-gradient">{user.name || user.email?.split('@')[0]}</span>
+            </>
+          }
+          description={subtext}
+        />
 
         {/* Primary KPI & Health Score Cards */}
         <FinancialOverview />
 
-        {/* Middle Tier: Insights, Net Worth Chart, and Recommendations */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <InsightsCard />
-          <NetWorthTrend />
-          <AlertsRecommendations />
+        {/* Middle Tier: Net Worth Chart, Insights, and Recommendations.
+            lg–xl: chart spans the full row first, insights + actions share the next row.
+            2xl: all three sit side by side in their original order. */}
+        <div className="grid grid-cols-1 gap-4 sm:gap-6 lg:grid-cols-2 2xl:grid-cols-3">
+          <div className="min-w-0">
+            <InsightsCard />
+          </div>
+          <div className="min-w-0 lg:order-first lg:col-span-2 2xl:order-none 2xl:col-span-1">
+            <NetWorthTrend />
+          </div>
+          <div className="min-w-0">
+            <AlertsRecommendations />
+          </div>
         </div>
 
         {/* Lower Tier: Risk Assessment & Quick Actions */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 gap-4 sm:gap-6 lg:grid-cols-2">
           <RiskAssessment />
           <QuickActions />
         </div>
 
-        {/* Bottom Tier: Portfolio Allocation & Asset Distribution */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <PortfolioAllocation />
-        </div>
+        {/* Bottom Tier: Portfolio Allocation & Asset Distribution (full width, split layout inside) */}
+        <PortfolioAllocation />
       </div>
     </DashboardLayout>
   )
