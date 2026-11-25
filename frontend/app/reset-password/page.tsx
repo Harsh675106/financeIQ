@@ -9,7 +9,7 @@ export default function ResetPasswordPage() {
     <Suspense fallback={
       <div className="relative flex min-h-screen items-center justify-center overflow-hidden px-4 py-10 sm:px-6">
         <div
-          className="glass-strong w-full max-w-md rounded-3xl p-6 text-center sm:p-8"
+          className="glass-strong auth-card w-full max-w-md rounded-3xl p-6 text-center sm:p-8"
           role="status"
           aria-live="polite"
         >
@@ -17,14 +17,14 @@ export default function ResetPasswordPage() {
             <span className="brand-mark h-10 w-10 rounded-xl">
               <TrendingUp className="h-5 w-5" strokeWidth={2.4} aria-hidden="true" />
             </span>
-            <span className="font-display text-lg font-semibold tracking-tight text-white">
+            <span className="font-display text-lg font-semibold tracking-tight text-ink-900">
               Finance<span className="text-gradient">IQ</span>
             </span>
           </div>
-          <span className="icon-tile icon-tile-lg icon-tile-brand mx-auto mt-8 flex h-14 w-14 rounded-2xl">
+          <span className="icon-tile icon-tile-lg icon-tile-sky mx-auto mt-8 flex h-14 w-14 rounded-2xl">
             <Loader2 className="h-6 w-6 animate-spin" aria-hidden="true" />
           </span>
-          <p className="mt-4 text-sm text-slate-400">Loading...</p>
+          <p className="mt-4 text-sm text-slate-500">Loading...</p>
         </div>
       </div>
     }>

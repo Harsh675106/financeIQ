@@ -51,27 +51,68 @@ export default function TransactionItemCard({
   const [copied, setCopied] = useState(false)
   const isIncome = transaction.type === 'income'
 
-  // Dynamic Category Icon Selection
+  // Dynamic Category Icon Selection (each category gets its own light tile tone)
   const getCategoryIcon = () => {
     const cat = (transaction.category + ' ' + transaction.description).toLowerCase()
     if (cat.includes('food') || cat.includes('dining') || cat.includes('restaurant') || cat.includes('cafe') || cat.includes('swiggy') || cat.includes('zomato'))
-      return <Utensils className="h-[18px] w-[18px] text-amber-400" />
+      return (
+        <span className="icon-tile bg-none bg-orange-50 text-orange-600 shadow-[inset_0_0_0_1px_rgba(249,115,22,0.22)]">
+          <Utensils className="h-[18px] w-[18px]" />
+        </span>
+      )
     if (cat.includes('shop') || cat.includes('cloth') || cat.includes('amazon') || cat.includes('flipkart') || cat.includes('myntra'))
-      return <ShoppingBag className="h-[18px] w-[18px] text-purple-400" />
+      return (
+        <span className="icon-tile bg-none bg-fuchsia-50 text-fuchsia-600 shadow-[inset_0_0_0_1px_rgba(217,70,239,0.2)]">
+          <ShoppingBag className="h-[18px] w-[18px]" />
+        </span>
+      )
     if (cat.includes('rent') || cat.includes('home') || cat.includes('house') || cat.includes('mortgage'))
-      return <Home className="h-[18px] w-[18px] text-indigo-400" />
+      return (
+        <span className="icon-tile icon-tile-violet">
+          <Home className="h-[18px] w-[18px]" />
+        </span>
+      )
     if (cat.includes('car') || cat.includes('fuel') || cat.includes('petrol') || cat.includes('uber') || cat.includes('ola') || cat.includes('travel') || cat.includes('flight'))
-      return <Car className="h-[18px] w-[18px] text-blue-400" />
+      return (
+        <span className="icon-tile icon-tile-sky">
+          <Car className="h-[18px] w-[18px]" />
+        </span>
+      )
     if (cat.includes('tech') || cat.includes('software') || cat.includes('subscription') || cat.includes('netflix') || cat.includes('spotify') || cat.includes('aws'))
-      return <Laptop className="h-[18px] w-[18px] text-cyan-400" />
+      return (
+        <span className="icon-tile icon-tile-cyan">
+          <Laptop className="h-[18px] w-[18px]" />
+        </span>
+      )
     if (cat.includes('health') || cat.includes('doctor') || cat.includes('med') || cat.includes('pharma') || cat.includes('gym'))
-      return <HeartPulse className="h-[18px] w-[18px] text-rose-400" />
+      return (
+        <span className="icon-tile icon-tile-rose">
+          <HeartPulse className="h-[18px] w-[18px]" />
+        </span>
+      )
     if (cat.includes('util') || cat.includes('bill') || cat.includes('electric') || cat.includes('wifi'))
-      return <Zap className="h-[18px] w-[18px] text-yellow-400" />
+      return (
+        <span className="icon-tile icon-tile-amber">
+          <Zap className="h-[18px] w-[18px]" />
+        </span>
+      )
     if (cat.includes('salary') || cat.includes('pay') || cat.includes('freelance') || cat.includes('bonus') || cat.includes('dividend'))
-      return <Briefcase className="h-[18px] w-[18px] text-emerald-400" />
-    if (isIncome) return <Coins className="h-[18px] w-[18px] text-emerald-400" />
-    return <Tag className="h-[18px] w-[18px] text-slate-400" />
+      return (
+        <span className="icon-tile icon-tile-emerald">
+          <Briefcase className="h-[18px] w-[18px]" />
+        </span>
+      )
+    if (isIncome)
+      return (
+        <span className="icon-tile icon-tile-emerald">
+          <Coins className="h-[18px] w-[18px]" />
+        </span>
+      )
+    return (
+      <span className="icon-tile icon-tile-slate">
+        <Tag className="h-[18px] w-[18px]" />
+      </span>
+    )
   }
 
   // Format Date human-friendly
@@ -105,20 +146,18 @@ export default function TransactionItemCard({
       <span
         aria-hidden="true"
         className={`pointer-events-none absolute inset-y-3 left-0 w-[3px] rounded-r-full ${
-          isIncome ? 'bg-emerald-400/80' : 'bg-rose-400/60'
+          isIncome ? 'bg-emerald-500' : 'bg-rose-400'
         }`}
       />
 
       <div className="flex flex-wrap items-center gap-x-3 gap-y-2.5 sm:flex-nowrap sm:gap-4">
         {/* Category icon tile */}
-        <span className={`icon-tile ${isIncome ? 'icon-tile-emerald' : 'icon-tile-slate'}`}>
-          {getCategoryIcon()}
-        </span>
+        {getCategoryIcon()}
 
         {/* Description, category & meta */}
         <div className="min-w-0 flex-1 basis-0">
           <div className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1">
-            <h4 className="min-w-0 max-w-full truncate text-sm font-semibold tracking-tight text-slate-100 transition-colors group-hover:text-white sm:text-[15px]">
+            <h4 className="min-w-0 max-w-full truncate text-sm font-semibold tracking-tight text-ink-900 sm:text-[15px]">
               {transaction.description || transaction.category || 'Transaction'}
             </h4>
 
@@ -129,15 +168,15 @@ export default function TransactionItemCard({
             )}
           </div>
 
-          <div className="mt-1 flex items-center gap-2 text-xs text-slate-400">
+          <div className="mt-1 flex items-center gap-2 text-xs text-slate-500">
             <span className="flex items-center gap-1 font-medium">
-              <Clock className="h-3 w-3 text-slate-500" />
+              <Clock className="h-3 w-3 text-slate-400" />
               {formatDate(transaction.date)}
             </span>
-            <span className="text-slate-600" aria-hidden="true">•</span>
+            <span className="text-slate-400" aria-hidden="true">•</span>
             <span
               className={`inline-flex items-center gap-0.5 text-[11px] font-medium capitalize ${
-                isIncome ? 'text-emerald-300/90' : 'text-rose-300/90'
+                isIncome ? 'text-emerald-700' : 'text-rose-600'
               }`}
             >
               {isIncome ? (
@@ -154,7 +193,7 @@ export default function TransactionItemCard({
         <div className="shrink-0 text-right">
           <p
             className={`num font-display text-base font-semibold tracking-tight sm:text-lg ${
-              isIncome ? 'text-emerald-400' : 'text-slate-100'
+              isIncome ? 'text-emerald-700' : 'text-rose-600'
             }`}
           >
             {isIncome ? '+' : '-'}₹{Number(transaction.amount).toLocaleString('en-IN')}
@@ -165,18 +204,18 @@ export default function TransactionItemCard({
         </div>
 
         {/* Action Icons */}
-        <div className="flex w-full items-center justify-end gap-1.5 border-t border-white/[0.05] pt-2.5 transition-opacity sm:w-auto sm:shrink-0 sm:border-t-0 sm:pt-0 sm:opacity-60 sm:focus-within:opacity-100 sm:group-hover:opacity-100">
+        <div className="flex w-full items-center justify-end gap-1.5 border-t border-line pt-2.5 transition-opacity sm:w-auto sm:shrink-0 sm:border-t-0 sm:pt-0 sm:opacity-60 sm:focus-within:opacity-100 sm:group-hover:opacity-100">
           <button
             onClick={handleCopy}
             className="btn-icon sm:h-8 sm:w-8 sm:rounded-lg"
             title="Copy details"
             aria-label="Copy details"
           >
-            {copied ? <Check className="h-3.5 w-3.5 text-emerald-400" /> : <Copy className="h-3.5 w-3.5" />}
+            {copied ? <Check className="h-3.5 w-3.5 text-emerald-600" /> : <Copy className="h-3.5 w-3.5" />}
           </button>
           <button
             onClick={() => onEdit(transaction)}
-            className="btn-icon hover:!text-primary-200 sm:h-8 sm:w-8 sm:rounded-lg"
+            className="btn-icon hover:!border-primary-200 hover:!bg-primary-50 hover:!text-primary-700 sm:h-8 sm:w-8 sm:rounded-lg"
             title="Edit Transaction"
             aria-label="Edit transaction"
           >
@@ -184,7 +223,7 @@ export default function TransactionItemCard({
           </button>
           <button
             onClick={() => onDelete(transaction.id)}
-            className="btn-icon hover:!border-rose-400/30 hover:!bg-rose-500/10 hover:!text-rose-300 sm:h-8 sm:w-8 sm:rounded-lg"
+            className="btn-icon hover:!border-rose-200 hover:!bg-rose-50 hover:!text-rose-600 sm:h-8 sm:w-8 sm:rounded-lg"
             title="Delete Transaction"
             aria-label="Delete transaction"
           >

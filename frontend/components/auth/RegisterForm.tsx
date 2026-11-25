@@ -95,20 +95,20 @@ export default function RegisterForm({ onRegister }: RegisterFormProps) {
           <span className="icon-tile icon-tile-lg icon-tile-brand h-14 w-14 rounded-2xl">
             <Mail className="h-6 w-6" aria-hidden="true" />
           </span>
-          <span className="absolute -bottom-1.5 -right-1.5 flex h-6 w-6 items-center justify-center rounded-full bg-emerald-500 text-white shadow-[0_0_0_3px_rgba(12,14,28,1),0_6px_16px_-4px_rgba(16,185,129,0.7)]">
+          <span className="absolute -bottom-1.5 -right-1.5 flex h-6 w-6 items-center justify-center rounded-full bg-emerald-600 text-white ring-[3px] ring-white shadow-[0_6px_14px_-6px_rgba(5,150,105,0.6)]">
             <CheckCircle className="h-3.5 w-3.5" strokeWidth={2.6} aria-hidden="true" />
           </span>
         </div>
-        <h3 className="text-xl font-semibold tracking-tight text-white">
+        <h3 className="text-xl font-semibold tracking-tight text-ink-900">
           Account Created!
         </h3>
-        <p className="mx-auto mt-2 max-w-xs text-sm leading-relaxed text-slate-400">
+        <p className="mx-auto mt-2 max-w-xs text-sm leading-relaxed text-slate-500">
           We&apos;ve sent a verification email to your inbox. Please verify your
           email to get started.
         </p>
         <button
           onClick={() => setRegistrationSuccess(false)}
-          className="btn-ghost btn-sm mt-5 text-primary-300"
+          className="btn-ghost btn-sm mt-5 text-primary-700"
         >
           <ArrowLeft className="h-3.5 w-3.5" aria-hidden="true" />
           Back to Sign Up
@@ -131,9 +131,9 @@ export default function RegisterForm({ onRegister }: RegisterFormProps) {
       {error && (
         <div
           role="alert"
-          className="flex items-start gap-2.5 rounded-xl border border-rose-500/25 bg-rose-500/10 px-3.5 py-3 text-sm leading-relaxed text-rose-200 animate-fade-in"
+          className="flex items-start gap-2.5 rounded-xl border border-rose-200 bg-rose-50 px-3.5 py-3 text-sm leading-relaxed text-rose-700 animate-fade-in"
         >
-          <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-rose-300" aria-hidden="true" />
+          <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-rose-600" aria-hidden="true" />
           <span className="min-w-0 break-words">{error}</span>
         </div>
       )}
@@ -144,7 +144,7 @@ export default function RegisterForm({ onRegister }: RegisterFormProps) {
         </label>
         <div className="group relative">
           <User
-            className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500 transition-colors group-focus-within:text-primary-300"
+            className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400 transition-colors group-focus-within:text-primary-600"
             aria-hidden="true"
           />
           <input
@@ -169,7 +169,7 @@ export default function RegisterForm({ onRegister }: RegisterFormProps) {
         </label>
         <div className="group relative">
           <Mail
-            className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500 transition-colors group-focus-within:text-primary-300"
+            className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400 transition-colors group-focus-within:text-primary-600"
             aria-hidden="true"
           />
           <input
@@ -195,7 +195,7 @@ export default function RegisterForm({ onRegister }: RegisterFormProps) {
 
         <div className="group relative">
           <Lock
-            className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500 transition-colors group-focus-within:text-primary-300"
+            className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400 transition-colors group-focus-within:text-primary-600"
             aria-hidden="true"
           />
           <input
@@ -217,7 +217,7 @@ export default function RegisterForm({ onRegister }: RegisterFormProps) {
             disabled={loading}
             onClick={() => setShowPassword(!showPassword)}
             aria-label={showPassword ? "Hide password" : "Show password"}
-            className="absolute inset-y-0 right-1.5 my-auto flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-white/[0.06] hover:text-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-400/70"
+            className="absolute inset-y-0 right-1.5 my-auto flex h-8 w-8 items-center justify-center rounded-lg text-slate-500 transition-colors hover:bg-ink-900/[0.04] hover:text-ink-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/60"
           >
             {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
           </button>
@@ -231,7 +231,7 @@ export default function RegisterForm({ onRegister }: RegisterFormProps) {
 
         <div className="group relative">
           <ShieldCheck
-            className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500 transition-colors group-focus-within:text-primary-300"
+            className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400 transition-colors group-focus-within:text-primary-600"
             aria-hidden="true"
           />
           <input
@@ -253,7 +253,7 @@ export default function RegisterForm({ onRegister }: RegisterFormProps) {
             disabled={loading}
             onClick={() => setShowConfirmPassword(!showConfirmPassword)}
             aria-label={showConfirmPassword ? "Hide password" : "Show password"}
-            className="absolute inset-y-0 right-1.5 my-auto flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-white/[0.06] hover:text-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-400/70"
+            className="absolute inset-y-0 right-1.5 my-auto flex h-8 w-8 items-center justify-center rounded-lg text-slate-500 transition-colors hover:bg-ink-900/[0.04] hover:text-ink-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/60"
           >
             {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
           </button>

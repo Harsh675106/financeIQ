@@ -134,7 +134,7 @@ export default function DocumentIntelligenceCard() {
     <div className="card card-pad">
       <SectionHeader icon={FileSearch} tone="violet" title="Document Intelligence" as="h3" />
 
-      <p className="mt-3 max-w-3xl text-sm leading-relaxed text-slate-400">
+      <p className="mt-3 max-w-3xl text-sm leading-relaxed text-slate-500">
         Upload text or CSV statements, or paste OCR text from PDFs and images. FinanceIQ will extract structured entries and let you import reviewed records.
       </p>
 
@@ -159,16 +159,16 @@ export default function DocumentIntelligenceCard() {
           ))}
         </select>
         <label
-          className={`group flex min-h-[2.75rem] min-w-0 cursor-pointer items-center gap-2.5 rounded-xl border border-dashed px-3 py-2 transition-colors duration-200 hover:border-violet-400/50 hover:bg-violet-500/[0.07] ${
-            fileName ? 'border-violet-400/40 bg-violet-500/[0.06]' : 'border-white/15 bg-white/[0.02]'
+          className={`group flex min-h-[2.75rem] min-w-0 cursor-pointer items-center gap-2.5 rounded-xl border border-dashed px-3 py-2 transition-colors duration-200 hover:border-primary-300 hover:bg-primary-50/70 ${
+            fileName ? 'border-primary-300 bg-primary-50/70' : 'border-ice-200 bg-ice-50/60'
           }`}
         >
-          <span className="icon-tile icon-tile-sm icon-tile-violet h-7 w-7 rounded-lg">
+          <span className="icon-tile icon-tile-sm icon-tile-sky h-7 w-7 rounded-lg">
             <Upload className="h-3.5 w-3.5" />
           </span>
           <span
-            className={`min-w-0 truncate text-sm transition-colors duration-200 group-hover:text-slate-100 ${
-              fileName ? 'font-medium text-slate-100' : 'text-slate-400'
+            className={`min-w-0 truncate text-sm transition-colors duration-200 group-hover:text-ink-900 ${
+              fileName ? 'font-medium text-ink-900' : 'text-slate-500'
             }`}
           >
             {fileName || 'Upload .txt or .csv'}
@@ -200,11 +200,11 @@ export default function DocumentIntelligenceCard() {
       </div>
 
       {currentResult ? (
-        <div className="mt-6 space-y-4 rounded-2xl border border-violet-400/20 bg-gradient-to-br from-violet-500/[0.08] via-transparent to-primary-500/[0.04] p-4 sm:p-5">
+        <div className="mt-6 space-y-4 rounded-2xl border border-indigo-100 bg-gradient-to-br from-indigo-50/80 via-white to-ice-50/70 p-4 sm:p-5">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
             <div className="min-w-0">
               <p className="eyebrow">Latest analysis</p>
-              <h4 className="mt-1.5 text-base font-semibold leading-snug text-slate-50">{currentResult.summary}</h4>
+              <h4 className="mt-1.5 text-base font-semibold leading-snug text-ink-900">{currentResult.summary}</h4>
             </div>
             <span className="badge badge-ai num shrink-0 self-start px-3 py-1">
               {Math.round(currentResult.confidence)}% confidence
@@ -212,26 +212,26 @@ export default function DocumentIntelligenceCard() {
           </div>
 
           <div className="grid gap-3 md:grid-cols-3">
-            <div className="surface-inset p-3 sm:p-4">
+            <div className="surface-inset bg-white p-3 sm:p-4">
               <p className="eyebrow">Import preview</p>
               <p className="kpi-value mt-2 text-lg">
                 {currentResult.importPreview.transactionCount} rows
               </p>
-              <p className="num text-xs text-slate-400">
+              <p className="num text-xs text-slate-500">
                 {currentResult.importPreview.incomeCount} income | {currentResult.importPreview.expenseCount} expense
               </p>
             </div>
-            <div className="surface-inset p-3 sm:p-4">
+            <div className="surface-inset bg-white p-3 sm:p-4">
               <p className="eyebrow">Assumptions</p>
               <div className="mt-2 space-y-1">
                 {currentResult.assumptions.slice(0, 2).map((item) => (
-                  <p key={item} className="text-xs leading-relaxed text-slate-300">{item}</p>
+                  <p key={item} className="text-xs leading-relaxed text-ink-700">{item}</p>
                 ))}
               </div>
             </div>
-            <div className="surface-inset p-3 sm:p-4">
+            <div className="surface-inset bg-white p-3 sm:p-4">
               <p className="eyebrow">If wrong</p>
-              <p className="mt-2 text-xs leading-relaxed text-slate-300">{currentResult.whatChangesIfWrong}</p>
+              <p className="mt-2 text-xs leading-relaxed text-ink-700">{currentResult.whatChangesIfWrong}</p>
             </div>
           </div>
 
@@ -240,17 +240,17 @@ export default function DocumentIntelligenceCard() {
               <p className="eyebrow">Detected entries</p>
               <div className="scroll-thin max-h-72 space-y-2 overflow-auto pr-1">
                 {currentResult.suggestedTransactions.slice(0, 8).map((item, index) => (
-                  <div key={`${item.description}-${index}`} className="surface-inset surface-inset-hover p-3">
+                  <div key={`${item.description}-${index}`} className="surface-inset surface-inset-hover bg-white p-3">
                     <div className="flex items-center justify-between gap-3">
                       <div className="min-w-0">
-                        <p className="break-words text-sm font-medium text-slate-100">{item.description}</p>
-                        <p className="num text-xs text-slate-400">
+                        <p className="break-words text-sm font-medium text-ink-900">{item.description}</p>
+                        <p className="num text-xs text-slate-500">
                           {item.date} | {item.category} | {Math.round(item.confidence)}% confidence
                         </p>
                       </div>
                       <div
                         className={`num shrink-0 font-display text-sm font-semibold ${
-                          item.type === 'income' ? 'text-emerald-300' : 'text-rose-300'
+                          item.type === 'income' ? 'text-emerald-700' : 'text-rose-600'
                         }`}
                       >
                         {Math.round(item.amount).toLocaleString('en-IN')}
@@ -276,11 +276,11 @@ export default function DocumentIntelligenceCard() {
         </div>
       ) : null}
 
-      <div className="mt-6 border-t border-white/[0.06] pt-5">
+      <div className="mt-6 border-t border-line pt-5">
         <p className="eyebrow mb-3">Recent analyses</p>
         <div className="space-y-3">
           {documents.length === 0 ? (
-            <p className="surface-inset border-dashed p-4 text-sm text-slate-400">No document analyses yet.</p>
+            <p className="surface-inset border-dashed border-line-strong p-4 text-sm text-slate-500">No document analyses yet.</p>
           ) : (
             documents.map((item) => (
               <div key={item.id} className="surface-inset surface-inset-hover p-4">
@@ -290,11 +290,11 @@ export default function DocumentIntelligenceCard() {
                       <FileText className="h-4 w-4" />
                     </span>
                     <div className="min-w-0">
-                      <h4 className="break-words text-sm font-semibold text-slate-50">{item.documentName}</h4>
-                      <p className="mt-1 text-xs text-slate-400">
+                      <h4 className="break-words text-sm font-semibold text-ink-900">{item.documentName}</h4>
+                      <p className="mt-1 text-xs text-slate-500">
                         {item.documentType.replace(/_/g, ' ')} | {new Date(item.createdAt).toLocaleDateString()}
                       </p>
-                      <p className="mt-2 text-sm leading-relaxed text-slate-300">{item.analysis?.summary}</p>
+                      <p className="mt-2 text-sm leading-relaxed text-slate-600">{item.analysis?.summary}</p>
                     </div>
                   </div>
                   <div className="shrink-0 text-right">

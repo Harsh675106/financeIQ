@@ -54,9 +54,9 @@ const STORY_CHAPTERS: StoryChapter[] = [
     subtitle: 'Foundation & Intent',
     range: [0, 24],
     icon: Sparkles,
-    color: 'text-sky-300',
-    glow: 'rgba(56, 189, 248, 0.4)',
-    badgeBg: 'bg-sky-500/10 border-sky-400/25 text-sky-200',
+    color: 'text-sky-600',
+    glow: 'rgba(56, 189, 248, 0.22)',
+    badgeBg: 'bg-sky-50 border-sky-200 text-sky-700',
     description: 'The journey begins. You declare your intention, plant the initial capital seed, and formulate the blueprint.',
   },
   {
@@ -65,9 +65,9 @@ const STORY_CHAPTERS: StoryChapter[] = [
     subtitle: 'Building Velocity',
     range: [25, 49],
     icon: Rocket,
-    color: 'text-primary-300',
-    glow: 'rgba(112, 104, 244, 0.45)',
-    badgeBg: 'bg-primary-500/15 border-primary-400/30 text-primary-200',
+    color: 'text-teal-600',
+    glow: 'rgba(20, 184, 166, 0.22)',
+    badgeBg: 'bg-teal-50 border-teal-200 text-teal-700',
     description: 'Momentum is igniting. Regular contributions establish discipline, and compounding begins its subtle work.',
   },
   {
@@ -76,9 +76,9 @@ const STORY_CHAPTERS: StoryChapter[] = [
     subtitle: 'Gravitational Escape',
     range: [50, 74],
     icon: Flame,
-    color: 'text-violet-300',
-    glow: 'rgba(139, 92, 246, 0.45)',
-    badgeBg: 'bg-violet-500/15 border-violet-400/30 text-violet-200',
+    color: 'text-indigo-600',
+    glow: 'rgba(99, 102, 241, 0.2)',
+    badgeBg: 'bg-indigo-50 border-indigo-200 text-indigo-700',
     description: 'The halfway threshold is crossed! You possess unstoppable capital velocity as your goal pulls within reachable distance.',
   },
   {
@@ -87,9 +87,9 @@ const STORY_CHAPTERS: StoryChapter[] = [
     subtitle: 'The Final Sprint',
     range: [75, 99],
     icon: Mountain,
-    color: 'text-cyan-300',
-    glow: 'rgba(34, 211, 238, 0.45)',
-    badgeBg: 'bg-cyan-500/15 border-cyan-400/30 text-cyan-200',
+    color: 'text-cyan-700',
+    glow: 'rgba(34, 211, 238, 0.22)',
+    badgeBg: 'bg-cyan-50 border-cyan-200 text-cyan-700',
     description: 'The summit is crystal clear. One final disciplined push separates you from your vision becoming tangible reality.',
   },
   {
@@ -98,9 +98,9 @@ const STORY_CHAPTERS: StoryChapter[] = [
     subtitle: 'Legendary Mastery',
     range: [100, 100],
     icon: Trophy,
-    color: 'text-emerald-300',
-    glow: 'rgba(52, 211, 153, 0.5)',
-    badgeBg: 'bg-emerald-500/15 border-emerald-400/30 text-emerald-200',
+    color: 'text-emerald-600',
+    glow: 'rgba(16, 185, 129, 0.24)',
+    badgeBg: 'bg-emerald-50 border-emerald-200 text-emerald-700',
     description: 'Goal fully conquered! A monument to your discipline and foresight, unlocking freedom and new horizons.',
   },
 ]
@@ -134,32 +134,32 @@ export default function GoalStorylineMap({
 
   return (
     <div className="story-glass-card relative overflow-hidden rounded-[1.25rem] p-5 animate-fade-up sm:p-7">
-      {/* Background Starfield Decor */}
+      {/* Background soft mint / ice wash with a few pastel sparkles */}
       <div className="pointer-events-none absolute inset-0" aria-hidden="true">
-        <div className="absolute -top-28 left-1/4 h-56 w-[28rem] max-w-full rounded-full bg-primary-500/10 blur-3xl" />
-        <div className="absolute -bottom-24 right-0 h-48 w-80 max-w-full rounded-full bg-cyan-500/[0.07] blur-3xl" />
-        <div className="opacity-50">
-          <div className="star-twinkle-anim absolute left-12 top-6 h-1 w-1 rounded-full bg-primary-300 shadow-[0_0_8px_#a9acff]" />
-          <div className="star-twinkle-anim absolute right-24 top-14 h-1.5 w-1.5 rounded-full bg-cyan-300 shadow-[0_0_8px_#22d3ee] [animation-delay:1.2s]" />
-          <div className="star-twinkle-anim absolute bottom-12 left-1/3 h-1 w-1 rounded-full bg-violet-300 shadow-[0_0_6px_#a78bfa] [animation-delay:2s]" />
-          <div className="star-twinkle-anim absolute bottom-6 right-1/4 h-1.5 w-1.5 rounded-full bg-primary-200 shadow-[0_0_8px_#cacdff] [animation-delay:0.7s]" />
+        <div className="absolute -top-28 left-1/4 h-56 w-[28rem] max-w-full rounded-full bg-primary-100/60 blur-3xl" />
+        <div className="absolute -bottom-24 right-0 h-48 w-80 max-w-full rounded-full bg-ice-100/70 blur-3xl" />
+        <div className="opacity-70">
+          <div className="star-twinkle-anim absolute left-12 top-6 h-1 w-1 rounded-full bg-primary-300" />
+          <div className="star-twinkle-anim absolute right-24 top-14 h-1.5 w-1.5 rounded-full bg-ice-300 [animation-delay:1.2s]" />
+          <div className="star-twinkle-anim absolute bottom-12 left-1/3 h-1 w-1 rounded-full bg-indigo-200 [animation-delay:2s]" />
+          <div className="star-twinkle-anim absolute bottom-6 right-1/4 h-1.5 w-1.5 rounded-full bg-primary-200 [animation-delay:0.7s]" />
         </div>
       </div>
 
       {/* Header Bar */}
-      <div className="relative z-10 flex flex-col gap-4 border-b border-white/[0.06] pb-5 md:flex-row md:items-center md:justify-between">
+      <div className="relative z-10 flex flex-col gap-4 border-b border-line pb-5 md:flex-row md:items-center md:justify-between">
         <div className="flex min-w-0 items-center gap-3">
           <span className="icon-tile icon-tile-lg icon-tile-brand">
             <Compass className="h-6 w-6" />
           </span>
           <div className="min-w-0">
             <div className="flex items-center gap-2">
-              <span className="eyebrow text-primary-300">
+              <span className="eyebrow text-primary-700">
                 Interactive Odyssey Map
               </span>
-              <span className="h-1.5 w-1.5 rounded-full bg-cyan-400 shadow-[0_0_8px_#22d3ee] animate-pulse" aria-hidden="true" />
+              <span className="h-1.5 w-1.5 rounded-full bg-ice-500 animate-pulse" aria-hidden="true" />
             </div>
-            <h2 className="mt-0.5 font-display text-xl font-semibold tracking-tight text-white sm:text-2xl">
+            <h2 className="mt-0.5 font-display text-lg font-semibold tracking-tight text-ink-900 sm:text-xl">
               The Wealth Journey Storyline
             </h2>
           </div>
@@ -178,17 +178,17 @@ export default function GoalStorylineMap({
                 aria-pressed={isSelected}
                 className={`flex shrink-0 items-center gap-2 whitespace-nowrap rounded-xl border px-3 py-2 text-xs font-semibold transition-colors ${
                   isSelected
-                    ? 'border-primary-400/45 bg-primary-500/15 text-white shadow-[0_6px_20px_-10px_rgba(112,104,244,0.8)]'
-                    : 'border-white/[0.08] bg-white/[0.03] text-slate-400 hover:border-white/15 hover:text-slate-100'
+                    ? 'border-primary-300 bg-primary-50 text-primary-800 shadow-xs'
+                    : 'border-line bg-white text-slate-600 hover:border-line-strong hover:bg-slate-50 hover:text-ink-900'
                 }`}
               >
                 <span className="max-w-[120px] truncate">{g.name}</span>
                 <span className={`num rounded-full px-1.5 text-[10px] leading-4 ${
                   gProgress >= 100
-                    ? 'bg-emerald-500/20 font-semibold text-emerald-300'
+                    ? 'bg-emerald-100 font-semibold text-emerald-700'
                     : isSelected
-                    ? 'bg-primary-400/25 text-primary-100'
-                    : 'bg-white/[0.06] text-slate-400'
+                    ? 'bg-white text-primary-700 ring-1 ring-primary-200'
+                    : 'bg-slate-100 text-slate-500'
                 }`}>
                   {gProgress.toFixed(0)}%
                 </span>
@@ -202,27 +202,27 @@ export default function GoalStorylineMap({
       <div className="relative z-10 my-6 py-4 sm:my-8">
         {/* Track Line Background (Desktop Horizontal Trail) */}
         <div className="relative mb-12 hidden lg:block">
-          {/* Glowing Base Path */}
-          <div className="absolute left-6 right-6 top-1/2 h-2.5 -translate-y-1/2 overflow-hidden rounded-full bg-white/[0.06] shadow-[inset_0_1px_1px_rgba(0,0,0,0.35)]">
-            {/* Filled Progress Beam */}
+          {/* Pale Base Path */}
+          <div className="absolute left-6 right-6 top-1/2 h-2.5 -translate-y-1/2 overflow-hidden rounded-full bg-[#E6EFEC] shadow-[inset_0_1px_2px_rgba(16,40,38,0.08)]">
+            {/* Filled Progress Beam (mint → ice, emerald when complete) */}
             <div
               className={`progress-fill neon-progress-bar ${
                 progress >= 100
-                  ? 'bg-gradient-to-r from-emerald-400 to-teal-300 shadow-[0_0_16px_-2px_rgba(52,211,153,0.8)]'
-                  : 'shadow-[0_0_18px_-2px_rgba(138,136,251,0.85)]'
+                  ? 'bg-gradient-to-r from-emerald-400 to-emerald-600'
+                  : ''
               }`}
               style={{ width: `${Math.max(2, progress)}%` }}
             />
           </div>
 
-          {/* SVG Animated Particle Route */}
+          {/* SVG Animated Route (soft white dashes travelling along the track) */}
           <svg className="pointer-events-none absolute left-6 right-6 top-1/2 h-6 w-[calc(100%-3rem)] -translate-y-1/2 overflow-visible" aria-hidden="true">
             <line
               x1="0"
               y1="12"
               x2="100%"
               y2="12"
-              className="odyssey-animated-track stroke-primary-200/30"
+              className="odyssey-animated-track stroke-white/70"
               strokeWidth="2"
             />
           </svg>
@@ -236,28 +236,28 @@ export default function GoalStorylineMap({
 
               return (
                 <div key={ch.id} className="group relative z-10 flex flex-col items-center">
-                  {/* Glowing Node Button */}
+                  {/* Milestone Node */}
                   <div className="relative flex items-center justify-center">
-                    {/* Active Beacon Ripple Rings */}
+                    {/* Active Beacon Ripple Ring */}
                     {isCurrent && (
-                      <div className="odyssey-beacon-ripple pointer-events-none absolute inset-0 -m-3 rounded-full border-2 border-primary-400/70" />
+                      <div className="odyssey-beacon-ripple pointer-events-none absolute inset-0 -m-3 rounded-full border-2 border-primary-300" />
                     )}
 
                     <div
                       className={`relative flex h-14 w-14 items-center justify-center rounded-2xl transition-[transform,background-color,border-color,box-shadow,color] duration-500 ${
                         isPast || (idx === 4 && progress >= 100)
                           ? idx === 4
-                            ? 'scale-105 bg-gradient-to-br from-emerald-400 to-teal-500 text-slate-950 shadow-[0_0_26px_rgba(52,211,153,0.45)]'
-                            : 'scale-105 bg-gradient-to-br from-primary-500 to-violet-600 text-white shadow-[0_0_24px_rgba(112,104,244,0.5),inset_0_1px_0_rgba(255,255,255,0.2)]'
+                            ? 'scale-105 bg-gradient-to-br from-emerald-600 to-teal-600 text-white shadow-[0_10px_24px_-12px_rgba(5,150,105,0.6)]'
+                            : 'scale-105 border-2 border-primary-200 bg-white text-primary-600 shadow-card'
                           : isCurrent
-                          ? 'scale-110 border-2 border-primary-400 bg-slate-900 text-primary-200 shadow-[0_0_30px_rgba(112,104,244,0.55)]'
-                          : 'border border-white/10 bg-slate-900 text-slate-500'
+                          ? 'scale-110 border-2 border-primary-500 bg-white text-primary-600 shadow-[0_0_0_4px_rgba(16,185,129,0.12),0_10px_24px_-12px_rgba(5,150,105,0.45)]'
+                          : 'border border-line-strong bg-white text-slate-400 shadow-xs'
                       }`}
                     >
                       <Icon className="h-6 w-6 transition-transform motion-safe:group-hover:scale-110" />
 
                       {isPast && (
-                        <div className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-cyan-300 text-slate-950 shadow-[0_0_10px_rgba(34,211,238,0.6)] ring-2 ring-slate-950">
+                        <div className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-ice-600 text-white shadow-xs ring-2 ring-white">
                           <CheckCircle2 className="h-3 w-3" />
                         </div>
                       )}
@@ -267,7 +267,7 @@ export default function GoalStorylineMap({
                   {/* Chapter Label */}
                   <div className="mt-3 text-center">
                     <span className={`block text-xs font-semibold transition-colors ${
-                      isCurrent ? 'text-primary-200' : isPast ? 'text-slate-200' : 'text-slate-500'
+                      isCurrent ? 'text-primary-700' : isPast ? 'text-ink-800' : 'text-slate-500'
                     }`}>
                       {ch.subtitle}
                     </span>
@@ -287,7 +287,7 @@ export default function GoalStorylineMap({
             <div
               className={`progress-fill neon-progress-bar ${
                 progress >= 100
-                  ? 'bg-gradient-to-r from-emerald-400 to-teal-300 shadow-[0_0_12px_-2px_rgba(52,211,153,0.75)]'
+                  ? 'bg-gradient-to-r from-emerald-400 to-emerald-600'
                   : ''
               }`}
               style={{ width: `${Math.max(4, progress)}%` }}
@@ -303,10 +303,10 @@ export default function GoalStorylineMap({
                   key={ch.id}
                   className={`flex min-w-0 flex-col items-center rounded-xl border p-2 text-center transition-colors ${
                     isCurrent
-                      ? 'border-primary-400/50 bg-primary-500/15 text-primary-100 shadow-[0_6px_20px_-10px_rgba(112,104,244,0.8)]'
+                      ? 'border-primary-300 bg-primary-50 text-primary-700 shadow-xs'
                       : isPast
-                      ? 'border-white/10 bg-white/[0.05] text-slate-300'
-                      : 'border-white/[0.05] bg-white/[0.02] text-slate-600'
+                      ? 'border-primary-100 bg-white text-ink-700'
+                      : 'border-line bg-slate-50 text-slate-500'
                   }`}
                 >
                   <Icon className="mb-1 h-4 w-4" />
@@ -318,10 +318,10 @@ export default function GoalStorylineMap({
         </div>
 
         {/* Dynamic Story Lore Card */}
-        <div className="relative overflow-hidden rounded-2xl border border-white/[0.07] bg-slate-950/60 p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)] backdrop-blur-xl sm:p-6">
+        <div className="surface-highlight relative overflow-hidden p-5 sm:p-6">
           <div
             aria-hidden="true"
-            className="pointer-events-none absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-primary-300/60 to-transparent"
+            className="pointer-events-none absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-primary-400/60 to-transparent"
           />
           <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
             <div className="min-w-0 space-y-2">
@@ -330,33 +330,33 @@ export default function GoalStorylineMap({
                   {React.createElement(currentChapter.icon, { className: 'h-3.5 w-3.5' })}
                   {currentChapter.name}
                 </span>
-                <span className="num text-xs text-slate-400">
-                  Coordinates: <strong className="font-semibold text-slate-100">₹{currentAmt.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</strong> of ₹{targetAmt.toLocaleString('en-IN', { maximumFractionDigits: 0 })} ({progress.toFixed(1)}%)
+                <span className="num text-xs text-slate-500">
+                  Coordinates: <strong className="font-semibold text-ink-900">₹{currentAmt.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</strong> of ₹{targetAmt.toLocaleString('en-IN', { maximumFractionDigits: 0 })} ({progress.toFixed(1)}%)
                 </span>
               </div>
 
-              <h3 className="break-words font-display text-lg font-semibold tracking-tight text-white sm:text-xl">
+              <h3 className="break-words font-display text-lg font-semibold tracking-tight text-ink-900">
                 {activeGoal.name} • {currentChapter.subtitle}
               </h3>
 
-              <p className="max-w-2xl text-xs leading-relaxed text-slate-300 sm:text-sm">
+              <p className="max-w-2xl text-xs leading-relaxed text-slate-600 sm:text-sm">
                 {currentChapter.description}
               </p>
 
               {/* Real-Time Quest Insights */}
               <div className="flex flex-wrap items-center gap-2 pt-2 text-xs">
-                <span className="num inline-flex items-center gap-1.5 rounded-lg border border-white/[0.06] bg-white/[0.03] px-2.5 py-1 text-slate-300">
-                  <Coins className="h-3.5 w-3.5 text-primary-300" />
+                <span className="num inline-flex items-center gap-1.5 rounded-lg border border-line bg-white px-2.5 py-1 text-ink-700 shadow-xs">
+                  <Coins className="h-3.5 w-3.5 text-primary-600" />
                   Remaining: ₹{remaining.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
                 </span>
                 {monthlyPace > 0 && (
-                  <span className="num inline-flex items-center gap-1.5 rounded-lg border border-white/[0.06] bg-white/[0.03] px-2.5 py-1 text-slate-300">
-                    <Zap className="h-3.5 w-3.5 text-cyan-300" />
+                  <span className="num inline-flex items-center gap-1.5 rounded-lg border border-line bg-white px-2.5 py-1 text-ink-700 shadow-xs">
+                    <Zap className="h-3.5 w-3.5 text-ice-600" />
                     Pace: ₹{monthlyPace.toLocaleString('en-IN', { maximumFractionDigits: 0 })}/mo
                   </span>
                 )}
                 {estimatedMonths !== null && (
-                  <span className="num inline-flex items-center gap-1.5 rounded-lg border border-violet-400/20 bg-violet-500/10 px-2.5 py-1 font-semibold text-violet-200">
+                  <span className="num inline-flex items-center gap-1.5 rounded-lg border border-indigo-200 bg-indigo-50 px-2.5 py-1 font-semibold text-indigo-700">
                     <Clock className="h-3.5 w-3.5" />
                     Projected Conquest: ~{estimatedMonths} {estimatedMonths === 1 ? 'month' : 'months'}
                   </span>
@@ -371,7 +371,7 @@ export default function GoalStorylineMap({
                 onClick={() => onOpenSimulator(activeGoal)}
                 className="btn-secondary h-10 flex-1 sm:flex-none"
               >
-                <Zap className="h-4 w-4 text-cyan-300" />
+                <Zap className="h-4 w-4 text-ice-600" />
                 Simulate Speedup
               </button>
 

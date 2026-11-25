@@ -55,7 +55,7 @@ interface AnalysisResponse {
 const FORECAST_LEGEND = [
   { label: 'Income', color: chartColors.positive },
   { label: 'Expense', color: chartColors.negative },
-  { label: 'Projected balance', color: chartColors.brand },
+  { label: 'Projected balance', color: chartColors.iceStrong },
 ]
 
 export default function AnalysisPage() {
@@ -99,15 +99,15 @@ export default function AnalysisPage() {
         >
           <div className="flex flex-col items-center gap-5">
             <div className="relative flex h-16 w-16 items-center justify-center">
-              <div aria-hidden="true" className="absolute inset-0 rounded-full bg-violet-500/20 blur-2xl" />
-              <div aria-hidden="true" className="absolute inset-0 rounded-full border border-white/10" />
+              <div aria-hidden="true" className="absolute inset-0 rounded-full bg-indigo-200/60 blur-2xl" />
+              <div aria-hidden="true" className="absolute inset-0 rounded-full border border-line" />
               <div
                 aria-hidden="true"
-                className="absolute inset-0 animate-spin rounded-full border-2 border-transparent border-r-cyan-400/70 border-t-primary-400"
+                className="absolute inset-0 animate-spin rounded-full border-2 border-transparent border-r-ice-400 border-t-primary-500"
               />
-              <BrainCircuit className="h-6 w-6 text-violet-200" />
+              <BrainCircuit className="h-6 w-6 text-indigo-600" />
             </div>
-            <p className="text-sm text-slate-400">Loading your financial analysis…</p>
+            <p className="text-sm text-slate-500">Loading your financial analysis…</p>
           </div>
         </div>
       </DashboardLayout>
@@ -142,13 +142,10 @@ export default function AnalysisPage() {
               tone="brand"
               title="6-Month Cashflow Forecast"
               actions={
-                <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-[11px] font-medium text-slate-300">
+                <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-[11px] font-medium text-slate-600">
                   {FORECAST_LEGEND.map((entry) => (
                     <span key={entry.label} className="flex items-center gap-1.5">
-                      <span
-                        className="h-2 w-2 rounded-full"
-                        style={{ backgroundColor: entry.color, boxShadow: `0 0 8px ${entry.color}` }}
-                      />
+                      <span className="h-2 w-2 rounded-full" style={{ backgroundColor: entry.color }} />
                       {entry.label}
                     </span>
                   ))}
@@ -183,10 +180,10 @@ export default function AnalysisPage() {
                   <Line
                     type="monotone"
                     dataKey="projectedBalance"
-                    stroke={chartColors.brand}
+                    stroke={chartColors.iceStrong}
                     strokeWidth={3}
-                    dot={{ r: 3, fill: chartColors.brand, strokeWidth: 0 }}
-                    activeDot={activeDot}
+                    dot={{ r: 3, fill: chartColors.iceStrong, strokeWidth: 0 }}
+                    activeDot={{ ...activeDot, fill: chartColors.iceStrong }}
                     isAnimationActive={!reduceMotion}
                   />
                 </LineChart>
@@ -195,13 +192,13 @@ export default function AnalysisPage() {
             <div className="mt-5 grid gap-3 sm:gap-4 md:grid-cols-2">
               <div className="surface-inset p-4">
                 <p className="eyebrow">Baseline income</p>
-                <p className="kpi-value mt-2 text-2xl text-emerald-300">
+                <p className="kpi-value mt-2 text-2xl text-emerald-700">
                   {Math.round(analysisData?.forecast?.baseline?.monthlyIncome || 0).toLocaleString('en-IN')}
                 </p>
               </div>
               <div className="surface-inset p-4">
                 <p className="eyebrow">Baseline expense</p>
-                <p className="kpi-value mt-2 text-2xl text-rose-300">
+                <p className="kpi-value mt-2 text-2xl text-rose-600">
                   {Math.round(analysisData?.forecast?.baseline?.monthlyExpense || 0).toLocaleString('en-IN')}
                 </p>
               </div>
@@ -212,19 +209,19 @@ export default function AnalysisPage() {
             <SectionHeader icon={AlertTriangle} tone="amber" title="Top Priorities" />
             <div className="mt-5 space-y-3">
               {priorities.length === 0 ? (
-                <p className="surface-inset border-dashed p-4 text-sm text-slate-400">
+                <p className="surface-inset border-dashed border-line-strong p-4 text-sm text-slate-500">
                   Add more financial data to unlock personalized priorities.
                 </p>
               ) : (
                 priorities.map((priority) => (
                   <div key={`${priority.title}-${priority.metric}`} className="surface-inset surface-inset-hover p-4">
                     <div className="flex items-start justify-between gap-3">
-                      <h3 className="min-w-0 break-words text-sm font-semibold text-slate-100">{priority.title}</h3>
+                      <h3 className="min-w-0 break-words text-sm font-semibold text-ink-900">{priority.title}</h3>
                       <span className="badge badge-ai shrink-0 uppercase tracking-wide">
                         {Math.round(priority.confidence * 100)}% confidence
                       </span>
                     </div>
-                    <p className="mt-2 text-sm leading-relaxed text-slate-300">{priority.detail}</p>
+                    <p className="mt-2 text-sm leading-relaxed text-slate-600">{priority.detail}</p>
                   </div>
                 ))
               )}
@@ -234,22 +231,22 @@ export default function AnalysisPage() {
 
         <div className="grid grid-cols-1 gap-4 sm:gap-6 lg:grid-cols-2">
           <div className="card card-pad min-w-0">
-            <SectionHeader icon={Wallet} tone="cyan" title="Opportunities" />
+            <SectionHeader icon={Wallet} tone="sky" title="Opportunities" />
             <div className="mt-5 space-y-3">
               {opportunities.length === 0 ? (
-                <p className="surface-inset border-dashed p-4 text-sm text-slate-400">
+                <p className="surface-inset border-dashed border-line-strong p-4 text-sm text-slate-500">
                   No clear opportunities yet. More budgeting and savings data will improve this section.
                 </p>
               ) : (
                 opportunities.map((item) => (
                   <div key={item.title} className="surface-inset surface-inset-hover p-4">
                     <div className="flex items-start justify-between gap-3">
-                      <h3 className="min-w-0 break-words text-sm font-semibold text-slate-100">{item.title}</h3>
-                      <span className="num shrink-0 font-display text-sm font-semibold text-emerald-300">
+                      <h3 className="min-w-0 break-words text-sm font-semibold text-ink-900">{item.title}</h3>
+                      <span className="num shrink-0 font-display text-sm font-semibold text-emerald-700">
                         {Math.round(item.estimatedMonthlyImpact).toLocaleString('en-IN')}/mo
                       </span>
                     </div>
-                    <p className="mt-2 text-sm leading-relaxed text-slate-300">{item.detail}</p>
+                    <p className="mt-2 text-sm leading-relaxed text-slate-600">{item.detail}</p>
                   </div>
                 ))
               )}
@@ -260,19 +257,19 @@ export default function AnalysisPage() {
             <SectionHeader icon={Repeat} tone="violet" title="Detected Recurring Expenses" />
             <div className="mt-5 space-y-3">
               {recurring.length === 0 ? (
-                <p className="surface-inset border-dashed p-4 text-sm text-slate-400">
+                <p className="surface-inset border-dashed border-line-strong p-4 text-sm text-slate-500">
                   FinanceIQ has not detected enough recurring expense patterns yet.
                 </p>
               ) : (
                 recurring.map((item) => (
                   <div key={`${item.description}-${item.amount}`} className="surface-inset surface-inset-hover p-4">
                     <div className="flex items-start justify-between gap-3">
-                      <h3 className="min-w-0 break-words text-sm font-semibold text-slate-100">{item.description}</h3>
-                      <span className="num shrink-0 font-display text-sm font-semibold text-slate-200">
+                      <h3 className="min-w-0 break-words text-sm font-semibold text-ink-900">{item.description}</h3>
+                      <span className="num shrink-0 font-display text-sm font-semibold text-ink-800">
                         {Math.round(item.amount).toLocaleString('en-IN')}
                       </span>
                     </div>
-                    <p className="mt-2 text-sm text-slate-400">
+                    <p className="mt-2 text-sm text-slate-500">
                       {item.category} | {item.occurrences} occurrences detected
                     </p>
                   </div>

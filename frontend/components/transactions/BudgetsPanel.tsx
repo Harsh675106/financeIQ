@@ -58,7 +58,7 @@ export default function BudgetsPanel({ refreshKey = 0 }: { refreshKey?: number }
     <div className="card card-pad relative overflow-hidden">
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-primary-500/10 blur-3xl"
+        className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-primary-100/60 blur-3xl"
       />
 
       {/* Header */}
@@ -134,7 +134,7 @@ export default function BudgetsPanel({ refreshKey = 0 }: { refreshKey?: number }
           <div className="skeleton hidden h-28 md:block" />
         </div>
       ) : budgets.length === 0 ? (
-        <div className="relative rounded-2xl border border-dashed border-white/10">
+        <div className="relative rounded-2xl border border-dashed border-line-strong bg-canvas/60">
           <EmptyState
             compact
             icon={Wallet}
@@ -154,8 +154,8 @@ export default function BudgetsPanel({ refreshKey = 0 }: { refreshKey?: number }
                 key={b.id}
                 className={`surface-inset p-4 transition-colors ${
                   isOver
-                    ? 'border-rose-500/30 bg-rose-500/[0.06] shadow-[0_12px_32px_-20px_rgba(244,63,94,0.6)]'
-                    : 'hover:border-white/10'
+                    ? 'border-rose-200 bg-rose-50/70 shadow-[0_8px_24px_-16px_rgba(225,29,72,0.35)]'
+                    : 'hover:border-line-strong'
                 }`}
               >
                 <div className="flex items-center justify-between gap-3">
@@ -163,12 +163,12 @@ export default function BudgetsPanel({ refreshKey = 0 }: { refreshKey?: number }
                     <span
                       aria-hidden="true"
                       className={`h-2.5 w-2.5 shrink-0 rounded-full ${
-                        isOver ? 'animate-pulse bg-rose-500 shadow-[0_0_10px_rgba(244,63,94,0.7)]' : 'bg-emerald-400'
+                        isOver ? 'animate-pulse bg-rose-500 ring-[3px] ring-rose-100' : 'bg-emerald-500 ring-[3px] ring-emerald-100'
                       }`}
                     />
-                    <h4 className="truncate text-sm font-semibold text-slate-100">{b.category}</h4>
+                    <h4 className="truncate text-sm font-semibold text-ink-900">{b.category}</h4>
                   </div>
-                  <span className={`num shrink-0 text-xs font-semibold ${isOver ? 'text-rose-300' : 'text-slate-300'}`}>
+                  <span className={`num shrink-0 text-xs font-semibold ${isOver ? 'text-rose-600' : 'text-slate-600'}`}>
                     {pct}% Consumed
                   </span>
                 </div>
@@ -178,18 +178,18 @@ export default function BudgetsPanel({ refreshKey = 0 }: { refreshKey?: number }
                   <div
                     className={`h-full rounded-full bg-gradient-to-r transition-[width] duration-700 ${
                       isOver
-                        ? 'from-rose-500 to-pink-400'
+                        ? 'from-rose-500 to-pink-500'
                         : pct > 80
-                        ? 'from-amber-400 to-orange-400'
-                        : 'from-emerald-400 to-teal-300'
+                        ? 'from-amber-400 to-orange-500'
+                        : 'from-emerald-500 to-ice-400'
                     }`}
                     style={{ width: `${pct}%` }}
                   />
                 </div>
 
-                <div className="num flex flex-wrap items-center justify-between gap-x-3 gap-y-1 text-xs text-slate-400">
+                <div className="num flex flex-wrap items-center justify-between gap-x-3 gap-y-1 text-xs text-slate-500">
                   <span>Spent: ₹{Math.round(b.spent).toLocaleString('en-IN')}</span>
-                  <span className={isOver ? 'font-semibold text-rose-300' : 'text-emerald-300'}>
+                  <span className={isOver ? 'font-semibold text-rose-600' : 'font-medium text-emerald-700'}>
                     {isOver
                       ? `Exceeded by ₹${Math.round(b.spent - b.amountMonthly).toLocaleString('en-IN')}`
                       : `Safe: ₹${Math.round(b.amountMonthly - b.spent).toLocaleString('en-IN')} left`}

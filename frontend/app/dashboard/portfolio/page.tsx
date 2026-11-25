@@ -276,12 +276,12 @@ export default function PortfolioPage() {
         {loadError && (
           <div
             role="alert"
-            className="pf-rise flex items-center gap-3 rounded-2xl border border-amber-400/25 bg-amber-500/[0.08] px-4 py-3 backdrop-blur-xl"
+            className="pf-rise flex items-center gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3"
           >
             <span className="icon-tile icon-tile-sm icon-tile-amber">
               <AlertTriangle className="h-4 w-4" />
             </span>
-            <p className="text-sm text-amber-100">{loadError}</p>
+            <p className="text-sm text-amber-800">{loadError}</p>
           </div>
         )}
 
@@ -326,12 +326,12 @@ export default function PortfolioPage() {
         {simError && (
           <div
             role="alert"
-            className="pf-rise flex items-center gap-3 rounded-2xl border border-rose-400/25 bg-rose-500/[0.08] px-4 py-3 backdrop-blur-xl"
+            className="pf-rise flex items-center gap-3 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3"
           >
             <span className="icon-tile icon-tile-sm icon-tile-rose">
               <AlertTriangle className="h-4 w-4" />
             </span>
-            <p className="text-sm text-rose-100">{simError}</p>
+            <p className="text-sm text-rose-700">{simError}</p>
           </div>
         )}
 
@@ -341,13 +341,13 @@ export default function PortfolioPage() {
         ) : (
           <div className="pf-panel pf-rise flex flex-col items-center justify-center px-6 py-12 text-center sm:py-14">
             <div className="relative mb-4">
-              <div aria-hidden="true" className="absolute inset-0 rounded-2xl bg-primary-500/25 blur-xl" />
+              <div aria-hidden="true" className="absolute inset-0 rounded-2xl bg-primary-200/60 blur-xl" />
               <span className="pf-orbit icon-tile icon-tile-lg icon-tile-brand relative">
                 <Sparkles className="h-6 w-6" />
               </span>
             </div>
-            <p className="font-display text-base font-semibold text-slate-50">Run a projection to see your outcome range</p>
-            <p className="mt-1.5 max-w-md text-sm leading-relaxed text-slate-400">
+            <p className="font-display text-base font-semibold text-ink-900">Run a projection to see your outcome range</p>
+            <p className="mt-1.5 max-w-md text-sm leading-relaxed text-slate-500">
               The Projection Lab is already seeded with your portfolio value, your average monthly surplus and the
               return your current asset mix implies. Hit Run Simulation to model 10,000 possible futures.
             </p>

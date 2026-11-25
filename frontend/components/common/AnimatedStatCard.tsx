@@ -80,7 +80,7 @@ export default function AnimatedStatCard({
         <div className="icon-tile">{icon}</div>
       </div>
       {badge && (
-        <div className="flex items-center gap-2 border-t border-white/[0.06] pt-3">
+        <div className="flex items-center gap-2 border-t border-line pt-3">
           <span className="badge badge-brand">{badge}</span>
         </div>
       )}

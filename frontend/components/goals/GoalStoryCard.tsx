@@ -47,32 +47,32 @@ interface GoalStoryCardProps {
 function getCategoryTheme(name: string) {
   const lower = name.toLowerCase()
   if (lower.includes('house') || lower.includes('home') || lower.includes('flat') || lower.includes('mortgage') || lower.includes('property')) {
-    return { icon: Home, color: 'text-primary-200', bg: 'bg-primary-500/15 border-primary-400/30', glow: 'rgba(112,104,244,0.35)' }
+    return { icon: Home, color: 'text-primary-600', bg: 'bg-primary-50 border-primary-200', glow: 'rgba(16,185,129,0.22)' }
   }
   if (lower.includes('car') || lower.includes('bike') || lower.includes('vehicle') || lower.includes('auto')) {
-    return { icon: Car, color: 'text-cyan-300', bg: 'bg-cyan-500/10 border-cyan-400/25', glow: 'rgba(6,182,212,0.32)' }
+    return { icon: Car, color: 'text-cyan-700', bg: 'bg-cyan-50 border-cyan-200', glow: 'rgba(34,211,238,0.22)' }
   }
   if (lower.includes('travel') || lower.includes('trip') || lower.includes('vacation') || lower.includes('holiday') || lower.includes('flight')) {
-    return { icon: Plane, color: 'text-sky-300', bg: 'bg-sky-500/10 border-sky-400/25', glow: 'rgba(56,189,248,0.32)' }
+    return { icon: Plane, color: 'text-sky-600', bg: 'bg-sky-50 border-sky-200', glow: 'rgba(56,189,248,0.22)' }
   }
   if (lower.includes('emergency') || lower.includes('safe') || lower.includes('shield') || lower.includes('reserve')) {
-    return { icon: Shield, color: 'text-amber-300', bg: 'bg-amber-500/10 border-amber-400/25', glow: 'rgba(245,158,11,0.3)' }
+    return { icon: Shield, color: 'text-amber-600', bg: 'bg-amber-50 border-amber-200', glow: 'rgba(245,158,11,0.2)' }
   }
   if (lower.includes('study') || lower.includes('degree') || lower.includes('college') || lower.includes('school') || lower.includes('course')) {
-    return { icon: GraduationCap, color: 'text-violet-300', bg: 'bg-violet-500/15 border-violet-400/30', glow: 'rgba(139,92,246,0.35)' }
+    return { icon: GraduationCap, color: 'text-indigo-600', bg: 'bg-indigo-50 border-indigo-200', glow: 'rgba(99,102,241,0.2)' }
   }
   if (lower.includes('phone') || lower.includes('laptop') || lower.includes('mac') || lower.includes('tech') || lower.includes('gadget')) {
-    return { icon: Smartphone, color: 'text-pink-300', bg: 'bg-pink-500/10 border-pink-400/25', glow: 'rgba(236,72,153,0.3)' }
+    return { icon: Smartphone, color: 'text-pink-600', bg: 'bg-pink-50 border-pink-200', glow: 'rgba(236,72,153,0.18)' }
   }
-  return { icon: Gem, color: 'text-cyan-200', bg: 'bg-gradient-to-br from-primary-500/20 to-cyan-500/10 border-primary-400/30', glow: 'rgba(112,104,244,0.35)' }
+  return { icon: Gem, color: 'text-teal-600', bg: 'bg-gradient-to-br from-primary-50 to-ice-50 border-primary-200', glow: 'rgba(56,189,248,0.22)' }
 }
 
 function getStoryChapterName(progress: number) {
-  if (progress >= 100) return { title: 'Zenith Mastered', chapter: 'Chapter V', badge: 'bg-emerald-500/15 text-emerald-200 border-emerald-400/30' }
-  if (progress >= 75) return { title: 'Summit Horizon', chapter: 'Chapter IV', badge: 'bg-cyan-500/15 text-cyan-200 border-cyan-400/30' }
-  if (progress >= 50) return { title: 'The Orbit', chapter: 'Chapter III', badge: 'bg-violet-500/15 text-violet-200 border-violet-400/30' }
-  if (progress >= 25) return { title: 'The Ascent', chapter: 'Chapter II', badge: 'bg-primary-500/15 text-primary-200 border-primary-400/30' }
-  return { title: 'The Spark', chapter: 'Chapter I', badge: 'bg-sky-500/10 text-sky-200 border-sky-400/25' }
+  if (progress >= 100) return { title: 'Zenith Mastered', chapter: 'Chapter V', badge: 'bg-emerald-50 text-emerald-700 border-emerald-200' }
+  if (progress >= 75) return { title: 'Summit Horizon', chapter: 'Chapter IV', badge: 'bg-cyan-50 text-cyan-700 border-cyan-200' }
+  if (progress >= 50) return { title: 'The Orbit', chapter: 'Chapter III', badge: 'bg-indigo-50 text-indigo-700 border-indigo-200' }
+  if (progress >= 25) return { title: 'The Ascent', chapter: 'Chapter II', badge: 'bg-teal-50 text-teal-700 border-teal-200' }
+  return { title: 'The Spark', chapter: 'Chapter I', badge: 'bg-sky-50 text-sky-700 border-sky-200' }
 }
 
 export default function GoalStoryCard({
@@ -108,13 +108,13 @@ export default function GoalStoryCard({
       onClick={onSelect}
       className={`card card-hover group relative flex cursor-pointer flex-col justify-between overflow-hidden p-5 motion-safe:hover:-translate-y-1 sm:p-6 ${
         isSelected
-          ? 'border-primary-400/45 shadow-[0_0_0_1px_rgba(138,136,251,0.32),0_24px_60px_-28px_rgba(112,104,244,0.75)]'
+          ? 'border-primary-300 shadow-[0_0_0_3px_rgba(16,185,129,0.12),0_16px_36px_-18px_rgba(5,150,105,0.35)]'
           : isCompleted
-          ? 'border-emerald-400/25'
+          ? 'border-emerald-200'
           : ''
       }`}
     >
-      {/* Ambient category glow */}
+      {/* Ambient category wash */}
       <div
         aria-hidden="true"
         className="pointer-events-none absolute -right-16 -top-16 h-40 w-40 rounded-full opacity-60 blur-3xl transition-opacity duration-300 group-hover:opacity-100"
@@ -123,7 +123,7 @@ export default function GoalStoryCard({
       {isSelected && (
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent via-primary-300/80 to-transparent"
+          className="pointer-events-none absolute inset-x-6 top-0 h-0.5 rounded-b-full bg-gradient-to-r from-primary-400 to-ice-400"
         />
       )}
 
@@ -133,7 +133,7 @@ export default function GoalStoryCard({
           <div className="flex min-w-0 items-center gap-3">
             <div
               className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border ${theme.bg} ${theme.color} transition-transform duration-300 motion-safe:group-hover:scale-105`}
-              style={{ boxShadow: `inset 0 1px 0 0 rgba(255,255,255,0.08), 0 10px 26px -12px ${theme.glow}` }}
+              style={{ boxShadow: `inset 0 1px 0 0 #ffffff, 0 10px 22px -12px ${theme.glow}` }}
             >
               <CategoryIcon className="h-6 w-6" />
             </div>
@@ -145,7 +145,7 @@ export default function GoalStoryCard({
                   {chapter.chapter} • {chapter.title}
                 </span>
               </div>
-              <h3 className="mt-1.5 break-words font-display text-base font-semibold leading-snug tracking-tight text-white transition-colors group-hover:text-primary-100 sm:text-lg">
+              <h3 className="mt-1.5 break-words font-display text-base font-semibold leading-snug tracking-tight text-ink-900 transition-colors group-hover:text-primary-700 sm:text-lg">
                 {goal.name}
               </h3>
             </div>
@@ -153,7 +153,7 @@ export default function GoalStoryCard({
 
           <div className="shrink-0 text-right">
             <div className={`num inline-block font-display text-lg font-semibold leading-none ${
-              isCompleted ? 'text-emerald-300' : 'text-gradient'
+              isCompleted ? 'text-emerald-600' : 'text-gradient'
             }`}>
               {progress.toFixed(0)}%
             </div>
@@ -164,14 +164,14 @@ export default function GoalStoryCard({
         {/* Currency Metrics */}
         <div className="mt-5 flex items-end justify-between gap-3">
           <div className="min-w-0">
-            <span className="text-xs text-slate-400">Current Capital</span>
+            <span className="text-xs text-slate-500">Current Capital</span>
             <div className="kpi-value mt-0.5 break-words text-xl">
               ₹{Number(goal.current_amount || 0).toLocaleString('en-IN', { maximumFractionDigits: 0 })}
             </div>
           </div>
           <div className="min-w-0 text-right">
-            <span className="text-xs text-slate-400">Target Summit</span>
-            <div className="num mt-0.5 break-words text-base font-semibold text-slate-300">
+            <span className="text-xs text-slate-500">Target Summit</span>
+            <div className="num mt-0.5 break-words text-base font-semibold text-ink-700">
               ₹{Number(goal.target_amount || 0).toLocaleString('en-IN', { maximumFractionDigits: 0 })}
             </div>
           </div>
@@ -183,16 +183,16 @@ export default function GoalStoryCard({
             <div
               className={`progress-fill neon-progress-bar ${
                 isCompleted
-                  ? 'bg-gradient-to-r from-emerald-400 to-teal-300 shadow-[0_0_12px_-2px_rgba(52,211,153,0.75)]'
+                  ? 'bg-gradient-to-r from-emerald-400 to-emerald-600'
                   : isOverdue
-                  ? 'bg-gradient-to-r from-rose-500 to-pink-400 shadow-[0_0_12px_-2px_rgba(244,63,94,0.75)]'
+                  ? 'bg-gradient-to-r from-rose-400 to-rose-600'
                   : ''
               }`}
               style={{ width: `${Math.max(2, progress)}%` }}
             />
-            <span aria-hidden="true" className="absolute inset-y-0 left-1/4 w-px bg-slate-950/50" />
-            <span aria-hidden="true" className="absolute inset-y-0 left-1/2 w-px bg-slate-950/50" />
-            <span aria-hidden="true" className="absolute inset-y-0 left-3/4 w-px bg-slate-950/50" />
+            <span aria-hidden="true" className="absolute inset-y-0 left-1/4 w-px bg-white/90" />
+            <span aria-hidden="true" className="absolute inset-y-0 left-1/2 w-px bg-white/90" />
+            <span aria-hidden="true" className="absolute inset-y-0 left-3/4 w-px bg-white/90" />
           </div>
 
           {/* Micro Milestone Markers */}
@@ -207,8 +207,8 @@ export default function GoalStoryCard({
         {/* Story Telemetry Grid */}
         <div className="mt-4 grid grid-cols-2 gap-2 text-xs">
           <div className="surface-inset min-w-0 p-2.5">
-            <span className="block text-[10px] text-slate-400">Monthly Fuel</span>
-            <span className="num mt-0.5 block truncate font-semibold text-slate-100">
+            <span className="block text-[10px] text-slate-500">Monthly Fuel</span>
+            <span className="num mt-0.5 block truncate font-semibold text-ink-900">
               {Number(goal.monthly_contribution || 0) > 0
                 ? `₹${Number(goal.monthly_contribution).toLocaleString('en-IN', { maximumFractionDigits: 0 })}/mo`
                 : 'Not Set'}
@@ -217,12 +217,12 @@ export default function GoalStoryCard({
 
           <div className={`min-w-0 rounded-[0.875rem] border p-2.5 ${
             isOverdue
-              ? 'border-rose-400/25 bg-rose-500/[0.08] text-rose-300'
+              ? 'border-rose-200 bg-rose-50 text-rose-700'
               : isDueSoon
-              ? 'border-amber-400/25 bg-amber-500/[0.08] text-amber-300'
-              : 'border-white/[0.06] bg-white/[0.025] text-slate-100'
+              ? 'border-amber-200 bg-amber-50 text-amber-700'
+              : 'border-line bg-canvas text-ink-900'
           }`}>
-            <span className="block text-[10px] text-slate-400">Summit Target</span>
+            <span className="block text-[10px] text-slate-500">Summit Target</span>
             <span className="num mt-0.5 block truncate font-semibold">
               {daysRemaining !== null
                 ? isOverdue
@@ -237,10 +237,10 @@ export default function GoalStoryCard({
 
         {/* Frictionless Quick Contribute Chips */}
         {!isCompleted && (
-          <div className="mt-4 border-t border-white/[0.06] pt-3.5">
+          <div className="mt-4 border-t border-line pt-3.5">
             <div className="mb-2 flex items-center justify-between gap-2">
-              <span className="flex items-center gap-1 text-[11px] font-medium text-slate-400">
-                <Zap className="h-3 w-3 text-primary-300" />
+              <span className="flex items-center gap-1 text-[11px] font-medium text-slate-500">
+                <Zap className="h-3 w-3 text-primary-600" />
                 Quick Fuel Boost:
               </span>
               <button
@@ -249,7 +249,7 @@ export default function GoalStoryCard({
                   e.stopPropagation()
                   onOpenSimulator(goal)
                 }}
-                className="-mr-1.5 flex items-center gap-1 rounded-md px-1.5 py-1 text-[11px] font-semibold text-cyan-300 transition-colors hover:bg-cyan-500/10 hover:text-cyan-200"
+                className="-mr-1.5 flex items-center gap-1 rounded-md px-1.5 py-1 text-[11px] font-semibold text-ice-700 transition-colors hover:bg-ice-50 hover:text-ice-800"
               >
                 Simulate <TrendingUp className="h-3 w-3" />
               </button>
@@ -264,7 +264,7 @@ export default function GoalStoryCard({
                     e.stopPropagation()
                     onQuickContribute(goal, amt)
                   }}
-                  className="num flex-1 rounded-lg border border-white/[0.08] bg-white/[0.03] py-2 text-center text-xs font-semibold text-slate-300 transition-colors hover:border-primary-400/40 hover:bg-primary-500/10 hover:text-white"
+                  className="num flex-1 rounded-lg border border-line-strong bg-white py-2 text-center text-xs font-semibold text-ink-700 shadow-xs transition-colors hover:border-primary-300 hover:bg-primary-50 hover:text-primary-700"
                 >
                   +₹{amt >= 1000 ? `${amt / 1000}k` : amt}
                 </button>
@@ -275,7 +275,7 @@ export default function GoalStoryCard({
       </div>
 
       {/* Card Action Controls */}
-      <div className="relative mt-4 flex items-center justify-between gap-2 border-t border-white/[0.06] pt-3.5">
+      <div className="relative mt-4 flex items-center justify-between gap-2 border-t border-line pt-3.5">
         <button
           type="button"
           onClick={(e) => {
@@ -295,7 +295,7 @@ export default function GoalStoryCard({
               e.stopPropagation()
               onEdit(goal)
             }}
-            className="rounded-lg p-2 text-slate-400 transition-colors hover:bg-white/[0.06] hover:text-white"
+            className="rounded-lg p-2 text-slate-500 transition-colors hover:bg-ink-900/[0.05] hover:text-ink-900"
             title="Edit Goal"
             aria-label="Edit Goal"
           >
@@ -307,7 +307,7 @@ export default function GoalStoryCard({
               e.stopPropagation()
               onDelete(goal.id)
             }}
-            className="rounded-lg p-2 text-slate-400 transition-colors hover:bg-rose-500/15 hover:text-rose-300"
+            className="rounded-lg p-2 text-slate-500 transition-colors hover:bg-rose-50 hover:text-rose-600"
             title="Delete Goal"
             aria-label="Delete Goal"
           >

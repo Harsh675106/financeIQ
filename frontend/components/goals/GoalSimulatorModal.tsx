@@ -55,21 +55,21 @@ export default function GoalSimulatorModal({
         />
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute -right-20 -top-20 h-48 w-48 rounded-full bg-primary-500/15 blur-3xl"
+          className="pointer-events-none absolute -right-20 -top-20 h-48 w-48 rounded-full bg-primary-100/70 blur-3xl"
         />
 
         {/* Header */}
-        <div className="relative flex items-start justify-between gap-4 border-b border-white/[0.06] pb-4">
+        <div className="relative flex items-start justify-between gap-4 border-b border-line pb-4">
           <div className="flex min-w-0 items-center gap-3">
             <span className="icon-tile icon-tile-brand">
               <Zap className="h-5 w-5" />
             </span>
             <div className="min-w-0">
-              <h3 className="font-display text-lg font-semibold tracking-tight text-white">
+              <h3 className="font-display text-lg font-semibold tracking-tight text-ink-900">
                 Storyline Journey Accelerator
               </h3>
-              <p className="mt-0.5 text-xs text-slate-400">
-                Simulating velocity for <span className="break-words font-semibold text-primary-200">{goal.name}</span>
+              <p className="mt-0.5 text-xs text-slate-500">
+                Simulating velocity for <span className="break-words font-semibold text-primary-700">{goal.name}</span>
               </p>
             </div>
           </div>
@@ -86,19 +86,19 @@ export default function GoalSimulatorModal({
         <div className="relative mt-5 grid grid-cols-2 gap-3">
           <div className="surface-inset p-3.5 text-center">
             <span className="eyebrow text-[10px]">Current Trajectory</span>
-            <div className="kpi-value mt-1.5 text-2xl text-slate-200">
-              {currentMonths} <span className="font-sans text-xs font-normal text-slate-400">months</span>
+            <div className="kpi-value mt-1.5 text-2xl text-ink-800">
+              {currentMonths} <span className="font-sans text-xs font-normal text-slate-500">months</span>
             </div>
             <span className="num text-[10px] text-slate-500">at ₹{currentMonthly.toLocaleString('en-IN')}/mo</span>
           </div>
 
-          <div className="relative overflow-hidden rounded-[0.875rem] border border-primary-400/30 bg-gradient-to-br from-primary-500/15 via-violet-500/10 to-cyan-500/10 p-3.5 text-center shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]">
-            <div className="absolute -right-4 -top-4 h-12 w-12 rounded-full bg-cyan-400/20 blur-xl"></div>
-            <span className="eyebrow relative text-[10px] text-primary-200">Accelerated Speed</span>
+          <div className="relative overflow-hidden rounded-xl border border-primary-200 bg-gradient-to-br from-primary-50 via-white to-ice-50 p-3.5 text-center shadow-xs">
+            <div className="absolute -right-4 -top-4 h-12 w-12 rounded-full bg-ice-200/50 blur-xl"></div>
+            <span className="eyebrow relative text-[10px] text-primary-700">Accelerated Speed</span>
             <div className="kpi-value relative mt-1.5 text-2xl">
-              <span className="text-gradient">{acceleratedMonths}</span> <span className="font-sans text-xs font-normal text-primary-200">months</span>
+              <span className="text-gradient">{acceleratedMonths}</span> <span className="font-sans text-xs font-normal text-primary-700">months</span>
             </div>
-            <span className="relative text-[10px] font-semibold text-emerald-300">
+            <span className="relative text-[10px] font-semibold text-emerald-700">
               ⚡ Saves {monthsSaved} {monthsSaved === 1 ? 'month' : 'months'}
             </span>
           </div>
@@ -107,7 +107,7 @@ export default function GoalSimulatorModal({
         {/* Interactive Boost Slider */}
         <div className="relative mt-5 space-y-3">
           <div className="flex items-center justify-between gap-3 text-xs">
-            <span className="font-medium text-slate-300">Extra Monthly Power Boost</span>
+            <span className="font-medium text-ink-700">Extra Monthly Power Boost</span>
             <span className="badge badge-brand num text-xs">
               +₹{boostMonthly.toLocaleString('en-IN')}/mo
             </span>
@@ -142,8 +142,8 @@ export default function GoalSimulatorModal({
               aria-pressed={boostMonthly === amt}
               className={`num rounded-lg border px-3 py-1.5 text-xs font-semibold transition-colors ${
                 boostMonthly === amt
-                  ? 'border-primary-400/50 bg-primary-500/20 text-white shadow-[0_4px_16px_-6px_rgba(112,104,244,0.8)]'
-                  : 'border-white/[0.08] bg-white/[0.03] text-slate-400 hover:border-white/15 hover:text-slate-100'
+                  ? 'border-primary-300 bg-primary-50 text-primary-700 shadow-xs'
+                  : 'border-line-strong bg-white text-slate-600 hover:border-primary-200 hover:bg-primary-50/50 hover:text-ink-900'
               }`}
             >
               +₹{amt.toLocaleString('en-IN')}
@@ -153,11 +153,11 @@ export default function GoalSimulatorModal({
 
         {/* Motivational Story Narrative */}
         <div className="surface-inset relative mt-5 flex items-start gap-3 p-3.5">
-          <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-primary-300" />
-          <p className="text-xs leading-relaxed text-slate-300">
-            By boosting your monthly fuel by <strong className="font-semibold text-primary-200">₹{boostMonthly.toLocaleString('en-IN')}</strong>, you reach the summit{' '}
-            <strong className="font-semibold text-emerald-300">{monthsSaved} months sooner</strong>, conquering your goal in approximately{' '}
-            <strong className="font-semibold text-slate-100">{acceleratedMonths} months</strong> instead of {currentMonths} months!
+          <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-primary-600" />
+          <p className="text-xs leading-relaxed text-ink-700">
+            By boosting your monthly fuel by <strong className="font-semibold text-primary-700">₹{boostMonthly.toLocaleString('en-IN')}</strong>, you reach the summit{' '}
+            <strong className="font-semibold text-emerald-700">{monthsSaved} months sooner</strong>, conquering your goal in approximately{' '}
+            <strong className="font-semibold text-ink-900">{acceleratedMonths} months</strong> instead of {currentMonths} months!
           </p>
         </div>
 

@@ -41,8 +41,9 @@ export default function ConfettiEffect({ trigger, onComplete }: ConfettiProps) {
       opacity: number
     }[] = []
 
-    // Obsidian Aurora palette: iris, violet, cyan, mint, pink, amber, soft iris
-    const colors = ['#8a88fb', '#a78bfa', '#22d3ee', '#34d399', '#f472b6', '#fbbf24', '#c7cdff']
+    // Mint & Ice palette (saturated enough to read on a light canvas):
+    // emerald, deep emerald, mint, ice blue, sky, amber, warm amber
+    const colors = ['#10b981', '#059669', '#34d399', '#38bdf8', '#0ea5e9', '#f59e0b', '#fbbf24']
 
     for (let i = 0; i < 90; i++) {
       particles.push({

@@ -101,7 +101,7 @@ export default function RiskAssessment() {
   const needleAngle = -90 + (activeScore / 100) * 180
   const displayedStress = (activeScore * 0.18).toFixed(1)
   const needleTipColor =
-    activeScore <= 35 ? chartColors.positiveStrong : activeScore <= 70 ? chartColors.cyan : chartColors.negativeStrong
+    activeScore <= 35 ? chartColors.positiveStrong : activeScore <= 70 ? chartColors.iceStrong : chartColors.negativeStrong
 
   if (loading) {
     return (
@@ -157,7 +157,7 @@ export default function RiskAssessment() {
           {/* Soft glow behind the dial */}
           <div
             aria-hidden="true"
-            className="pointer-events-none absolute left-1/2 top-4 h-28 w-48 -translate-x-1/2 rounded-full bg-primary-500/15 blur-3xl"
+            className="pointer-events-none absolute left-1/2 top-4 h-28 w-48 -translate-x-1/2 rounded-full bg-primary-100/60 blur-3xl"
           />
 
           <div className="relative flex h-28 w-52 items-end justify-center overflow-hidden">
@@ -168,7 +168,7 @@ export default function RiskAssessment() {
                 cy="50"
                 r="40"
                 fill="none"
-                stroke="rgba(255, 255, 255, 0.06)"
+                stroke="#E6EFEC"
                 strokeWidth="11"
                 strokeDasharray="125.6 125.6"
               />
@@ -178,28 +178,28 @@ export default function RiskAssessment() {
                 cy="50"
                 r="40"
                 fill="none"
-                stroke={chartColors.positiveStrong}
+                stroke={chartColors.positive}
                 strokeWidth="11"
                 strokeDasharray="41.8 125.6"
                 strokeDashoffset="0"
                 className={`transition-opacity duration-200 ${
-                  activeScore <= 35 ? 'opacity-100 drop-shadow-[0_0_6px_rgba(16,185,129,0.7)]' : 'opacity-40'
+                  activeScore <= 35 ? 'opacity-100' : 'opacity-30'
                 }`}
               />
-              {/* Balanced zone (Teal/Cyan) */}
+              {/* Balanced zone (Ice blue) */}
               <circle
                 cx="50"
                 cy="50"
                 r="40"
                 fill="none"
-                stroke={chartColors.cyan}
+                stroke={chartColors.ice}
                 strokeWidth="11"
                 strokeDasharray="41.8 125.6"
                 strokeDashoffset="-41.8"
                 className={`transition-opacity duration-200 ${
                   activeScore > 35 && activeScore <= 70
-                    ? 'opacity-100 drop-shadow-[0_0_6px_rgba(34,211,238,0.7)]'
-                    : 'opacity-40'
+                    ? 'opacity-100'
+                    : 'opacity-30'
                 }`}
               />
               {/* Aggressive zone (Rose/Red) */}
@@ -208,38 +208,38 @@ export default function RiskAssessment() {
                 cy="50"
                 r="40"
                 fill="none"
-                stroke={chartColors.negativeStrong}
+                stroke={chartColors.negative}
                 strokeWidth="11"
                 strokeDasharray="41.8 125.6"
                 strokeDashoffset="-83.6"
                 className={`transition-opacity duration-200 ${
-                  activeScore > 70 ? 'opacity-100 drop-shadow-[0_0_6px_rgba(244,63,94,0.7)]' : 'opacity-40'
+                  activeScore > 70 ? 'opacity-100' : 'opacity-30'
                 }`}
               />
             </svg>
 
             {/* Dynamic Needle Pin */}
             <div
-              className="pointer-events-none absolute bottom-0 left-1/2 h-24 w-1.5 origin-bottom rounded-full shadow-2xl transition-transform ease-out motion-reduce:transition-none"
+              className="pointer-events-none absolute bottom-0 left-1/2 h-24 w-1.5 origin-bottom rounded-full shadow-sm transition-transform ease-out motion-reduce:transition-none"
               style={{
                 transform: `translateX(-50%) rotate(${needleAngle}deg)`,
                 transitionDuration: isHovered ? '75ms' : '650ms',
-                background: 'linear-gradient(to top, #4a5170, #f7f8fc)',
+                background: 'linear-gradient(to top, #172b2a, #5e6e6c)',
               }}
             >
-              {/* Needle Glowing Tip */}
+              {/* Needle Tip */}
               <div
-                className="absolute left-1/2 top-0 h-3 w-3 -translate-x-1/2 -translate-y-1 rounded-full ring-2 ring-[#090b17]"
+                className="absolute left-1/2 top-0 h-3 w-3 -translate-x-1/2 -translate-y-1 rounded-full ring-2 ring-white"
                 style={{
                   backgroundColor: needleTipColor,
-                  boxShadow: `0 0 12px ${needleTipColor}`,
+                  boxShadow: `0 0 0 4px ${needleTipColor}26`,
                 }}
               />
             </div>
 
             {/* Center Pivot Hub */}
-            <div className="absolute bottom-0 left-1/2 z-10 flex h-5 w-5 -translate-x-1/2 translate-y-1/2 items-center justify-center rounded-full border-2 border-primary-400 bg-[#090b17] shadow-[0_0_14px_rgba(138,136,251,0.6)]">
-              <div className="h-1.5 w-1.5 animate-ping rounded-full bg-primary-300" />
+            <div className="absolute bottom-0 left-1/2 z-10 flex h-5 w-5 -translate-x-1/2 translate-y-1/2 items-center justify-center rounded-full border-2 border-ink-900 bg-white shadow-card">
+              <div className="h-1.5 w-1.5 animate-ping rounded-full bg-primary-500" />
             </div>
           </div>
 
@@ -251,9 +251,9 @@ export default function RiskAssessment() {
               </span>
               <span className="text-xs font-semibold text-slate-500">/ 100</span>
             </div>
-            <p className="mt-1 text-[11px] text-slate-400">
+            <p className="mt-1 text-[11px] text-slate-500">
               {isHovered ? (
-                <span className="font-medium text-primary-300">Hovering Simulator • Release to reset</span>
+                <span className="font-medium text-primary-700">Hovering Simulator • Release to reset</span>
               ) : (
                 'Assessed Risk Tolerance Score'
               )}
@@ -264,9 +264,9 @@ export default function RiskAssessment() {
         {/* Quick Zone Jump Buttons */}
         <div className="grid grid-cols-3 gap-2 pt-1">
           {[
-            { label: 'Conservative', score: 25, color: 'hover:border-emerald-400/45 hover:bg-emerald-500/10 hover:text-emerald-200' },
-            { label: 'Balanced', score: 55, color: 'hover:border-cyan-400/45 hover:bg-cyan-500/10 hover:text-cyan-200' },
-            { label: 'Aggressive', score: 85, color: 'hover:border-rose-400/45 hover:bg-rose-500/10 hover:text-rose-200' },
+            { label: 'Conservative', score: 25, color: 'hover:border-emerald-200 hover:bg-emerald-50 hover:text-emerald-700' },
+            { label: 'Balanced', score: 55, color: 'hover:border-sky-200 hover:bg-sky-50 hover:text-sky-700' },
+            { label: 'Aggressive', score: 85, color: 'hover:border-rose-200 hover:bg-rose-50 hover:text-rose-700' },
           ].map((zone, idx) => (
             <button
               key={idx}
@@ -275,7 +275,7 @@ export default function RiskAssessment() {
                 setIsHovered(true)
               }}
               onMouseLeave={handleDialMouseLeave}
-              className={`min-h-[2.25rem] truncate rounded-xl border border-white/[0.07] bg-white/[0.025] px-1.5 py-2 text-[11px] font-medium text-slate-300 transition-colors ${zone.color}`}
+              className={`min-h-[2.25rem] truncate rounded-xl border border-line bg-white px-1.5 py-2 text-[11px] font-medium text-slate-600 shadow-xs transition-colors ${zone.color}`}
             >
               {zone.label}
             </button>
@@ -285,19 +285,19 @@ export default function RiskAssessment() {
         {/* Stress Probability Dynamic Wave Bar */}
         <div className="surface-inset p-3.5">
           <div className="mb-2 flex items-center justify-between gap-2">
-            <span className="flex min-w-0 items-center gap-2 text-xs font-semibold text-slate-300">
+            <span className="flex min-w-0 items-center gap-2 text-xs font-semibold text-ink-700">
               <span className="icon-tile icon-tile-sm icon-tile-rose h-6 w-6 rounded-md">
                 <Activity className="h-3.5 w-3.5" />
               </span>
               <span className="truncate">12-Month Stress Exposure</span>
             </span>
-            <span className="num shrink-0 text-xs font-bold text-rose-300">
+            <span className="num shrink-0 text-xs font-bold text-rose-600">
               {isHovered ? displayedStress : (data?.stressProbability || 0).toFixed(1)}%
             </span>
           </div>
           <div className="progress-track h-1.5">
             <div
-              className="h-full rounded-full bg-gradient-to-r from-emerald-400 via-amber-400 to-rose-500 transition-[width] duration-300"
+              className="h-full rounded-full bg-gradient-to-r from-emerald-500 via-amber-400 to-rose-500 transition-[width] duration-300"
               style={{
                 width: `${Math.min(
                   100,

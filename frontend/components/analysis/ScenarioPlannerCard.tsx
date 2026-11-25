@@ -71,9 +71,9 @@ export default function ScenarioPlannerCard() {
 
       {result ? (
         <div className="mt-5 space-y-3">
-          <div className="surface-inset p-4">
-            <div className="text-sm leading-relaxed text-slate-100">{result.explanation}</div>
-            <div className="num mt-2 text-xs text-slate-400">
+          <div className="rounded-xl border border-ice-100 bg-ice-50/60 p-4">
+            <div className="text-sm leading-relaxed text-ink-800">{result.explanation}</div>
+            <div className="num mt-2 text-xs text-slate-500">
               Baseline cash {Math.round(result.baseline.cash).toLocaleString('en-IN')} | Final cash {Math.round(result.projected.finalCash).toLocaleString('en-IN')}
             </div>
           </div>
@@ -87,7 +87,7 @@ export default function ScenarioPlannerCard() {
           </div>
         </div>
       ) : (
-        <div className="surface-inset mt-5 flex items-center gap-3 border-dashed p-4 text-sm text-slate-400">
+        <div className="surface-inset mt-5 flex items-center gap-3 border-dashed border-line-strong p-4 text-sm text-slate-500">
           <span className="icon-tile icon-tile-sm icon-tile-slate">
             <Sparkles className="h-4 w-4" />
           </span>

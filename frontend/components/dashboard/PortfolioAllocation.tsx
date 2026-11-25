@@ -6,7 +6,7 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts'
 import { TrendingUp, Shield, PieChart as PieIcon, Sparkles } from 'lucide-react'
 import { useCountUp } from '@/hooks/useCountUp'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
-import { chartColors } from '@/lib/chartTheme'
+import { chartColors, chartPalette } from '@/lib/chartTheme'
 import { ChartTooltipCard } from '@/components/ui/ChartTooltip'
 import SectionHeader from '@/components/ui/SectionHeader'
 import EmptyState from '@/components/ui/EmptyState'
@@ -32,10 +32,10 @@ interface PortfolioData {
 }
 
 const COLORS = {
-  equity: chartColors.brand, // iris
-  debt: chartColors.cyan, // cyan
-  gold: chartColors.warning, // amber
-  liquid: chartColors.pink, // pink
+  equity: chartPalette[0], // emerald
+  debt: chartPalette[1], // ice blue
+  gold: chartPalette[3], // amber
+  liquid: chartPalette[2], // indigo
 }
 
 // Custom Tooltip for Pie Chart
@@ -122,7 +122,7 @@ export default function PortfolioAllocation() {
           <div className="relative flex h-56 w-full items-center justify-center sm:h-64">
             <div
               aria-hidden="true"
-              className="pointer-events-none absolute left-1/2 top-1/2 h-40 w-40 -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary-500/15 blur-3xl"
+              className="pointer-events-none absolute left-1/2 top-1/2 h-[7.5rem] w-[7.5rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-gradient-to-br from-primary-50 via-white to-ice-50"
             />
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
@@ -144,7 +144,7 @@ export default function PortfolioAllocation() {
                       key={`cell-${index}`}
                       fill={entry.color}
                       stroke={chartColors.surface}
-                      strokeWidth={2}
+                      strokeWidth={3}
                       className="cursor-pointer transition-all duration-300"
                       style={{
                         transform: activeIndex === index ? 'scale(1.05)' : 'scale(1)',
@@ -176,19 +176,19 @@ export default function PortfolioAllocation() {
                   onMouseLeave={() => setActiveIndex(null)}
                   className={`surface-inset cursor-pointer p-3 transition-[transform,border-color,background-color] duration-200 ${
                     activeIndex === index
-                      ? 'border-primary-400/40 bg-white/[0.05] motion-safe:scale-[1.02]'
-                      : 'hover:bg-white/[0.04]'
+                      ? 'border-primary-200 bg-white shadow-card motion-safe:scale-[1.02]'
+                      : 'hover:border-line-strong hover:bg-white'
                   }`}
                 >
                   <div className="flex items-center justify-between gap-2">
                     <div className="flex min-w-0 items-center gap-2">
                       <span
                         className="h-2.5 w-2.5 shrink-0 rounded-full"
-                        style={{ backgroundColor: item.color, boxShadow: `0 0 8px ${item.color}` }}
+                        style={{ backgroundColor: item.color, boxShadow: `0 0 0 3px ${item.color}22` }}
                       />
-                      <span className="truncate text-xs font-semibold text-slate-200">{item.name}</span>
+                      <span className="truncate text-xs font-semibold text-ink-800">{item.name}</span>
                     </div>
-                    <span className="num shrink-0 text-xs font-bold text-slate-100">{item.value}%</span>
+                    <span className="num shrink-0 text-xs font-bold text-ink-900">{item.value}%</span>
                   </div>
                   <div className="progress-track mt-2.5 h-1" aria-hidden="true">
                     <div
@@ -202,13 +202,13 @@ export default function PortfolioAllocation() {
 
             {/* AI Recommendation Alert */}
             {data?.recommendation && (
-              <div className="flex items-start gap-3 rounded-xl border border-violet-400/20 bg-violet-500/[0.06] p-3.5">
+              <div className="flex items-start gap-3 rounded-xl border border-indigo-100 bg-indigo-50/60 p-3.5">
                 <span className="icon-tile icon-tile-sm icon-tile-violet">
                   <Shield className="h-4 w-4" />
                 </span>
                 <div className="min-w-0">
-                  <p className="text-xs font-semibold text-violet-200">Rebalancing Intelligence</p>
-                  <p className="mt-0.5 break-words text-[11px] leading-relaxed text-slate-400">
+                  <p className="text-xs font-semibold text-indigo-700">Rebalancing Intelligence</p>
+                  <p className="mt-0.5 break-words text-[11px] leading-relaxed text-slate-600">
                     {data.recommendation}
                   </p>
                 </div>

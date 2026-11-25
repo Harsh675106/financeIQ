@@ -146,17 +146,17 @@ export default function SpendingAnalytics({ refreshKey = 0 }: SpendingAnalyticsP
           <SectionHeader
             as="h3"
             icon={TrendingUp}
-            tone="cyan"
+            tone="sky"
             title="Inflow vs Outflow Rhythm"
             subtitle="Monthly cash delta timeline"
             className="mb-5"
             actions={
               <div className="flex items-center gap-3 text-xs">
-                <span className="flex items-center gap-1.5 font-medium text-emerald-300">
-                  <span className="h-2 w-2 rounded-full bg-emerald-400" /> Income
+                <span className="flex items-center gap-1.5 font-medium text-slate-600">
+                  <span className="h-2 w-2 rounded-full bg-emerald-500" /> Income
                 </span>
-                <span className="flex items-center gap-1.5 font-medium text-rose-300">
-                  <span className="h-2 w-2 rounded-full bg-rose-400" /> Expense
+                <span className="flex items-center gap-1.5 font-medium text-slate-600">
+                  <span className="h-2 w-2 rounded-full bg-rose-500" /> Expense
                 </span>
               </div>
             }
@@ -174,11 +174,11 @@ export default function SpendingAnalytics({ refreshKey = 0 }: SpendingAnalyticsP
                 <AreaChart data={trend} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                   <defs>
                     <linearGradient id="incomeWave" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor={chartColors.positive} stopOpacity={0.35} />
-                      <stop offset="95%" stopColor={chartColors.positive} stopOpacity={0.0} />
+                      <stop offset="5%" stopColor={chartColors.positive} stopOpacity={0.25} />
+                      <stop offset="95%" stopColor={chartColors.ice} stopOpacity={0.02} />
                     </linearGradient>
                     <linearGradient id="expenseWave" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor={chartColors.negative} stopOpacity={0.35} />
+                      <stop offset="5%" stopColor={chartColors.negative} stopOpacity={0.16} />
                       <stop offset="95%" stopColor={chartColors.negative} stopOpacity={0.0} />
                     </linearGradient>
                   </defs>

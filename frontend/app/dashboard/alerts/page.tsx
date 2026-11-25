@@ -139,14 +139,14 @@ export default function AlertsPage() {
   const getSeverityColor = (severity: string) => {
     switch (severity) {
       case 'critical':
-        return 'border-rose-500/30 bg-rose-500/[0.07]'
+        return 'border-rose-200 bg-rose-50/70'
       case 'high':
-        return 'border-rose-500/20 bg-rose-500/[0.05]'
+        return 'border-rose-200/80 bg-rose-50/40'
       case 'warning':
       case 'medium':
-        return 'border-amber-500/25 bg-amber-500/[0.06]'
+        return 'border-amber-200 bg-amber-50/60'
       default:
-        return 'border-sky-500/20 bg-sky-500/[0.05]'
+        return 'border-sky-200 bg-sky-50/50'
     }
   }
 
@@ -224,11 +224,11 @@ export default function AlertsPage() {
                         <div className="flex min-w-0 items-start gap-3">
                           <div className="shrink-0">{getSeverityIcon(item.severity)}</div>
                           <div className="min-w-0 space-y-1.5">
-                            <h3 className="break-words font-display text-[15px] font-semibold text-slate-50">
+                            <h3 className="break-words font-display text-[15px] font-semibold text-ink-900">
                               {item.title}
                             </h3>
-                            <p className="break-words text-sm text-slate-200">{item.message}</p>
-                            <p className="break-words text-sm text-slate-400">{item.recommendation}</p>
+                            <p className="break-words text-sm text-ink-700">{item.message}</p>
+                            <p className="break-words text-sm text-slate-600">{item.recommendation}</p>
                           </div>
                         </div>
                         <div className="flex shrink-0 flex-wrap gap-1.5 pl-[3.25rem] sm:flex-col sm:items-end sm:pl-0">
@@ -240,23 +240,23 @@ export default function AlertsPage() {
                       </div>
 
                       <div className="mt-4 grid gap-3 lg:grid-cols-3">
-                        <div className="surface-inset p-3.5">
+                        <div className="surface-inset bg-white/80 p-3.5">
                           <p className="eyebrow text-[10px] text-slate-500">Why</p>
-                          <p className="mt-2 break-words text-sm text-slate-300">{item.whyItTriggered}</p>
+                          <p className="mt-2 break-words text-sm text-ink-700">{item.whyItTriggered}</p>
                         </div>
-                        <div className="surface-inset p-3.5">
+                        <div className="surface-inset bg-white/80 p-3.5">
                           <p className="eyebrow text-[10px] text-slate-500">Assumptions</p>
                           <div className="mt-2 space-y-1">
                             {item.assumptions.map((assumption) => (
-                              <p key={assumption} className="break-words text-sm text-slate-300">
+                              <p key={assumption} className="break-words text-sm text-ink-700">
                                 {assumption}
                               </p>
                             ))}
                           </div>
                         </div>
-                        <div className="surface-inset p-3.5">
+                        <div className="surface-inset bg-white/80 p-3.5">
                           <p className="eyebrow text-[10px] text-slate-500">If Assumptions Change</p>
-                          <p className="mt-2 break-words text-sm text-slate-300">{item.whatChangesIfWrong}</p>
+                          <p className="mt-2 break-words text-sm text-ink-700">{item.whatChangesIfWrong}</p>
                         </div>
                       </div>
                     </div>
@@ -297,12 +297,12 @@ export default function AlertsPage() {
                         </span>
                       </div>
                       {!alert.is_read && (
-                        <span className="h-2 w-2 shrink-0 rounded-full bg-primary-400 shadow-[0_0_8px_rgba(138,136,251,0.8)]">
+                        <span className="h-2 w-2 shrink-0 rounded-full bg-primary-500 ring-4 ring-primary-100">
                           <span className="sr-only">Unread</span>
                         </span>
                       )}
                     </div>
-                    <p className="break-words text-slate-100">{alert.message}</p>
+                    <p className="break-words text-ink-900">{alert.message}</p>
                     <div className="mt-4 flex flex-wrap items-center gap-2">
                       {!alert.is_read && (
                         <button
@@ -314,7 +314,7 @@ export default function AlertsPage() {
                       )}
                       <button
                         onClick={() => deleteAlert(alert.id)}
-                        className="btn-ghost btn-sm text-rose-300 hover:!bg-rose-500/10 hover:!text-rose-200"
+                        className="btn-ghost btn-sm text-rose-600 hover:!bg-rose-50 hover:!text-rose-700"
                       >
                         Dismiss
                       </button>

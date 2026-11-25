@@ -59,7 +59,7 @@ export default function LoginForm({ onLogin }: LoginFormProps) {
 
     buttonHost.innerHTML = "";
     window.google.accounts.id.renderButton(buttonHost, {
-      theme: "filled_black",
+      theme: "outline",
       size: "large",
       text: "continue_with",
       shape: "pill",
@@ -297,9 +297,9 @@ export default function LoginForm({ onLogin }: LoginFormProps) {
         {error && (
           <div
             role="alert"
-            className="flex items-start gap-2.5 rounded-xl border border-rose-500/25 bg-rose-500/10 px-3.5 py-3 text-sm leading-relaxed text-rose-200 animate-fade-in"
+            className="flex items-start gap-2.5 rounded-xl border border-rose-200 bg-rose-50 px-3.5 py-3 text-sm leading-relaxed text-rose-700 animate-fade-in"
           >
-            <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-rose-300" aria-hidden="true" />
+            <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-rose-600" aria-hidden="true" />
             <span className="min-w-0 break-words">{error}</span>
           </div>
         )}
@@ -311,11 +311,11 @@ export default function LoginForm({ onLogin }: LoginFormProps) {
         />
 
         <div className="flex items-center gap-3">
-          <span className="h-px flex-1 bg-gradient-to-r from-transparent to-white/[0.12]" aria-hidden="true" />
+          <span className="h-px flex-1 bg-line" aria-hidden="true" />
           <span className="whitespace-nowrap text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500">
             Or continue with email
           </span>
-          <span className="h-px flex-1 bg-gradient-to-l from-transparent to-white/[0.12]" aria-hidden="true" />
+          <span className="h-px flex-1 bg-line" aria-hidden="true" />
         </div>
 
         <div>
@@ -324,7 +324,7 @@ export default function LoginForm({ onLogin }: LoginFormProps) {
           </label>
           <div className="group relative">
             <Mail
-              className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500 transition-colors group-focus-within:text-primary-300"
+              className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400 transition-colors group-focus-within:text-primary-600"
               aria-hidden="true"
             />
             <input
@@ -346,7 +346,7 @@ export default function LoginForm({ onLogin }: LoginFormProps) {
           </label>
           <div className="group relative">
             <Lock
-              className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500 transition-colors group-focus-within:text-primary-300"
+              className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400 transition-colors group-focus-within:text-primary-600"
               aria-hidden="true"
             />
             <input
@@ -370,7 +370,7 @@ export default function LoginForm({ onLogin }: LoginFormProps) {
                 setForgotEmail("");
               }}
               disabled={isBusy}
-              className="rounded-md text-[13px] font-medium text-primary-300 transition-colors hover:text-primary-200 disabled:cursor-not-allowed disabled:opacity-50"
+              className="rounded-md text-[13px] font-medium text-primary-700 underline-offset-4 transition-colors hover:text-primary-800 hover:underline disabled:cursor-not-allowed disabled:opacity-50"
             >
               Forgot password?
             </button>
@@ -393,18 +393,18 @@ export default function LoginForm({ onLogin }: LoginFormProps) {
       </form>
 
       {showResendVerification && (
-        <div className="mt-5 space-y-3 rounded-2xl border border-primary-400/20 bg-primary-500/[0.08] p-4 animate-fade-up">
+        <div className="surface-highlight mt-5 space-y-3 p-4 animate-fade-up">
           <div className="flex items-start gap-3">
             <span className="icon-tile icon-tile-sm icon-tile-brand">
               <MailCheck className="h-4 w-4" aria-hidden="true" />
             </span>
-            <p className="min-w-0 pt-1.5 text-xs leading-relaxed text-slate-300">
+            <p className="min-w-0 pt-1.5 text-xs leading-relaxed text-slate-600">
               Did not receive the verification email? Request a new one.
             </p>
           </div>
           <div className="group relative">
             <Mail
-              className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500 transition-colors group-focus-within:text-primary-300"
+              className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400 transition-colors group-focus-within:text-primary-600"
               aria-hidden="true"
             />
             <input
@@ -422,8 +422,8 @@ export default function LoginForm({ onLogin }: LoginFormProps) {
               role="status"
               className={`break-words rounded-xl border px-3 py-2 text-xs leading-relaxed ${
                 verificationMessage.startsWith("Success:")
-                  ? "border-emerald-500/25 bg-emerald-500/10 text-emerald-200"
-                  : "border-rose-500/25 bg-rose-500/10 text-rose-200"
+                  ? "border-emerald-200 bg-emerald-50 text-emerald-700"
+                  : "border-rose-200 bg-rose-50 text-rose-700"
               }`}
             >
               {verificationMessage}
@@ -454,20 +454,20 @@ export default function LoginForm({ onLogin }: LoginFormProps) {
               className="modal-panel max-w-md overflow-y-auto p-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] animate-pop-in sm:p-6"
             >
               <div
-                className="pointer-events-none absolute inset-x-10 top-0 h-px bg-gradient-to-r from-transparent via-primary-300/60 to-transparent"
+                className="pointer-events-none absolute inset-x-10 top-0 h-px bg-gradient-to-r from-transparent via-primary-400/50 to-transparent"
                 aria-hidden="true"
               />
-              <div className="mx-auto mb-4 h-1 w-10 rounded-full bg-white/15 sm:hidden" aria-hidden="true" />
+              <div className="mx-auto mb-4 h-1 w-10 rounded-full bg-slate-200 sm:hidden" aria-hidden="true" />
 
               <div className="mb-5 flex items-start gap-3.5">
                 <span className="icon-tile icon-tile-brand">
                   <KeyRound className="h-[18px] w-[18px]" aria-hidden="true" />
                 </span>
                 <div className="min-w-0">
-                  <h3 id="forgot-password-title" className="text-lg font-semibold text-white">
+                  <h3 id="forgot-password-title" className="text-lg font-semibold tracking-tight text-ink-900">
                     Forgot Password
                   </h3>
-                  <p className="mt-1 text-sm leading-relaxed text-slate-400">
+                  <p className="mt-1 text-sm leading-relaxed text-slate-500">
                     We will send you a link to reset your password.
                   </p>
                 </div>
@@ -480,7 +480,7 @@ export default function LoginForm({ onLogin }: LoginFormProps) {
                   </label>
                   <div className="group relative">
                     <Mail
-                      className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500 transition-colors group-focus-within:text-primary-300"
+                      className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400 transition-colors group-focus-within:text-primary-600"
                       aria-hidden="true"
                     />
                     <input
@@ -496,8 +496,8 @@ export default function LoginForm({ onLogin }: LoginFormProps) {
                 </div>
 
                 {forgotCooldown > 0 && (
-                  <p className="flex items-center gap-2 text-xs text-slate-400">
-                    <Clock className="h-3.5 w-3.5 shrink-0 text-slate-500" aria-hidden="true" />
+                  <p className="flex items-center gap-2 rounded-xl border border-ice-200 bg-ice-50 px-3 py-2 text-xs text-ice-700">
+                    <Clock className="h-3.5 w-3.5 shrink-0 text-ice-600" aria-hidden="true" />
                     <span>You can request another reset email in {forgotCooldown}s.</span>
                   </p>
                 )}
@@ -507,8 +507,8 @@ export default function LoginForm({ onLogin }: LoginFormProps) {
                     role="status"
                     className={`break-words rounded-xl border px-3.5 py-2.5 text-sm leading-relaxed ${
                       forgotMessage.startsWith("Success:")
-                        ? "border-emerald-500/25 bg-emerald-500/10 text-emerald-200"
-                        : "border-rose-500/25 bg-rose-500/10 text-rose-200"
+                        ? "border-emerald-200 bg-emerald-50 text-emerald-700"
+                        : "border-rose-200 bg-rose-50 text-rose-700"
                     }`}
                   >
                     {forgotMessage}

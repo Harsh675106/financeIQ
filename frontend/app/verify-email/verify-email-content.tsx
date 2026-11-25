@@ -12,7 +12,7 @@ function AuthBrand() {
       <span className="brand-mark h-10 w-10 rounded-xl">
         <TrendingUp className="h-5 w-5" strokeWidth={2.4} aria-hidden="true" />
       </span>
-      <span className="font-display text-lg font-semibold tracking-tight text-white">
+      <span className="font-display text-lg font-semibold tracking-tight text-ink-900">
         Finance<span className="text-gradient">IQ</span>
       </span>
     </div>
@@ -107,13 +107,13 @@ export default function VerifyEmailContent() {
     <div className="relative flex min-h-screen items-center justify-center overflow-hidden px-4 py-10 sm:px-6">
       <div className="relative isolate w-full max-w-md">
         <div
-          className="pointer-events-none absolute -inset-10 -z-10 rounded-[3rem] bg-[radial-gradient(60%_50%_at_50%_0%,rgba(112,104,244,0.22),transparent_70%),radial-gradient(50%_40%_at_50%_100%,rgba(34,211,238,0.1),transparent_70%)] blur-2xl"
+          className="pointer-events-none absolute -inset-10 -z-10 rounded-[3rem] bg-[radial-gradient(60%_50%_at_50%_0%,rgba(52,211,153,0.22),transparent_70%),radial-gradient(50%_40%_at_50%_100%,rgba(56,189,248,0.18),transparent_70%)] blur-2xl"
           aria-hidden="true"
         />
 
-        <div className="glass-strong relative overflow-hidden rounded-3xl p-6 text-center animate-fade-up sm:p-8">
+        <div className="glass-strong auth-card rounded-3xl p-6 text-center animate-fade-up sm:p-8">
           <div
-            className="pointer-events-none absolute inset-x-10 top-0 h-px bg-gradient-to-r from-transparent via-primary-300/60 to-transparent"
+            className="pointer-events-none absolute inset-x-10 top-0 h-px bg-gradient-to-r from-transparent via-primary-400/50 to-transparent"
             aria-hidden="true"
           />
 
@@ -122,11 +122,11 @@ export default function VerifyEmailContent() {
           <div className="mt-8">
             {status === 'loading' && (
               <>
-                <span className="icon-tile icon-tile-lg icon-tile-brand mx-auto mb-5 flex h-14 w-14 rounded-2xl">
+                <span className="icon-tile icon-tile-lg icon-tile-sky mx-auto mb-5 flex h-14 w-14 rounded-2xl">
                   <Loader className="h-6 w-6 animate-spin" aria-hidden="true" />
                 </span>
-                <h1 className="text-2xl font-semibold tracking-tight text-white">Verifying Email</h1>
-                <p className="mt-2 text-sm leading-relaxed text-slate-400">Please wait while we verify your email address...</p>
+                <h1 className="text-xl font-semibold tracking-tight text-ink-900 sm:text-2xl">Verifying Email</h1>
+                <p className="mt-2 text-sm leading-relaxed text-slate-500">Please wait while we verify your email address...</p>
               </>
             )}
 
@@ -135,9 +135,9 @@ export default function VerifyEmailContent() {
                 <span className="icon-tile icon-tile-lg icon-tile-emerald mx-auto mb-5 flex h-14 w-14 rounded-2xl">
                   <CheckCircle className="h-6 w-6" aria-hidden="true" />
                 </span>
-                <h1 className="text-2xl font-semibold tracking-tight text-white">Email Verified!</h1>
-                <p className="mt-2 break-words text-sm leading-relaxed text-slate-400">{message}</p>
-                <div className="mx-auto mt-6 h-6 w-6 animate-spin rounded-full border-2 border-white/10 border-t-primary-400" aria-hidden="true" />
+                <h1 className="text-xl font-semibold tracking-tight text-ink-900 sm:text-2xl">Email Verified!</h1>
+                <p className="mt-2 break-words text-sm leading-relaxed text-slate-500">{message}</p>
+                <div className="mx-auto mt-6 h-6 w-6 animate-spin rounded-full border-2 border-primary-100 border-t-primary-600" aria-hidden="true" />
               </>
             )}
 
@@ -146,13 +146,13 @@ export default function VerifyEmailContent() {
                 <span className="icon-tile icon-tile-lg icon-tile-rose mx-auto mb-5 flex h-14 w-14 rounded-2xl">
                   <AlertCircle className="h-6 w-6" aria-hidden="true" />
                 </span>
-                <h1 className="text-2xl font-semibold tracking-tight text-white">Verification Failed</h1>
-                <p className="mt-2 break-words text-sm leading-relaxed text-slate-400">{message}</p>
+                <h1 className="text-xl font-semibold tracking-tight text-ink-900 sm:text-2xl">Verification Failed</h1>
+                <p className="mt-2 break-words text-sm leading-relaxed text-slate-500">{message}</p>
 
                 <div className="mt-6 space-y-3 text-left">
                   <div className="group relative">
                     <Mail
-                      className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500 transition-colors group-focus-within:text-primary-300"
+                      className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400 transition-colors group-focus-within:text-primary-600"
                       aria-hidden="true"
                     />
                     <input
@@ -170,8 +170,8 @@ export default function VerifyEmailContent() {
                     <div
                       className={`break-words rounded-xl border px-3 py-2 text-xs leading-relaxed ${
                         resendMessage.startsWith('Success:')
-                          ? 'border-emerald-500/25 bg-emerald-500/10 text-emerald-200'
-                          : 'border-rose-500/25 bg-rose-500/10 text-rose-200'
+                          ? 'border-emerald-200 bg-emerald-50 text-emerald-700'
+                          : 'border-rose-200 bg-rose-50 text-rose-700'
                       }`}
                     >
                       {resendMessage}

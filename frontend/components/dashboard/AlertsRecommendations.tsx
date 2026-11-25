@@ -18,10 +18,10 @@ interface Recommendation {
 }
 
 function sevStyle(sev: string) {
-  if (sev === 'critical') return 'border-rose-500/25 bg-rose-500/[0.07] text-rose-200 hover:border-rose-400/45'
-  if (sev === 'high') return 'border-orange-500/25 bg-orange-500/[0.07] text-orange-200 hover:border-orange-400/45'
-  if (sev === 'warning') return 'border-amber-500/25 bg-amber-500/[0.07] text-amber-200 hover:border-amber-400/45'
-  return 'border-sky-500/20 bg-sky-500/[0.06] text-sky-200 hover:border-sky-400/40'
+  if (sev === 'critical') return 'border-rose-200 bg-rose-50/70 text-rose-800 hover:border-rose-300'
+  if (sev === 'high') return 'border-orange-200 bg-orange-50/70 text-orange-800 hover:border-orange-300'
+  if (sev === 'warning') return 'border-amber-200 bg-amber-50/70 text-amber-800 hover:border-amber-300'
+  return 'border-sky-200 bg-sky-50/60 text-sky-800 hover:border-sky-300'
 }
 
 export default function AlertsRecommendations() {
@@ -86,11 +86,11 @@ export default function AlertsRecommendations() {
             >
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0 flex-1">
-                  <p className="break-words text-xs font-semibold text-slate-100">{item.title || item.message}</p>
-                  <p className="mt-1 break-words text-[11px] leading-snug opacity-90">{item.message}</p>
+                  <p className="break-words text-xs font-semibold text-ink-900">{item.title || item.message}</p>
+                  <p className="mt-1 break-words text-[11px] leading-snug">{item.message}</p>
                   {item.recommendation && (
-                    <div className="mt-2 flex items-start gap-1.5 text-[11px] font-medium text-violet-200">
-                      <Sparkles className="mt-0.5 h-3 w-3 shrink-0 text-violet-300" aria-hidden="true" />
+                    <div className="mt-2 flex items-start gap-1.5 text-[11px] font-medium text-indigo-700">
+                      <Sparkles className="mt-0.5 h-3 w-3 shrink-0 text-indigo-500" aria-hidden="true" />
                       <span className="min-w-0 break-words">{item.recommendation}</span>
                     </div>
                   )}
@@ -104,7 +104,7 @@ export default function AlertsRecommendations() {
                     </span>
                   )}
                   {item.estimatedMonthlyImpact && (
-                    <div className="num text-[10px] font-bold text-emerald-400">
+                    <div className="num text-[10px] font-bold text-emerald-700">
                       +₹{Math.round(item.estimatedMonthlyImpact).toLocaleString('en-IN')}/mo
                     </div>
                   )}

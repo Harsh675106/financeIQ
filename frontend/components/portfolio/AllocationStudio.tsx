@@ -40,7 +40,7 @@ interface Props {
 const BUCKET_COLORS: Record<AssetBucket, string> = {
   equity: chartPalette[0],
   debt: chartPalette[1],
-  gold: chartPalette[4],
+  gold: chartPalette[3],
   liquid: chartPalette[2],
 }
 
@@ -103,7 +103,7 @@ export default function AllocationStudio({ rows, totalValue, profile, suggestion
         <div className="relative mx-auto flex h-56 w-full max-w-[240px] items-center justify-center sm:h-60">
           <div
             aria-hidden="true"
-            className="pointer-events-none absolute inset-6 rounded-full bg-primary-500/10 blur-2xl"
+            className="pointer-events-none absolute inset-6 rounded-full bg-gradient-to-br from-primary-100/80 to-ice-100/80 blur-2xl"
           />
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
@@ -135,7 +135,7 @@ export default function AllocationStudio({ rows, totalValue, profile, suggestion
                       opacity: active && active !== row.bucket ? 0.35 : 1,
                       transform: !reduceMotion && active === row.bucket ? 'scale(1.04)' : 'scale(1)',
                       transformOrigin: 'center',
-                      filter: active === row.bucket ? `drop-shadow(0 0 10px ${colorOf(row)}aa)` : 'none',
+                      filter: active === row.bucket ? `drop-shadow(0 4px 8px ${colorOf(row)}59)` : 'none',
                     }}
                   />
                 ))}
@@ -150,11 +150,16 @@ export default function AllocationStudio({ rows, totalValue, profile, suggestion
                 const row = rows.find((r) => r.bucket === active)!
                 return (
                   <div className="pf-donut-center px-6">
-                    <p className="text-[10px] font-semibold uppercase tracking-[0.14em]" style={{ color: colorOf(row) }}>
+                    <p className="inline-flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-ink-700">
+                      <span
+                        aria-hidden="true"
+                        className="h-1.5 w-1.5 rounded-full"
+                        style={{ backgroundColor: colorOf(row) }}
+                      />
                       {ASSET_CLASS_MODEL[row.bucket].short}
                     </p>
                     <p className="kpi-value mt-0.5 text-xl">{row.currentPct.toFixed(1)}%</p>
-                    <p className="num text-[11px] font-medium text-slate-400">₹{formatINR(row.value)}</p>
+                    <p className="num text-[11px] font-medium text-slate-500">₹{formatINR(row.value)}</p>
                   </div>
                 )
               })()
@@ -182,34 +187,33 @@ export default function AllocationStudio({ rows, totalValue, profile, suggestion
                 onMouseEnter={() => setActive(row.bucket)}
                 onMouseLeave={() => setActive(null)}
                 className={`surface-inset surface-inset-hover p-3 sm:p-3.5 ${
-                  active === row.bucket ? 'border-primary-400/40 bg-white/[0.05]' : ''
+                  active === row.bucket ? 'border-primary-200 bg-white shadow-xs' : ''
                 }`}
               >
                 <div className="flex items-center justify-between gap-3">
                   <div className="flex min-w-0 items-center gap-2">
                     <span
                       className="h-2.5 w-2.5 shrink-0 rounded-full"
-                      style={{ backgroundColor: color, boxShadow: `0 0 8px ${color}99` }}
+                      style={{ backgroundColor: color, boxShadow: `0 0 0 3px ${color}26` }}
                     />
-                    <span className="truncate text-xs font-semibold text-slate-200 sm:text-[13px]">{row.label}</span>
+                    <span className="truncate text-xs font-semibold text-ink-800 sm:text-[13px]">{row.label}</span>
                   </div>
 
                   <div className="flex shrink-0 items-baseline gap-1.5">
-                    <span className="num text-sm font-semibold text-white">{row.currentPct.toFixed(1)}%</span>
+                    <span className="num text-sm font-semibold text-ink-900">{row.currentPct.toFixed(1)}%</span>
                     <span className="num text-[11px] text-slate-500">/ {row.targetPct.toFixed(0)}%</span>
                   </div>
                 </div>
 
                 {/* Track: filled = current, marker = target */}
-                <div className="relative mt-2.5 h-2 rounded-full bg-white/[0.06] shadow-[inset_0_1px_1px_rgba(0,0,0,0.3)]">
+                <div className="relative mt-2.5 h-2 rounded-full bg-ink-900/[0.06]">
                   <div
                     className={`pf-bar h-full ${offBand ? 'pf-bar-flow' : ''}`}
                     style={{
                       width: `${width}%`,
-                      backgroundImage: `linear-gradient(90deg, ${color}99, ${color})`,
+                      backgroundImage: `linear-gradient(90deg, ${color}b3, ${color})`,
                       backgroundColor: color,
                       animationDelay: `${160 + i * 90}ms`,
-                      boxShadow: `0 0 12px -2px ${color}aa`,
                     }}
                   />
                   <span
@@ -220,15 +224,15 @@ export default function AllocationStudio({ rows, totalValue, profile, suggestion
                 </div>
 
                 <div className="mt-2 flex items-center justify-between gap-2">
-                  <span className="num truncate text-[11px] font-medium text-slate-400">₹{formatINR(row.value)}</span>
+                  <span className="num truncate text-[11px] font-medium text-slate-500">₹{formatINR(row.value)}</span>
 
                   <span
                     className={`inline-flex shrink-0 items-center gap-1 text-[11px] font-semibold ${
                       !offBand
-                        ? 'text-emerald-300/80'
+                        ? 'text-emerald-700'
                         : row.drift > 0
-                          ? 'text-amber-300'
-                          : 'text-sky-300'
+                          ? 'text-amber-700'
+                          : 'text-sky-700'
                     }`}
                   >
                     {!offBand ? (
@@ -253,21 +257,21 @@ export default function AllocationStudio({ rows, totalValue, profile, suggestion
       </div>
 
       {/* ---------- Rebalancing actions ---------- */}
-      <div className="mt-6 border-t border-white/[0.06] pt-5">
+      <div className="mt-6 border-t border-line pt-5">
         <div className="mb-3 flex flex-wrap items-center gap-x-2.5 gap-y-1">
           <span className="icon-tile icon-tile-sm icon-tile-brand">
             <Target className="h-4 w-4" />
           </span>
-          <h3 className="font-display text-sm font-semibold text-slate-100">Rebalancing Actions</h3>
+          <h3 className="font-display text-sm font-semibold text-ink-900">Rebalancing Actions</h3>
           <span className="text-[11px] text-slate-500">± {band} pp tolerance band</span>
         </div>
 
         {suggestions.length === 0 ? (
-          <div className="flex items-center gap-3 rounded-[0.875rem] border border-emerald-400/20 bg-emerald-500/[0.06] p-3">
+          <div className="flex items-center gap-3 rounded-[0.875rem] border border-emerald-100 bg-emerald-50/70 p-3">
             <span className="icon-tile icon-tile-sm icon-tile-emerald">
               <Check className="h-4 w-4" />
             </span>
-            <p className="text-xs leading-relaxed text-slate-300">
+            <p className="text-xs leading-relaxed text-ink-700">
               Every asset class sits inside the ±{band} pp band — no trades needed right now.
             </p>
           </div>
@@ -287,7 +291,7 @@ export default function AllocationStudio({ rows, totalValue, profile, suggestion
                       {isSell ? <ArrowDownRight className="h-3.5 w-3.5" /> : <ArrowUpRight className="h-3.5 w-3.5" />}
                     </span>
                     <div className="min-w-0">
-                      <p className="text-xs font-semibold capitalize text-slate-100">
+                      <p className="text-xs font-semibold capitalize text-ink-900">
                         {s.action} {meta?.short ?? s.bucket}
                       </p>
                       <p className="truncate text-[11px] text-slate-500">
@@ -298,7 +302,7 @@ export default function AllocationStudio({ rows, totalValue, profile, suggestion
 
                   <span
                     className={`num shrink-0 font-display text-sm font-semibold ${
-                      isSell ? 'text-amber-300' : 'text-primary-200'
+                      isSell ? 'text-amber-700' : 'text-primary-700'
                     }`}
                   >
                     {compactINR(s.amount)}

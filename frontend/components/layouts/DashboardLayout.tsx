@@ -1,9 +1,10 @@
 'use client'
 
-import { ReactNode, useEffect, useState } from 'react'
+import { Fragment, ReactNode, useEffect, useState } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useAuth } from '@/hooks/useAuth'
+import { AnimatePresence, m } from 'framer-motion'
 import {
   ArrowLeftRight,
   CandlestickChart,
@@ -138,9 +139,9 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         return (
           <div key={group} className="mb-3 last:mb-0">
             {collapsed ? (
-              <div className="mx-auto mb-2 h-px w-6 bg-white/[0.07]" aria-hidden="true" />
+              <div className="mx-auto mb-2 h-px w-6 bg-line-strong" aria-hidden="true" />
             ) : (
-              <p className="eyebrow mb-1.5 px-3 text-[10px] text-slate-500">{group}</p>
+              <p className="eyebrow mb-1.5 px-3 text-[10px] text-slate-400">{group}</p>
             )}
 
             <ul className="space-y-1">
@@ -160,20 +161,20 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                       } ${
                         isActive
                           ? 'nav-active'
-                          : 'text-slate-400 hover:bg-white/[0.04] hover:text-slate-100'
+                          : 'text-slate-600 hover:bg-ink-900/[0.04] hover:text-ink-900'
                       }`}
                     >
                       {isActive && <span className="nav-active-indicator" aria-hidden="true" />}
                       <span className="relative flex shrink-0">
                         <Icon
                           className={`h-[18px] w-[18px] transition-colors duration-200 ${
-                            isActive ? 'text-primary-300' : 'text-slate-500 group-hover:text-slate-200'
+                            isActive ? 'text-primary-600' : 'text-slate-400 group-hover:text-ink-700'
                           }`}
                         />
                         {item.highlight && (
                           <span className="absolute -right-1 -top-1 flex h-2 w-2">
-                            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-violet-400 opacity-75" />
-                            <span className="relative inline-flex h-2 w-2 rounded-full bg-violet-400" />
+                            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-ice-400 opacity-60" />
+                            <span className="relative inline-flex h-2 w-2 rounded-full bg-ice-500" />
                           </span>
                         )}
                       </span>
@@ -183,7 +184,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                           <span className="truncate">{item.label}</span>
                           {item.badge && (
                             <span className="badge badge-success px-2 py-0 text-[10px] leading-[18px]">
-                              <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+                              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
                               {item.badge}
                             </span>
                           )}
@@ -194,7 +195,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                     {/* Collapsed tooltip flyout */}
                     {collapsed && (
                       <div className="pointer-events-none absolute left-full top-1/2 z-50 ml-3 -translate-y-1/2 opacity-0 transition-opacity duration-200 group-hover:opacity-100 group-focus-within:opacity-100">
-                        <div className="glass-strong whitespace-nowrap rounded-lg px-2.5 py-1.5 text-xs font-semibold text-slate-100">
+                        <div className="glass-strong whitespace-nowrap rounded-lg px-2.5 py-1.5 text-xs font-semibold text-ink-900">
                           {item.label}
                         </div>
                       </div>
@@ -211,21 +212,21 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 
   const renderUserSection = (collapsed = false, mobile = false) => (
     <div
-      className={`relative shrink-0 border-t border-white/[0.06] p-3 ${collapsed ? 'px-2' : ''}`}
+      className={`relative shrink-0 border-t border-line p-3 ${collapsed ? 'px-2' : ''}`}
       style={mobile ? { paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom))' } : undefined}
     >
       {!collapsed ? (
         <div className="flex items-center gap-3 rounded-xl px-2 py-1.5">
-          <span className="avatar-ring flex h-9 w-9 shrink-0 items-center justify-center rounded-full font-display text-sm font-semibold text-white">
+          <span className="avatar-ring flex h-9 w-9 shrink-0 items-center justify-center rounded-full font-display text-sm font-semibold text-primary-700">
             {userInitial}
           </span>
           <div className="min-w-0 flex-1">
-            <p className="truncate text-[13px] font-semibold text-slate-100">{user?.name || user?.email}</p>
+            <p className="truncate text-[13px] font-semibold text-ink-900">{user?.name || user?.email}</p>
             <p className="truncate text-[11px] text-slate-500">{user?.email}</p>
           </div>
           <button
             onClick={handleLogout}
-            className="btn-icon h-8 w-8 rounded-lg hover:!border-rose-400/30 hover:!bg-rose-500/10 hover:!text-rose-300"
+            className="btn-icon h-8 w-8 rounded-lg hover:!border-rose-200 hover:!bg-rose-50 hover:!text-rose-600"
             title="Sign Out"
             aria-label="Sign out"
           >
@@ -234,12 +235,12 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         </div>
       ) : (
         <div className="flex flex-col items-center gap-2">
-          <span className="avatar-ring flex h-9 w-9 items-center justify-center rounded-full font-display text-sm font-semibold text-white">
+          <span className="avatar-ring flex h-9 w-9 items-center justify-center rounded-full font-display text-sm font-semibold text-primary-700">
             {userInitial}
           </span>
           <button
             onClick={handleLogout}
-            className="btn-icon h-8 w-8 rounded-lg hover:!border-rose-400/30 hover:!bg-rose-500/10 hover:!text-rose-300"
+            className="btn-icon h-8 w-8 rounded-lg hover:!border-rose-200 hover:!bg-rose-50 hover:!text-rose-600"
             title="Sign Out"
             aria-label="Sign out"
           >
@@ -251,28 +252,28 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   )
 
   const renderAiStatus = () => (
-    <div className="relative mx-3 mb-3 overflow-hidden rounded-2xl border border-primary-400/15 bg-gradient-to-br from-primary-500/[0.14] via-violet-500/[0.08] to-cyan-500/[0.06] p-3.5">
-      <div className="pointer-events-none absolute -right-6 -top-8 h-20 w-20 rounded-full bg-primary-500/30 blur-2xl" />
+    <div className="relative mx-3 mb-3 overflow-hidden rounded-2xl border border-primary-100 bg-gradient-to-br from-primary-50 via-white to-ice-50 p-3.5">
+      <div className="pointer-events-none absolute -right-6 -top-8 h-20 w-20 rounded-full bg-ice-200/60 blur-2xl" />
       <div className="relative flex items-center gap-2">
         <span className="relative flex h-2 w-2">
-          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-60" />
-          <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
+          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-50" />
+          <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
         </span>
-        <span className="text-xs font-semibold text-slate-100">AI Financial Brain</span>
+        <span className="text-xs font-semibold text-ink-900">AI Financial Brain</span>
       </div>
-      <p className="relative mt-1 text-[11px] leading-snug text-slate-400">
+      <p className="relative mt-1 text-[11px] leading-snug text-slate-500">
         Real-time portfolio intelligence active
       </p>
     </div>
   )
 
   return (
-    <div className="relative min-h-screen text-slate-100 lg:flex">
+    <div className="relative min-h-screen text-ink-900 lg:flex">
       {/* Toast Notification */}
       {syncToast && (
         <div
           role="status"
-          className="glass-strong fixed bottom-6 right-4 z-[200] flex items-center gap-2.5 rounded-2xl px-4 py-3 text-xs font-medium text-slate-100 animate-pop-in sm:right-6"
+          className="glass-strong fixed bottom-6 right-4 z-[200] flex items-center gap-2.5 rounded-2xl px-4 py-3 text-xs font-medium text-ink-900 animate-pop-in sm:right-6"
         >
           <span className="icon-tile icon-tile-sm icon-tile-emerald h-6 w-6 rounded-md">
             <Zap className="h-3.5 w-3.5" />
@@ -282,24 +283,35 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       )}
 
       {/* Mobile Drawer */}
+      <AnimatePresence>
       {sidebarOpen && (
-        <>
-          <div
-            className="fixed inset-0 z-[100] bg-[#03040a]/70 backdrop-blur-sm animate-fade-in lg:hidden"
+        <Fragment key="mobile-drawer">
+          <m.div
+            key="drawer-backdrop"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 z-[100] bg-ink-900/25 backdrop-blur-sm lg:hidden"
             onClick={() => setSidebarOpen(false)}
             aria-hidden="true"
           />
-          <aside
+          <m.aside
+            key="drawer-panel"
+            initial={{ x: '-104%', rotateY: 8, transformPerspective: 1200 }}
+            animate={{ x: 0, rotateY: 0, transitionEnd: { transformPerspective: 0 } }}
+            exit={{ x: '-104%', rotateY: 6, transformPerspective: 1200 }}
+            transition={{ type: 'spring', stiffness: 320, damping: 34 }}
             role="dialog"
             aria-modal="true"
             aria-label="Navigation"
-            className="sidebar-panel fixed inset-y-0 left-0 z-[110] flex h-[100dvh] max-h-[100dvh] min-h-0 w-[18rem] max-w-[86vw] flex-col rounded-r-3xl animate-slide-in-left lg:hidden"
+            className="sidebar-panel fixed inset-y-0 left-0 z-[110] flex h-[100dvh] max-h-[100dvh] min-h-0 w-[18rem] max-w-[86vw] flex-col rounded-r-3xl lg:hidden"
           >
             <div className="sidebar-ambient" aria-hidden="true" />
             <div className="relative flex shrink-0 items-center justify-between px-4 py-4">
               <div className="flex items-center gap-2.5">
                 <BrandMark />
-                <span className="font-display text-lg font-semibold tracking-tight text-white">FinanceIQ</span>
+                <span className="font-display text-lg font-semibold tracking-tight text-ink-900">FinanceIQ</span>
               </div>
               <button
                 onClick={() => setSidebarOpen(false)}
@@ -312,9 +324,10 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
             {renderNav(true)}
             {renderAiStatus()}
             {renderUserSection(false, true)}
-          </aside>
-        </>
+          </m.aside>
+        </Fragment>
       )}
+      </AnimatePresence>
 
       {/* Desktop floating sidebar */}
       <aside
@@ -334,7 +347,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
             <Link href="/dashboard" className="flex items-center gap-2.5" aria-label="FinanceIQ dashboard">
               <BrandMark />
               {!isCollapsed && (
-                <span className="font-display text-lg font-semibold tracking-tight text-white">
+                <span className="font-display text-lg font-semibold tracking-tight text-ink-900">
                   Finance<span className="text-gradient">IQ</span>
                 </span>
               )}
@@ -379,7 +392,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 
               <Link href="/dashboard" className="flex items-center gap-2 lg:hidden" aria-label="FinanceIQ dashboard">
                 <BrandMark size="sm" />
-                <span className="font-display text-base font-semibold tracking-tight text-white max-[359px]:hidden">
+                <span className="font-display text-base font-semibold tracking-tight text-ink-900 max-[359px]:hidden">
                   FinanceIQ
                 </span>
               </Link>
@@ -389,11 +402,11 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                   <ActiveIcon className="h-4 w-4" />
                 </span>
                 <div className="min-w-0 leading-tight">
-                  <p className="text-[11px] font-medium text-slate-500">
-                    Workspace <span className="mx-1 text-slate-600">/</span>
-                    <span className="text-slate-400">{activeItem.group}</span>
+                  <p className="text-[11px] font-medium text-slate-400">
+                    Workspace <span className="mx-1 text-slate-300">/</span>
+                    <span className="text-slate-500">{activeItem.group}</span>
                   </p>
-                  <p className="truncate font-display text-sm font-semibold text-slate-100">{activeItem.label}</p>
+                  <p className="truncate font-display text-sm font-semibold text-ink-900">{activeItem.label}</p>
                 </div>
               </div>
             </div>
@@ -407,7 +420,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                 title="Instant Metrics Refresh"
               >
                 <RefreshCw
-                  className={`h-3.5 w-3.5 text-primary-300 transition-transform duration-700 ${
+                  className={`h-3.5 w-3.5 text-primary-600 transition-transform duration-700 ${
                     isSyncing ? 'animate-spin' : 'motion-safe:group-hover:rotate-180'
                   }`}
                 />
@@ -425,7 +438,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 
         {/* Main Body */}
         <main className="relative flex-1 pb-10 pt-6">
-          <div className="container-app">{children}</div>
+          <div className="container-app page-enter">{children}</div>
         </main>
       </div>
     </div>

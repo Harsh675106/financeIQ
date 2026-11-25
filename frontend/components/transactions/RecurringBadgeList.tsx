@@ -35,7 +35,7 @@ export default function RecurringBadgeList() {
       ) : (
         <div className="flex flex-wrap gap-2">
           {items.length === 0 ? (
-            <span className="text-sm text-slate-400">No recurring detected</span>
+            <span className="text-sm text-slate-500">No recurring detected</span>
           ) : items.map((x, i) => (
             <span
               key={i}
