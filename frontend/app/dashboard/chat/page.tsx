@@ -23,9 +23,9 @@ export default function ChatPage() {
   }
 
   return (
-    <DashboardLayout>
+    <DashboardLayout chatHeader>
       <PageBackground variant="sparkles" />
-      <div className="relative z-10 chat-page-bleed xl:h-[calc(100dvh-8rem)] xl:min-h-0 xl:overflow-hidden">
+      <div className="relative z-10 chat-page-bleed min-h-[calc(100dvh-4.5rem)] xl:h-[calc(100dvh-4.5rem)] xl:min-h-0 xl:overflow-hidden">
         <FinanceCopilotCard fullPage />
       </div>
     </DashboardLayout>

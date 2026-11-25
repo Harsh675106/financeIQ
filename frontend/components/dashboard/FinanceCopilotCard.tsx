@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState, useCallback } from 'react'
+import { createPortal } from 'react-dom'
 import { api } from '@/lib/api'
 import {
   BrainCircuit,
@@ -220,6 +221,7 @@ export default function FinanceCopilotCard({ fullPage = false }: FinanceCopilotC
   const [response, setResponse] = useState<CopilotResponse | null>(null)
   const [persona, setPersona] = useState<PersonaMode>('wealth')
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null)
+  const [headerTarget, setHeaderTarget] = useState<HTMLElement | null>(null)
 
   // Voice & Speech State
   const [audioEnabled, setAudioEnabled] = useState(true)
@@ -232,6 +234,17 @@ export default function FinanceCopilotCard({ fullPage = false }: FinanceCopilotC
   const bottomRef = useRef<HTMLDivElement | null>(null)
   const scrollContainerRef = useRef<HTMLDivElement | null>(null)
   const shouldAutoScrollRef = useRef(false)
+
+  useEffect(() => {
+    if (!fullPage) return
+
+    const target = document.getElementById('chat-navbar-content')
+    if (!target) {
+      console.error('AI chat navbar content target was not found.')
+      return
+    }
+    setHeaderTarget(target)
+  }, [fullPage])
 
   // Load chat history on mount
   useEffect(() => {
@@ -516,20 +529,25 @@ export default function FinanceCopilotCard({ fullPage = false }: FinanceCopilotC
     ? 'speaking'
     : 'idle'
 
+  const neuralAvatar = (
+    <NeuralAIAvatar
+      status={avatarStatus}
+      persona={persona}
+      onPersonaChange={setPersona}
+      confidenceScore={99.4}
+      audioEnabled={audioEnabled}
+      onToggleAudio={() => {
+        if (audioEnabled) stopSpeaking()
+        setAudioEnabled(!audioEnabled)
+      }}
+      compact={fullPage}
+    />
+  )
+
   return (
-    <div className="flex h-full min-h-[calc(100dvh-8rem)] flex-col gap-3 sm:gap-4">
+    <div className={`flex h-full flex-col gap-3 sm:gap-4 ${fullPage ? 'min-h-0' : 'min-h-[calc(100dvh-8rem)]'}`}>
       {/* 1. Futuristic AI Avatar & Neural Stage */}
-      <NeuralAIAvatar
-        status={avatarStatus}
-        persona={persona}
-        onPersonaChange={setPersona}
-        confidenceScore={99.4}
-        audioEnabled={audioEnabled}
-        onToggleAudio={() => {
-          if (audioEnabled) stopSpeaking()
-          setAudioEnabled(!audioEnabled)
-        }}
-      />
+      {fullPage ? headerTarget && createPortal(neuralAvatar, headerTarget) : neuralAvatar}
 
       {/* Speech Error Banner */}
       {speechError && (

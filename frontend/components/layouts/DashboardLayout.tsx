@@ -28,6 +28,7 @@ import {
 
 interface DashboardLayoutProps {
   children: ReactNode
+  chatHeader?: boolean
 }
 
 type NavGroup = 'Overview' | 'Money' | 'Invest' | 'Intelligence' | 'Account'
@@ -69,7 +70,7 @@ function BrandMark({ size = 'md' }: { size?: 'sm' | 'md' }) {
   )
 }
 
-export default function DashboardLayout({ children }: DashboardLayoutProps) {
+export default function DashboardLayout({ children, chatHeader = false }: DashboardLayoutProps) {
   const { user, logout } = useAuth()
   const router = useRouter()
   const pathname = usePathname()
@@ -378,7 +379,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       <div className="relative flex min-w-0 flex-1 flex-col">
         {/* Top Navbar */}
         <header className="app-header sticky top-0 z-50">
-          <div className="container-app flex h-16 items-center justify-between gap-3">
+          <div className={`container-app flex h-16 items-center gap-3 ${chatHeader ? '' : 'justify-between'}`}>
             {/* Left: mobile trigger + brand / desktop page context */}
             <div className="flex min-w-0 items-center gap-3">
               <button
@@ -390,29 +391,41 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                 <Menu className="h-5 w-5" />
               </button>
 
-              <Link href="/dashboard" className="flex items-center gap-2 lg:hidden" aria-label="FinanceIQ dashboard">
-                <BrandMark size="sm" />
-                <span className="font-display text-base font-semibold tracking-tight text-ink-900 max-[359px]:hidden">
-                  FinanceIQ
-                </span>
-              </Link>
+              {!chatHeader && (
+                <Link href="/dashboard" className="flex items-center gap-2 lg:hidden" aria-label="FinanceIQ dashboard">
+                  <BrandMark size="sm" />
+                  <span className="font-display text-base font-semibold tracking-tight text-ink-900 max-[359px]:hidden">
+                    FinanceIQ
+                  </span>
+                </Link>
+              )}
 
-              <div className="hidden min-w-0 items-center gap-3 lg:flex">
-                <span className="icon-tile icon-tile-sm">
-                  <ActiveIcon className="h-4 w-4" />
-                </span>
-                <div className="min-w-0 leading-tight">
-                  <p className="text-[11px] font-medium text-slate-400">
-                    Workspace <span className="mx-1 text-slate-300">/</span>
-                    <span className="text-slate-500">{activeItem.group}</span>
-                  </p>
-                  <p className="truncate font-display text-sm font-semibold text-ink-900">{activeItem.label}</p>
+              {!chatHeader && (
+                <div className="hidden min-w-0 items-center gap-3 lg:flex">
+                  <span className="icon-tile icon-tile-sm">
+                    <ActiveIcon className="h-4 w-4" />
+                  </span>
+                  <div className="min-w-0 leading-tight">
+                    <p className="text-[11px] font-medium text-slate-400">
+                      Workspace <span className="mx-1 text-slate-300">/</span>
+                      <span className="text-slate-500">{activeItem.group}</span>
+                    </p>
+                    <p className="truncate font-display text-sm font-semibold text-ink-900">{activeItem.label}</p>
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
 
+            {chatHeader && (
+              <div
+                id="chat-navbar-content"
+                className="flex h-full min-w-0 flex-1 items-center overflow-x-auto"
+                aria-label="AURA AI controls"
+              />
+            )}
+
             {/* Right Side Header Controls */}
-            <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+            {!chatHeader && <div className="flex shrink-0 items-center gap-2 sm:gap-3">
               <button
                 onClick={handleSyncNow}
                 disabled={isSyncing}
@@ -432,12 +445,12 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                 <Sparkles className="h-3.5 w-3.5" />
                 <span>Ask Copilot</span>
               </Link>
-            </div>
+            </div>}
           </div>
         </header>
 
         {/* Main Body */}
-        <main className="relative flex-1 pb-10 pt-6">
+        <main className={`relative flex-1 ${chatHeader ? 'min-h-0 pb-1 pt-1' : 'pb-10 pt-6'}`}>
           <div className="container-app page-enter">{children}</div>
         </main>
       </div>
