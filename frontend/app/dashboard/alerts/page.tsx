@@ -6,6 +6,7 @@ import { useAuth } from '@/hooks/useAuth'
 import DashboardLayout from '@/components/layouts/DashboardLayout'
 import PageBackground from '@/components/layouts/PageBackground'
 import PageHeader from '@/components/ui/PageHeader'
+import Reveal from '@/components/motion/Reveal'
 import SectionHeader from '@/components/ui/SectionHeader'
 import EmptyState from '@/components/ui/EmptyState'
 import LoadingScreen from '@/components/ui/LoadingScreen'
@@ -195,18 +196,18 @@ export default function AlertsPage() {
             ))}
           </div>
         ) : alerts.length === 0 && recommendations.length === 0 ? (
-          <div className="card card-pad animate-fade-up">
+          <Reveal className="card card-pad" variant="zoom">
             <EmptyState
               icon={CheckCircle}
               tone="emerald"
               title="All Clear"
               description="No active risk alerts at this time"
             />
-          </div>
+          </Reveal>
         ) : (
           <div className="space-y-4 sm:space-y-6">
             {recommendations.length > 0 ? (
-              <div className="card card-pad animate-fade-up">
+              <Reveal className="card card-pad">
                 <SectionHeader
                   icon={Sparkles}
                   tone="violet"
@@ -262,13 +263,15 @@ export default function AlertsPage() {
                     </div>
                   ))}
                 </div>
-              </div>
+              </Reveal>
             ) : null}
 
-            {alerts.map((alert) => (
-              <div
+            {alerts.map((alert, alertIndex) => (
+              <Reveal
                 key={alert.id}
-                className={`card card-pad animate-fade-up transition-opacity ${
+                variant="rise"
+                delay={Math.min(alertIndex, 4) * 70}
+                className={`card card-pad transition-opacity ${
                   alert.is_read ? 'opacity-70' : getSeverityColor(alert.severity)
                 }`}
               >
@@ -328,7 +331,7 @@ export default function AlertsPage() {
                     <X className="h-4 w-4" />
                   </button>
                 </div>
-              </div>
+              </Reveal>
             ))}
           </div>
         )}

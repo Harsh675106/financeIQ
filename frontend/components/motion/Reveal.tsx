@@ -12,7 +12,11 @@ interface RevealProps {
   /** rise = fade up · tilt = 3D tip-in on X · flip = 3D swing-in on Y · zoom = soft scale. */
   variant?: RevealVariant
   as?: 'div' | 'section' | 'li' | 'article'
-  /** Fraction of the element that must be visible before revealing. */
+  /**
+   * Fraction of the element that must be visible before revealing.
+   * Defaults to 0 (any overlap) — a section taller than the viewport can never
+   * reach a higher ratio, and would otherwise stay hidden forever.
+   */
   threshold?: number
   style?: CSSProperties
 }
@@ -37,7 +41,7 @@ export default function Reveal({
   delay = 0,
   variant = 'tilt',
   as: Tag = 'div',
-  threshold = 0.12,
+  threshold = 0,
   style,
 }: RevealProps) {
   const ref = useRef<HTMLElement | null>(null)
@@ -50,6 +54,15 @@ export default function Reveal({
       setVisible(true)
       return
     }
+
+    // Anything already on screen at mount reveals straight away, so content is
+    // never left hidden if the observer doesn't fire.
+    const rect = node.getBoundingClientRect()
+    if (rect.top < window.innerHeight * 0.96 && rect.bottom > 0) {
+      setVisible(true)
+      return
+    }
+
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries.some((entry) => entry.isIntersecting)) {
@@ -57,7 +70,7 @@ export default function Reveal({
           observer.disconnect()
         }
       },
-      { threshold, rootMargin: '0px 0px -6% 0px' }
+      { threshold, rootMargin: '0px 0px -4% 0px' }
     )
     observer.observe(node)
     return () => observer.disconnect()
