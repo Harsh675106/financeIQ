@@ -29,6 +29,8 @@ import GoalStoryCard from '@/components/goals/GoalStoryCard'
 import GoalSimulatorModal from '@/components/goals/GoalSimulatorModal'
 import ConfettiEffect from '@/components/goals/ConfettiEffect'
 import PageHeader from '@/components/ui/PageHeader'
+import Reveal from '@/components/motion/Reveal'
+import TiltCard from '@/components/motion/TiltCard'
 import SectionHeader from '@/components/ui/SectionHeader'
 import EmptyState from '@/components/ui/EmptyState'
 import LoadingScreen from '@/components/ui/LoadingScreen'
@@ -296,90 +298,106 @@ export default function GoalsPage() {
         {/* ================= TELEMETRY HERO METRICS ================= */}
         <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4 lg:gap-6">
           {/* Card 1: Active Goals Capital (or Total Conquered if none active) */}
-          <div className="card card-spotlight p-4 animate-fade-up sm:p-5" style={{ animationDelay: '60ms' }}>
-            <div className="relative flex h-full flex-col">
-              <div className="flex items-start justify-between gap-2">
-                <span className="min-w-0 text-xs font-medium leading-snug text-slate-500">
-                  {telemetry.activeCount > 0 ? 'Active Quests Capital' : 'Conquered Vault'}
-                </span>
-                <span className="icon-tile icon-tile-sm icon-tile-brand">
-                  <Coins className="h-4 w-4" />
-                </span>
+          <div className="h-full animate-fade-up" style={{ animationDelay: '60ms' }}>
+            <TiltCard className="h-full" max={7}>
+              <div className="card card-spotlight h-full p-4 sm:p-5">
+                <div className="relative flex h-full flex-col">
+                  <div className="flex items-start justify-between gap-2">
+                    <span className="min-w-0 text-xs font-medium leading-snug text-slate-500">
+                      {telemetry.activeCount > 0 ? 'Active Quests Capital' : 'Conquered Vault'}
+                    </span>
+                    <span className="icon-tile icon-tile-sm icon-tile-brand">
+                      <Coins className="h-4 w-4" />
+                    </span>
+                  </div>
+                  <div className="kpi-value mt-3 break-words text-lg sm:text-2xl">
+                    ₹{(telemetry.activeCount > 0 ? telemetry.activeSaved : telemetry.conqueredSaved).toLocaleString('en-IN')}
+                  </div>
+                  <span className="num mt-1 text-[11px] text-slate-500">
+                    of ₹{(telemetry.activeCount > 0 ? telemetry.activeTarget : telemetry.conqueredTarget).toLocaleString('en-IN')} Target
+                  </span>
+                </div>
               </div>
-              <div className="kpi-value mt-3 break-words text-lg sm:text-2xl">
-                ₹{(telemetry.activeCount > 0 ? telemetry.activeSaved : telemetry.conqueredSaved).toLocaleString('en-IN')}
-              </div>
-              <span className="num mt-1 text-[11px] text-slate-500">
-                of ₹{(telemetry.activeCount > 0 ? telemetry.activeTarget : telemetry.conqueredTarget).toLocaleString('en-IN')} Target
-              </span>
-            </div>
+            </TiltCard>
           </div>
 
           {/* Card 2: Active Quests Victory Index */}
-          <div className="card card-spotlight p-4 animate-fade-up sm:p-5" style={{ animationDelay: '120ms' }}>
-            <div className="relative flex h-full flex-col">
-              <div className="flex items-start justify-between gap-2">
-                <span className="min-w-0 text-xs font-medium leading-snug text-slate-500">
-                  {telemetry.activeCount > 0 ? 'Active Quests Index' : 'All Quests Conquered'}
-                </span>
-                <span className="icon-tile icon-tile-sm icon-tile-violet">
-                  <Trophy className="h-4 w-4" />
-                </span>
+          <div className="h-full animate-fade-up" style={{ animationDelay: '120ms' }}>
+            <TiltCard className="h-full" max={7}>
+              <div className="card card-spotlight h-full p-4 sm:p-5">
+                <div className="relative flex h-full flex-col">
+                  <div className="flex items-start justify-between gap-2">
+                    <span className="min-w-0 text-xs font-medium leading-snug text-slate-500">
+                      {telemetry.activeCount > 0 ? 'Active Quests Index' : 'All Quests Conquered'}
+                    </span>
+                    <span className="icon-tile icon-tile-sm icon-tile-violet">
+                      <Trophy className="h-4 w-4" />
+                    </span>
+                  </div>
+                  <div
+                    className={`kpi-value mt-3 text-lg sm:text-2xl ${
+                      telemetry.activeCount > 0 ? 'text-gradient' : 'text-gradient-emerald'
+                    }`}
+                  >
+                    {telemetry.activeCount > 0 ? `${telemetry.activeProgress.toFixed(1)}%` : '100%'}
+                  </div>
+                  <div className="progress-track mt-2.5 h-1.5">
+                    <div
+                      className={
+                        telemetry.activeCount > 0
+                          ? 'progress-fill'
+                          : 'progress-fill bg-gradient-to-r from-emerald-400 to-emerald-600'
+                      }
+                      style={{ width: `${Math.min(100, telemetry.activeCount > 0 ? telemetry.activeProgress : 100)}%` }}
+                    />
+                  </div>
+                </div>
               </div>
-              <div
-                className={`kpi-value mt-3 text-lg sm:text-2xl ${
-                  telemetry.activeCount > 0 ? 'text-gradient' : 'text-gradient-emerald'
-                }`}
-              >
-                {telemetry.activeCount > 0 ? `${telemetry.activeProgress.toFixed(1)}%` : '100%'}
-              </div>
-              <div className="progress-track mt-2.5 h-1.5">
-                <div
-                  className={
-                    telemetry.activeCount > 0
-                      ? 'progress-fill'
-                      : 'progress-fill bg-gradient-to-r from-emerald-400 to-emerald-600'
-                  }
-                  style={{ width: `${Math.min(100, telemetry.activeCount > 0 ? telemetry.activeProgress : 100)}%` }}
-                />
-              </div>
-            </div>
+            </TiltCard>
           </div>
 
           {/* Card 3: Monthly Fuel (Active in-flight goals only) */}
-          <div className="card card-spotlight p-4 animate-fade-up sm:p-5" style={{ animationDelay: '180ms' }}>
-            <div className="relative flex h-full flex-col">
-              <div className="flex items-start justify-between gap-2">
-                <span className="min-w-0 text-xs font-medium leading-snug text-slate-500">Active Monthly Fuel</span>
-                <span className="icon-tile icon-tile-sm icon-tile-cyan">
-                  <Zap className="h-4 w-4" />
-                </span>
+          <div className="h-full animate-fade-up" style={{ animationDelay: '180ms' }}>
+            <TiltCard className="h-full" max={7}>
+              <div className="card card-spotlight h-full p-4 sm:p-5">
+                <div className="relative flex h-full flex-col">
+                  <div className="flex items-start justify-between gap-2">
+                    <span className="min-w-0 text-xs font-medium leading-snug text-slate-500">Active Monthly Fuel</span>
+                    <span className="icon-tile icon-tile-sm icon-tile-cyan">
+                      <Zap className="h-4 w-4" />
+                    </span>
+                  </div>
+                  <div className="kpi-value mt-3 break-words text-lg sm:text-2xl">
+                    ₹{telemetry.activeMonthly.toLocaleString('en-IN')}
+                  </div>
+                  <span className="mt-1 text-[11px] text-slate-500">
+                    {telemetry.activeCount > 0 ? 'Committed for active quests' : 'All goals reached'}
+                  </span>
+                </div>
               </div>
-              <div className="kpi-value mt-3 break-words text-lg sm:text-2xl">
-                ₹{telemetry.activeMonthly.toLocaleString('en-IN')}
-              </div>
-              <span className="mt-1 text-[11px] text-slate-500">
-                {telemetry.activeCount > 0 ? 'Committed for active quests' : 'All goals reached'}
-              </span>
-            </div>
+            </TiltCard>
           </div>
 
           {/* Card 4: Conquered Vault & Mastered Goals */}
-          <div className="card card-spotlight p-4 animate-fade-up sm:p-5" style={{ animationDelay: '240ms' }}>
-            <div className="relative flex h-full flex-col">
-              <div className="flex items-start justify-between gap-2">
-                <span className="min-w-0 text-xs font-medium leading-snug text-slate-500">Conquered Treasury</span>
-                <span className="icon-tile icon-tile-sm icon-tile-emerald">
-                  <CheckCircle2 className="h-4 w-4" />
-                </span>
+          <div className="h-full animate-fade-up" style={{ animationDelay: '240ms' }}>
+            <TiltCard className="h-full" max={7}>
+              <div className="card card-spotlight h-full p-4 sm:p-5">
+                <div className="relative flex h-full flex-col">
+                  <div className="flex items-start justify-between gap-2">
+                    <span className="min-w-0 text-xs font-medium leading-snug text-slate-500">Conquered Treasury</span>
+                    <span className="icon-tile icon-tile-sm icon-tile-emerald">
+                      <CheckCircle2 className="h-4 w-4" />
+                    </span>
+                  </div>
+                  <div className="kpi-value mt-3 break-words text-lg text-emerald-600 sm:text-2xl">
+                    ₹{telemetry.conqueredSaved.toLocaleString('en-IN')}
+                  </div>
+                  <span className="num mt-1 text-[11px] font-medium text-emerald-700">
+                    {telemetry.completedCount} Mastered • {telemetry.activeCount} In Flight
+                  </span>
+                </div>
               </div>
-              <div className="kpi-value mt-3 break-words text-lg text-emerald-600 sm:text-2xl">
-                ₹{telemetry.conqueredSaved.toLocaleString('en-IN')}
-              </div>
-              <span className="num mt-1 text-[11px] font-medium text-emerald-700">
-                {telemetry.completedCount} Mastered • {telemetry.activeCount} In Flight
-              </span>
-            </div>
+            </TiltCard>
           </div>
         </div>
 
@@ -505,9 +523,9 @@ export default function GoalsPage() {
               />
 
               <div className="grid grid-cols-1 gap-4 sm:gap-6 md:grid-cols-2 xl:grid-cols-3">
-                {filteredGoals.map((goal) => (
+                {filteredGoals.map((goal, goalIndex) => (
+                  <Reveal key={goal.id} variant="rise" delay={Math.min(goalIndex, 5) * 70}>
                   <GoalStoryCard
-                    key={goal.id}
                     goal={goal}
                     isSelected={goal.id === selectedGoalId}
                     onSelect={() => setSelectedGoalId(goal.id)}
@@ -517,14 +535,15 @@ export default function GoalsPage() {
                     onDelete={handleDelete}
                     onOpenSimulator={(g) => setSimulatorGoal(g)}
                   />
+                  </Reveal>
                 ))}
               </div>
             </section>
 
             {/* ================= AI PROJECTIONS MATRIX ================= */}
-            <div>
+            <Reveal delay={90}>
               <GoalProjections refreshKey={goalRefreshKey} />
-            </div>
+            </Reveal>
           </>
         )}
       </div>

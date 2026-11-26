@@ -15,6 +15,7 @@ import AlertsRecommendations from '@/components/dashboard/AlertsRecommendations'
 import PageBackground from '@/components/layouts/PageBackground'
 import PageHeader from '@/components/ui/PageHeader'
 import LoadingScreen from '@/components/ui/LoadingScreen'
+import Reveal from '@/components/motion/Reveal'
 import { Sparkles, Calendar, Sun, Sunrise, Sunset, Moon } from 'lucide-react'
 
 export default function DashboardPage() {
@@ -72,31 +73,42 @@ export default function DashboardPage() {
         />
 
         {/* Primary KPI & Health Score Cards */}
-        <FinancialOverview />
+        <Reveal variant="rise">
+          <FinancialOverview />
+        </Reveal>
 
         {/* Middle Tier: Net Worth Chart, Insights, and Recommendations.
             lg–xl: chart spans the full row first, insights + actions share the next row.
             2xl: all three sit side by side in their original order. */}
         <div className="grid grid-cols-1 gap-4 sm:gap-6 lg:grid-cols-2 2xl:grid-cols-3">
-          <div className="min-w-0">
+          <Reveal className="min-w-0" delay={60}>
             <InsightsCard />
-          </div>
-          <div className="min-w-0 lg:order-first lg:col-span-2 2xl:order-none 2xl:col-span-1">
+          </Reveal>
+          <Reveal
+            className="min-w-0 lg:order-first lg:col-span-2 2xl:order-none 2xl:col-span-1"
+            variant="rise"
+          >
             <NetWorthTrend />
-          </div>
-          <div className="min-w-0">
+          </Reveal>
+          <Reveal className="min-w-0" delay={120}>
             <AlertsRecommendations />
-          </div>
+          </Reveal>
         </div>
 
         {/* Lower Tier: Risk Assessment & Quick Actions */}
         <div className="grid grid-cols-1 gap-4 sm:gap-6 lg:grid-cols-2">
-          <RiskAssessment />
-          <QuickActions />
+          <Reveal className="min-w-0" variant="flip">
+            <RiskAssessment />
+          </Reveal>
+          <Reveal className="min-w-0" variant="flip" delay={90}>
+            <QuickActions />
+          </Reveal>
         </div>
 
         {/* Bottom Tier: Portfolio Allocation & Asset Distribution (full width, split layout inside) */}
-        <PortfolioAllocation />
+        <Reveal>
+          <PortfolioAllocation />
+        </Reveal>
       </div>
     </DashboardLayout>
   )

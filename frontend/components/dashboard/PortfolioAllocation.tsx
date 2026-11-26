@@ -160,7 +160,8 @@ export default function PortfolioAllocation() {
             {/* Center Hole Total Value */}
             <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center text-center">
               <span className="eyebrow text-[10px] text-slate-500">Total Value</span>
-              <span className="kpi-value mt-0.5 max-w-[7.5rem] text-base [overflow-wrap:anywhere] sm:text-lg">
+              {/* Kept on one line: the donut hole is too narrow to wrap in. */}
+              <span className="kpi-value num mt-0.5 whitespace-nowrap text-[13px] leading-tight sm:text-sm">
                 ₹{animatedTotal.toLocaleString('en-IN')}
               </span>
             </div>

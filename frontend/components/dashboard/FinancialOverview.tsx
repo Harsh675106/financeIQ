@@ -4,6 +4,7 @@ import { useEffect, useState, useRef } from 'react'
 import { api } from '@/lib/api'
 import { useCountUp } from '@/hooks/useCountUp'
 import EmptyState from '@/components/ui/EmptyState'
+import TiltCard from '@/components/motion/TiltCard'
 import {
   TrendingUp,
   TrendingDown,
@@ -77,11 +78,14 @@ function MetricCard({
   }
 
   return (
+    // Entrance animation lives on the outer wrapper so its transform can't
+    // fight the 3D tilt applied by TiltCard.
+    <div className="h-full animate-fade-up" style={{ animationDelay: `${delay}ms` }}>
+      <TiltCard className="h-full" max={6}>
     <div
       ref={cardRef}
       onMouseMove={handleMouseMove}
-      className="card card-pad card-spotlight group cursor-pointer animate-fade-up"
-      style={{ animationDelay: `${delay}ms` }}
+      className="card card-pad card-spotlight group h-full cursor-pointer"
     >
       {/* Ambient accent glow */}
       <div
@@ -123,6 +127,8 @@ function MetricCard({
           </div>
         )}
       </div>
+    </div>
+      </TiltCard>
     </div>
   )
 }
@@ -236,7 +242,9 @@ export default function FinancialOverview() {
       {/* 4 Main KPI Cards */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 xl:grid-cols-4">
         {/* Card 1: Interactive Health Score with SVG Circular Gauge */}
-        <div className="card card-pad card-spotlight group cursor-pointer animate-fade-up stagger-1">
+        <div className="h-full animate-fade-up stagger-1">
+          <TiltCard className="h-full" max={6}>
+        <div className="card card-pad card-spotlight group h-full cursor-pointer">
           {/* Soft mint / ice ambient wash */}
           <div
             aria-hidden="true"
@@ -320,6 +328,8 @@ export default function FinancialOverview() {
               </div>
             </div>
           </div>
+        </div>
+          </TiltCard>
         </div>
 
         {/* Card 2: Income */}

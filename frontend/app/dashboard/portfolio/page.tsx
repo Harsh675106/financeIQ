@@ -14,6 +14,7 @@ import ProjectionLab, { type ProjectionForm } from '@/components/portfolio/Proje
 import ProjectionResults from '@/components/portfolio/ProjectionResults'
 import PortfolioExplainabilityCard from '@/components/portfolio/PortfolioExplainabilityCard'
 import LoadingScreen from '@/components/ui/LoadingScreen'
+import Reveal from '@/components/motion/Reveal'
 import { AlertTriangle, Sparkles } from 'lucide-react'
 import { api } from '@/lib/api'
 import { safeNumber } from '@/lib/formatters'
@@ -285,22 +286,24 @@ export default function PortfolioPage() {
           </div>
         )}
 
-        <PortfolioHero
-          totalValue={totalValue}
-          investedValue={investedValue}
-          liquidValue={liquidValue}
-          holdingsCount={holdingsCount}
-          profile={profile}
-          monthlySurplus={cashflow.monthlySurplus}
-          savingsRate={cashflow.savingsRate}
-          cashflowMonths={cashflow.months}
-          lastUpdated={lastUpdated}
-          refreshing={refreshing}
-          onRefresh={() => loadData(true)}
-        />
+        <Reveal variant="rise">
+          <PortfolioHero
+            totalValue={totalValue}
+            investedValue={investedValue}
+            liquidValue={liquidValue}
+            holdingsCount={holdingsCount}
+            profile={profile}
+            monthlySurplus={cashflow.monthlySurplus}
+            savingsRate={cashflow.savingsRate}
+            cashflowMonths={cashflow.months}
+            lastUpdated={lastUpdated}
+            refreshing={refreshing}
+            onRefresh={() => loadData(true)}
+          />
+        </Reveal>
 
         {/* ---------- Allocation + projection inputs ---------- */}
-        <div className="grid gap-4 sm:gap-6 xl:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)]">
+        <Reveal className="grid gap-4 sm:gap-6 xl:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)]">
           <AllocationStudio
             rows={bucketRows}
             totalValue={totalValue}
@@ -321,7 +324,7 @@ export default function PortfolioPage() {
               hasCashflow: cashflow.hasData,
             }}
           />
-        </div>
+        </Reveal>
 
         {simError && (
           <div
@@ -355,7 +358,9 @@ export default function PortfolioPage() {
         )}
 
         {/* ---------- AI explainability ---------- */}
-        <PortfolioExplainabilityCard />
+        <Reveal delay={90}>
+          <PortfolioExplainabilityCard />
+        </Reveal>
       </div>
     </DashboardLayout>
   )

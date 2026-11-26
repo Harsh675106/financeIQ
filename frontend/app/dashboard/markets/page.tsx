@@ -7,6 +7,7 @@ import { useReducedMotion } from '@/hooks/useReducedMotion'
 import DashboardLayout from '@/components/layouts/DashboardLayout'
 import PageBackground from '@/components/layouts/PageBackground'
 import PageHeader from '@/components/ui/PageHeader'
+import Reveal from '@/components/motion/Reveal'
 import SectionHeader from '@/components/ui/SectionHeader'
 import { api } from '@/lib/api'
 import { activeDot, axisProps, barCursor, chartColors, gridProps, tooltipCursor } from '@/lib/chartTheme'
@@ -447,59 +448,61 @@ export default function MarketsPage() {
           }
         />
 
-        <section
-          className="surface-highlight card-spotlight relative overflow-hidden p-5 shadow-card animate-fade-up sm:p-6"
-          style={{ animationDelay: '60ms' }}
-        >
-          <div className="pointer-events-none absolute inset-0" aria-hidden="true">
-            <div className="absolute inset-0 bg-[linear-gradient(rgba(5,150,105,0.06)_1px,transparent_1px),linear-gradient(90deg,rgba(5,150,105,0.06)_1px,transparent_1px)] bg-[length:32px_32px] [mask-image:radial-gradient(ellipse_at_top_left,#000_15%,transparent_70%)]" />
-          </div>
-
-          <div className="relative grid gap-5 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)] lg:gap-6">
-            <div className="min-w-0">
-              <div className="flex items-center gap-2.5">
-                <span className="icon-tile icon-tile-sm icon-tile-violet">
-                  <BrainCircuit className="h-4 w-4" />
-                </span>
-                <p className="eyebrow">What it means</p>
-              </div>
-              <p className="text-pretty mt-4 font-display text-lg font-medium leading-relaxed text-ink-900 sm:text-xl">
-                {data?.insights.headline}
-              </p>
+        <Reveal variant="rise">
+          <section
+            className="surface-highlight card-spotlight relative overflow-hidden p-5 shadow-card animate-fade-up sm:p-6"
+            style={{ animationDelay: '60ms' }}
+          >
+            <div className="pointer-events-none absolute inset-0" aria-hidden="true">
+              <div className="absolute inset-0 bg-[linear-gradient(rgba(5,150,105,0.06)_1px,transparent_1px),linear-gradient(90deg,rgba(5,150,105,0.06)_1px,transparent_1px)] bg-[length:32px_32px] [mask-image:radial-gradient(ellipse_at_top_left,#000_15%,transparent_70%)]" />
             </div>
 
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
-              <div className="rounded-xl border border-line bg-white/80 p-4 shadow-xs">
-                <div className="flex items-center gap-2 text-slate-500">
-                  <Clock className="h-3.5 w-3.5" />
-                  <p className="eyebrow">Data refresh</p>
+            <div className="relative grid gap-5 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)] lg:gap-6">
+              <div className="min-w-0">
+                <div className="flex items-center gap-2.5">
+                  <span className="icon-tile icon-tile-sm icon-tile-violet">
+                    <BrainCircuit className="h-4 w-4" />
+                  </span>
+                  <p className="eyebrow">What it means</p>
                 </div>
-                <p className="kpi-value mt-2 text-lg">
-                  {data?.generatedAt
-                    ? new Date(data.generatedAt).toLocaleString('en-IN', {
-                        dateStyle: 'medium',
-                        timeStyle: 'short',
-                      })
-                    : 'Unknown'}
-                </p>
-                <p className="mt-1.5 text-xs leading-5 text-slate-500">
-                  Cached market data refreshes from free APIs with fallback handling.
+                <p className="text-pretty mt-4 font-display text-lg font-medium leading-relaxed text-ink-900 sm:text-xl">
+                  {data?.insights.headline}
                 </p>
               </div>
-              <div className="rounded-xl border border-line bg-white/80 p-4 shadow-xs">
-                <div className="flex items-center gap-2 text-slate-500">
-                  <IndianRupee className="h-3.5 w-3.5" />
-                  <p className="eyebrow">USD/INR</p>
+
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
+                <div className="rounded-xl border border-line bg-white/80 p-4 shadow-xs">
+                  <div className="flex items-center gap-2 text-slate-500">
+                    <Clock className="h-3.5 w-3.5" />
+                    <p className="eyebrow">Data refresh</p>
+                  </div>
+                  <p className="kpi-value mt-2 text-lg">
+                    {data?.generatedAt
+                      ? new Date(data.generatedAt).toLocaleString('en-IN', {
+                          dateStyle: 'medium',
+                          timeStyle: 'short',
+                        })
+                      : 'Unknown'}
+                  </p>
+                  <p className="mt-1.5 text-xs leading-5 text-slate-500">
+                    Cached market data refreshes from free APIs with fallback handling.
+                  </p>
                 </div>
-                <p className="kpi-value mt-2 text-2xl">
-                  {data?.snapshot.sourceStatus.usdInrRate
-                    ? `₹${data.snapshot.sourceStatus.usdInrRate.toFixed(2)}`
-                    : 'Unavailable'}
-                </p>
+                <div className="rounded-xl border border-line bg-white/80 p-4 shadow-xs">
+                  <div className="flex items-center gap-2 text-slate-500">
+                    <IndianRupee className="h-3.5 w-3.5" />
+                    <p className="eyebrow">USD/INR</p>
+                  </div>
+                  <p className="kpi-value mt-2 text-2xl">
+                    {data?.snapshot.sourceStatus.usdInrRate
+                      ? `₹${data.snapshot.sourceStatus.usdInrRate.toFixed(2)}`
+                      : 'Unavailable'}
+                  </p>
+                </div>
               </div>
             </div>
-          </div>
-        </section>
+          </section>
+        </Reveal>
 
         {missingKeys.length > 0 ? (
           <div className="flex items-start gap-3 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm leading-6 text-amber-800">
@@ -512,87 +515,89 @@ export default function MarketsPage() {
           </div>
         ) : null}
 
-        <section className="card card-pad">
-          <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-            <SectionHeader
-              icon={Search}
-              tone="brand"
-              title="Search Any Market Trend"
-              subtitle="Search by symbol or name and view the latest trend in both market currency and rupees."
-              className="min-w-0"
-            />
-            <div className="flex w-full gap-2 lg:max-w-xl">
-              <div className="relative min-w-0 flex-1">
-                <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-                <input
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault()
-                      void runSearch()
-                    }
-                  }}
-                  placeholder="Search Tesla, Reliance, BTC/USD, AAPL, NIFTY..."
-                  className="input h-11 w-full pl-11"
-                  aria-label="Search market instruments"
-                />
+        <Reveal delay={60}>
+          <section className="card card-pad">
+            <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+              <SectionHeader
+                icon={Search}
+                tone="brand"
+                title="Search Any Market Trend"
+                subtitle="Search by symbol or name and view the latest trend in both market currency and rupees."
+                className="min-w-0"
+              />
+              <div className="flex w-full gap-2 lg:max-w-xl">
+                <div className="relative min-w-0 flex-1">
+                  <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                  <input
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault()
+                        void runSearch()
+                      }
+                    }}
+                    placeholder="Search Tesla, Reliance, BTC/USD, AAPL, NIFTY..."
+                    className="input h-11 w-full pl-11"
+                    aria-label="Search market instruments"
+                  />
+                </div>
+                <button type="button" onClick={() => void runSearch()} disabled={searching} className="btn-primary h-11 shrink-0 px-5">
+                  {searching ? 'Searching...' : 'Search'}
+                </button>
               </div>
-              <button type="button" onClick={() => void runSearch()} disabled={searching} className="btn-primary h-11 shrink-0 px-5">
-                {searching ? 'Searching...' : 'Search'}
-              </button>
             </div>
-          </div>
 
-          {searchResult ? (
-            <div className="surface-inset relative mt-5 overflow-hidden p-5 animate-pop-in">
-              <div className="pointer-events-none absolute -right-12 -top-12 h-36 w-36 rounded-full bg-primary-100/80 blur-2xl" aria-hidden="true" />
-              <div className="relative flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-                <div className="min-w-0">
-                  <p className="eyebrow">
-                    {searchResult.instrumentType || searchResult.category}
-                  </p>
-                  <h3 className="mt-2 break-words font-display text-2xl font-semibold tracking-tight text-ink-900">{searchResult.label}</h3>
-                  <p className="mt-1 break-words font-mono text-[13px] text-slate-500">
-                    {searchResult.symbol}
-                    {searchResult.country ? ` | ${searchResult.country}` : ''}
-                    {searchResult.exchange ? ` | ${searchResult.exchange}` : ''}
-                  </p>
-                </div>
-                <div className="text-left lg:text-right">
-                  <p className="kpi-value text-3xl">{formatAssetPrice(searchResult)}</p>
-                  <p className="num mt-1 text-xs text-slate-500">Original: {formatOriginalPrice(searchResult)}</p>
-                  <p className="mt-1 text-xs text-slate-500">Currency: {searchResult.rawCurrency || searchResult.currency}</p>
-                </div>
-              </div>
-              <div className="relative mt-4 grid grid-cols-3 gap-2 sm:max-w-md">
-                {[
-                  ['1D', searchResult.change1D],
-                  ['1W', searchResult.change1W],
-                  ['1M', searchResult.change1M],
-                ].map(([label, value]) => (
-                  <div key={label} className={`rounded-xl px-3 py-2.5 text-center ${getChangeTone(value as number | null)}`}>
-                    <p className="text-[10px] font-semibold uppercase tracking-wider opacity-70">{label}</p>
-                    <p className="num mt-0.5 text-sm font-semibold">{formatSignedPercent(value as number | null)}</p>
+            {searchResult ? (
+              <div className="surface-inset relative mt-5 overflow-hidden p-5 animate-pop-in">
+                <div className="pointer-events-none absolute -right-12 -top-12 h-36 w-36 rounded-full bg-primary-100/80 blur-2xl" aria-hidden="true" />
+                <div className="relative flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+                  <div className="min-w-0">
+                    <p className="eyebrow">
+                      {searchResult.instrumentType || searchResult.category}
+                    </p>
+                    <h3 className="mt-2 break-words font-display text-2xl font-semibold tracking-tight text-ink-900">{searchResult.label}</h3>
+                    <p className="mt-1 break-words font-mono text-[13px] text-slate-500">
+                      {searchResult.symbol}
+                      {searchResult.country ? ` | ${searchResult.country}` : ''}
+                      {searchResult.exchange ? ` | ${searchResult.exchange}` : ''}
+                    </p>
                   </div>
-                ))}
+                  <div className="text-left lg:text-right">
+                    <p className="kpi-value text-3xl">{formatAssetPrice(searchResult)}</p>
+                    <p className="num mt-1 text-xs text-slate-500">Original: {formatOriginalPrice(searchResult)}</p>
+                    <p className="mt-1 text-xs text-slate-500">Currency: {searchResult.rawCurrency || searchResult.currency}</p>
+                  </div>
+                </div>
+                <div className="relative mt-4 grid grid-cols-3 gap-2 sm:max-w-md">
+                  {[
+                    ['1D', searchResult.change1D],
+                    ['1W', searchResult.change1W],
+                    ['1M', searchResult.change1M],
+                  ].map(([label, value]) => (
+                    <div key={label} className={`rounded-xl px-3 py-2.5 text-center ${getChangeTone(value as number | null)}`}>
+                      <p className="text-[10px] font-semibold uppercase tracking-wider opacity-70">{label}</p>
+                      <p className="num mt-0.5 text-sm font-semibold">{formatSignedPercent(value as number | null)}</p>
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
-          ) : searchReason ? (
-            <div className="surface-inset mt-5 flex items-start gap-3 p-4 text-sm text-ink-700">
-              <Info className="mt-0.5 h-4 w-4 shrink-0 text-sky-600" />
-              <p className="min-w-0">
-                {searchReason === 'missing_twelve_data_key'
-                  ? 'Search is unavailable because the Twelve Data API key is missing.'
-                  : searchReason === 'not_found'
-                    ? 'No matching market instrument was found for that search.'
-                    : 'Search data is temporarily unavailable. Please try another symbol or try again later.'}
-              </p>
-            </div>
-          ) : null}
-        </section>
+            ) : searchReason ? (
+              <div className="surface-inset mt-5 flex items-start gap-3 p-4 text-sm text-ink-700">
+                <Info className="mt-0.5 h-4 w-4 shrink-0 text-sky-600" />
+                <p className="min-w-0">
+                  {searchReason === 'missing_twelve_data_key'
+                    ? 'Search is unavailable because the Twelve Data API key is missing.'
+                    : searchReason === 'not_found'
+                      ? 'No matching market instrument was found for that search.'
+                      : 'Search data is temporarily unavailable. Please try another symbol or try again later.'}
+                </p>
+              </div>
+            ) : null}
+          </section>
+        </Reveal>
 
-        <div className="grid gap-4 sm:gap-6 xl:grid-cols-[minmax(0,1.45fr)_minmax(0,0.55fr)]">
+        <Reveal className="grid gap-4 sm:gap-6 xl:grid-cols-[minmax(0,1.45fr)_minmax(0,0.55fr)]">
           <section className="card card-pad">
             <SectionHeader icon={CandlestickChart} tone="brand" title="Live Markets" />
 
@@ -685,9 +690,9 @@ export default function MarketsPage() {
               </div>
             </div>
           </section>
-        </div>
+        </Reveal>
 
-        <div className="grid gap-4 sm:gap-6 xl:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
+        <Reveal className="grid gap-4 sm:gap-6 xl:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
           <section className="card card-pad">
             <SectionHeader
               icon={TrendingUp}
@@ -801,9 +806,9 @@ export default function MarketsPage() {
               <p className="mt-1.5 text-sm leading-6 text-ink-700">{data?.macro.recessionSignal.detail}</p>
             </div>
           </section>
-        </div>
+        </Reveal>
 
-        <div className="grid gap-4 sm:gap-6 xl:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)]">
+        <Reveal className="grid gap-4 sm:gap-6 xl:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)]">
           <section className="card card-pad">
             <SectionHeader icon={Activity} tone="brand" title="Top Movers" />
             <div className="mt-5 grid gap-3 md:grid-cols-3 xl:grid-cols-1">
@@ -923,9 +928,9 @@ export default function MarketsPage() {
               )}
             </div>
           </section>
-        </div>
+        </Reveal>
 
-        <div className="grid gap-4 sm:gap-6 xl:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
+        <Reveal className="grid gap-4 sm:gap-6 xl:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
           <section className="card card-pad">
             <SectionHeader icon={BookOpen} tone="brand" title="Learn Finance" />
             <div className="mt-5 space-y-3">
@@ -988,7 +993,7 @@ export default function MarketsPage() {
               </div>
             </div>
           </section>
-        </div>
+        </Reveal>
       </div>
     </DashboardLayout>
   )

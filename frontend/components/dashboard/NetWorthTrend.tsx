@@ -20,6 +20,7 @@ import { chartColors, axisProps, gridProps, tooltipCursor, activeDot } from '@/l
 import { ChartTooltipCard } from '@/components/ui/ChartTooltip'
 import SectionHeader from '@/components/ui/SectionHeader'
 import EmptyState from '@/components/ui/EmptyState'
+import SectionSwap from '@/components/motion/SectionSwap'
 
 interface TrendPoint {
   month: string
@@ -157,7 +158,7 @@ export default function NetWorthTrend() {
           className="relative py-10"
         />
       ) : (
-        <div className="relative h-56 w-full sm:h-64">
+        <SectionSwap swapKey={chartType} mode="flip" className="relative h-56 w-full sm:h-64">
           <ResponsiveContainer width="100%" height="100%">
             {chartType === 'area' ? (
               <AreaChart data={trend} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
@@ -211,7 +212,7 @@ export default function NetWorthTrend() {
               </LineChart>
             )}
           </ResponsiveContainer>
-        </div>
+        </SectionSwap>
       )}
     </div>
   )

@@ -16,6 +16,7 @@ import {
 import { api } from '@/lib/api'
 import SectionHeader from '@/components/ui/SectionHeader'
 import Portal from '@/components/ui/Portal'
+import TiltCard from '@/components/motion/TiltCard'
 
 export default function QuickActions() {
   const router = useRouter()
@@ -108,11 +109,16 @@ export default function QuickActions() {
           {actions.map((action, index) => {
             const Icon = action.icon
             return (
-              <button
+              // Entrance animation sits on the wrapper so it can't fight the 3D tilt.
+              <div
                 key={index}
-                onClick={action.onClick}
-                className="quick-action-card group/action relative flex min-h-[7.5rem] flex-col justify-between overflow-hidden rounded-2xl border border-line bg-canvas p-3.5 text-left transition-colors hover:border-primary-200 hover:bg-white hover:shadow-card-hover sm:p-4 animate-fade-up"
+                className="h-full animate-fade-up"
                 style={{ animationDelay: `${50 + index * 40}ms` }}
+              >
+              <TiltCard className="h-full" max={9} lift={8}>
+              <button
+                onClick={action.onClick}
+                className="quick-action-card group/action relative flex h-full min-h-[7.5rem] w-full flex-col justify-between overflow-hidden rounded-2xl border border-line bg-canvas p-3.5 text-left transition-colors hover:border-primary-200 hover:bg-white hover:shadow-card-hover sm:p-4"
               >
                 {/* Hover accent glow */}
                 <div
@@ -143,6 +149,8 @@ export default function QuickActions() {
                   </p>
                 </div>
               </button>
+              </TiltCard>
+              </div>
             )
           })}
         </div>

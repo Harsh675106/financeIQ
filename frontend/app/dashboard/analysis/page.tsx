@@ -6,6 +6,7 @@ import { useAuth } from '@/hooks/useAuth'
 import DashboardLayout from '@/components/layouts/DashboardLayout'
 import PageBackground from '@/components/layouts/PageBackground'
 import PageHeader from '@/components/ui/PageHeader'
+import Reveal from '@/components/motion/Reveal'
 import SectionHeader from '@/components/ui/SectionHeader'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { activeDot, axisProps, chartColors, gridProps, tooltipCursor } from '@/lib/chartTheme'
@@ -135,7 +136,7 @@ export default function AnalysisPage() {
           description={analysisData?.summary}
         />
 
-        <div className="grid grid-cols-1 gap-4 sm:gap-6 xl:grid-cols-3">
+        <Reveal variant="rise" className="grid grid-cols-1 gap-4 sm:gap-6 xl:grid-cols-3">
           <div className="card card-pad min-w-0 xl:col-span-2">
             <SectionHeader
               icon={TrendingUp}
@@ -227,9 +228,9 @@ export default function AnalysisPage() {
               )}
             </div>
           </div>
-        </div>
+        </Reveal>
 
-        <div className="grid grid-cols-1 gap-4 sm:gap-6 lg:grid-cols-2">
+        <Reveal className="grid grid-cols-1 gap-4 sm:gap-6 lg:grid-cols-2">
           <div className="card card-pad min-w-0">
             <SectionHeader icon={Wallet} tone="sky" title="Opportunities" />
             <div className="mt-5 space-y-3">
@@ -277,11 +278,17 @@ export default function AnalysisPage() {
               )}
             </div>
           </div>
-        </div>
+        </Reveal>
 
-        <ScenarioPlannerCard />
-        <LifeEventPlannerCard />
-        <DocumentIntelligenceCard />
+        <Reveal>
+          <ScenarioPlannerCard />
+        </Reveal>
+        <Reveal delay={60}>
+          <LifeEventPlannerCard />
+        </Reveal>
+        <Reveal delay={120}>
+          <DocumentIntelligenceCard />
+        </Reveal>
       </div>
     </DashboardLayout>
   )

@@ -8,6 +8,7 @@ import PageBackground from '@/components/layouts/PageBackground'
 import { SlidersHorizontal } from 'lucide-react'
 import ProfileForm from '@/components/settings/ProfileForm'
 import PageHeader from '@/components/ui/PageHeader'
+import Reveal from '@/components/motion/Reveal'
 import LoadingScreen from '@/components/ui/LoadingScreen'
 
 export default function SettingsPage() {
@@ -36,9 +37,9 @@ export default function SettingsPage() {
           description="Tune your financial profile and target allocation."
         />
 
-        <div className="max-w-4xl">
+        <Reveal className="max-w-4xl">
           <ProfileForm />
-        </div>
+        </Reveal>
       </div>
     </DashboardLayout>
   )
